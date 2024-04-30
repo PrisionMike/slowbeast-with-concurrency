@@ -4,7 +4,11 @@ __pycache__
 tags
 
 tests/Output
+tests/threads
 sb-out
 llvmlite
+slowbeast_test_bkp
 
 *.bc
+
+sv-benchmarks

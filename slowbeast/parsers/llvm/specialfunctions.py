@@ -11,7 +11,7 @@ from slowbeast.ir.instruction import (
     Extend,
     Load,
 )
-from slowbeast.ir.types import type_mgr
+from slowbeast.ir.types import PointerType, type_mgr
 from slowbeast.util.debugging import print_stderr
 from .utils import get_llvm_operands, type_size_in_bits, to_float_ty, get_sb_type
 from ...domains.concrete import ConstantFalse, ConcreteDomain
@@ -96,6 +96,8 @@ special_functions = [
     "__errno_location",
     # kernel functions
     "printk",
+    # string functions
+    # "strcpy",
 ]
 
 modelled_functions = ["__VERIFIER_assert"]
@@ -354,6 +356,17 @@ def create_special_fun(parser, inst, fun, error_funs, to_check):
     elif fun == "__slowbeast_print":
         P = Print(*[parser.operand(x) for x in get_llvm_operands(inst)[:-1]])
         return P, [P]
+    # elif fun == "strcpy":
+    #     operands = get_llvm_operands(inst)
+    #     dest, src = [parser.operand(operands[i]) for i in range(2)]
+    #     types = [get_sb_type(module, operands[i].type) for i in range(2)]
+    #     assert all(type(_type) == PointerType() for _type in types)
+    #     save = Alloc(dest, on_heap=False)
+    #     index = 0
+    #     while True:
+    #         char = Load(src + index, type_mgr().char_ty(), [])
+
+        
     elif fun in ("fesetround", "_setjmp", "setjmp", "longjmp"):
         raise NotImplementedError(f"{fun} is not supported yet")
     else:

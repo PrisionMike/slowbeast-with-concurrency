@@ -1,5 +1,6 @@
 try:
     import clang.cindex
+    clang.cindex.Config.set_library_file('/usr/lib/x86_64-linux-gnu/libclang-14.so.14.0.0')
 except ImportError as e:
     raise ImportError(f"Need clang bindings: {e}")
 
@@ -38,15 +39,17 @@ class Parser:
             tu = index.parse(cfile)
             print("Translation unit:", tu.spelling)
             tus[cfile] = tu
-            print(tu.cursor.kind)
-            print(tu.cursor.spelling)
-            print(tu.cursor.location)
+            print("tu.cursor.kind: ", tu.cursor.kind)
+            print("tu.cursor.spelling: ",tu.cursor.spelling)
+            print("tu.cursor.location: ",tu.cursor.location)
             for c in tu.cursor.get_children():
-                print("  ", c.kind)
-                print("  ", c.spelling)
-                print("  ", c.location)
-                print("  ", c.is_definition())
-                print(dir(c))
+                try:
+                    print("c.kind:  ", c.kind)
+                    print("c.spelling:  ", c.spelling)
+                    print("c.location:  ", c.location)
+                    print("c.is_definition():  ", c.is_definition())
+                except e:
+                    print(str(e))
 
             # succ, retty = parse_fun_ret_ty(self.llvmmodule, f.type.element_type)
             # if not succ:

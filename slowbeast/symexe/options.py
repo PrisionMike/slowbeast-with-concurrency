@@ -1,6 +1,6 @@
 from slowbeast.interpreter.options import ExecutionOptions
 
-
+# FIXME self.check should be an enum
 class SEOptions(ExecutionOptions):
     def __init__(self, opts: None = None) -> None:
         super().__init__(opts)
@@ -12,6 +12,7 @@ class SEOptions(ExecutionOptions):
             self.exit_on_error = opts.exit_on_error
             self.error_funs = opts.error_funs
             self.threads = opts.threads
+            self.check = opts.check
         else:
             self.threads = False
             self.incremental_solving = False
@@ -20,3 +21,5 @@ class SEOptions(ExecutionOptions):
             self.uninit_is_nondet = False
             self.exit_on_error = False
             self.error_funs = []
+            self.check = None
+            

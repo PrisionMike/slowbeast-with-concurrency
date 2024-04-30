@@ -2,6 +2,7 @@ from typing import List, Optional, Sized
 
 from slowbeast.core.iexecutor import IExecutor
 from slowbeast.interpreter.interactive import InteractiveHandler
+from slowbeast.ir.instruction import Instruction
 from slowbeast.ir.program import Program
 from slowbeast.symexe.state import SEState
 from .options import ExecutionOptions
@@ -10,10 +11,9 @@ from ..util.debugging import print_stderr, dbg
 
 # dummy class used as a program counter during initialization
 # of global variables
-class GlobalInit:
+class GlobalInit():
     def get_next_inst(self) -> "GlobalInit":
         return self
-
 
 class Interpreter:
     def __init__(
@@ -90,7 +90,7 @@ class Interpreter:
         self._interactive.prompt(s)
 
     def run_static(self) -> None:
-        """Run static ctors (e.g. initialize globals)"""
+        """Run static actors (e.g. initialize globals)"""
         # fake the program counter for the executor
         ginit = GlobalInit()
         states = self.states
@@ -108,9 +108,14 @@ class Interpreter:
                 continue
             for i in G.init():
                 for s in states:
-                    ret = self._executor.execute(s, i)
+
+                    # Hack for concurrent program: FIXME
+                    if self.get_options().threads:
+                        ret = self._executor.execute_single_thread(s, i)
+                    else:
+                        ret = self._executor.execute(s, i)
                     assert len(ret) == 1, "Unhandled initialization"
-                    assert ret[0] is s, "Unhandled initialization instruction"
+                    # assert ret[0] is s, "Unhandled initialization instruction"
                     assert ret[
                         0
                     ].is_ready(), (

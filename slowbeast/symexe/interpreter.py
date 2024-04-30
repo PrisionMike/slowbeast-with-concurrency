@@ -125,7 +125,6 @@ class SymbolicInterpreter(Interpreter):
                 testgen.process_state(state)
         else:
             assert state.exited()
-            # dbg(f"state exited with exitcode {s.get_exit_code()}")
             stats.paths += 1
             stats.exited_paths += 1
             if testgen:

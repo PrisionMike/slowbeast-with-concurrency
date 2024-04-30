@@ -9,7 +9,7 @@ from slowbeast.domains.concrete_bitvec import ConcreteBitVec
 from slowbeast.domains.concrete_bytes import ConcreteBytes
 from slowbeast.domains.concrete_value import ConcreteVal, ConcreteBool
 from slowbeast.domains.pointer import Pointer, get_null_pointer
-from slowbeast.ir.types import BitVecType, FloatType, PointerType, type_mgr
+from slowbeast.ir.types import type_mgr, get_pointer_bitwidth
 from slowbeast.util.debugging import warn
 
 concrete_value = ConcreteDomain.get_value
@@ -88,7 +88,7 @@ def _bitwidth(ty: Sized) -> Optional[int]:
     if ty[0] == "i":
         return _getInt(ty[1:])
     elif ty.startswith("double"):
-        # FIXME: get this from program
+        # FIXME: get this from program - SSD - Should we?
         return 64
     elif ty.startswith("float"):
         return 32
@@ -141,10 +141,9 @@ def type_size_in_bits(m: ModuleRef, ty: str) -> Optional[int]:
     if not isinstance(ty, str) and hasattr(m, "get_type_size"):
         return m.get_type_size(ty)
 
-
     # FIXME: get rid of parsing str
     # FIXME: get rid of the magic constants and use the layout from the program
-    POINTER_SIZE = 64
+    POINTER_SIZE = get_pointer_bitwidth()
     if not isinstance(ty, str):
         if ty.is_pointer:
             return POINTER_SIZE

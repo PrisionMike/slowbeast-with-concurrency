@@ -14,7 +14,7 @@ class GlobalVariable(ProgramElement):
         self._name = name
         # is the pointed memory constant?
         self._isconst = const
-        # sequence of instructions used to initialize this global
+        # sequence of instructions used to initialize this global NOTE
         self._init = []
         self._zeroed = False
 
@@ -163,9 +163,6 @@ class ValueInstruction(Instruction):
     def __init__(self, ops=None, types=None) -> None:
         super().__init__(ops, types)
         self._name = None
-
-    # def is_concrete(self) -> bool:
-    #    return False
 
     def set_name(self, nm) -> None:
         self._name = nm

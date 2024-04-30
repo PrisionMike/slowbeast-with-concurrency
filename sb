@@ -315,7 +315,8 @@ def create_arg_parser():
         "  - 'unreach'ability of error calls (default C assertions)\n"
         "  - 'no-overflow' of arithmetic operations\n"
         "  - 'termination' and non-termination of the program\n"
-        "  - 'non-termination' only.",
+        "  - 'no-data-race' in the program\n"
+        "  - 'non-termination' only.\n",
     )
 
     return parser
@@ -455,12 +456,12 @@ def main():
             unsupp_undefs.split(",") if unsupp_undefs else None,
             args.check,
         )
+        arglist = ["-Xclang", "-disable-O0-optnone", "-fno-vectorize", "-fno-slp-vectorize"] if args.external_invariants == "clam" else []
+        arglist += ["-m32" if args.pointer_bitwidth == 32 else "-m64"]
         code = compile_and_link(
             args.prog,
             args.out_dir,
-            ["-Xclang", "-disable-O0-optnone", "-fno-vectorize", "-fno-slp-vectorize"]
-            if args.external_invariants == "clam"
-            else None,
+            arglist,
         )
         if args.opt:
             code = opt(code, args.opt.split(","))
@@ -501,7 +502,7 @@ def main():
             rmtree(args.out_dir)
             mkdir(args.out_dir)
 
-        with open("{0}/program.txt".format(args.out_dir), "w", encoding="utf-8") as f:
+        with open("{0}/program.ll".format(args.out_dir), "w", encoding="utf-8") as f:
             P.dump(f)
 
         if not args.no_tests:
@@ -590,11 +591,15 @@ def main():
     elif args.se:
         opts = SEOptions()
 
+        opts.concretize_nondets = args.concretize_nondet
+        opts.uninit_is_nondet = args.uninitialized_nondet
+
         opts.threads = not args.forbid_threads
         opts.replay_errors = args.replay_errors
         opts.exit_on_error = args.exit_on_error
         opts.interactive = args.interactive
         opts.incremental_solving = args.se_incremental_solving
+        opts.check = args.check
 
         if args.se_step == "block":
             opts.set_block_step()
@@ -611,10 +616,6 @@ def main():
             )
         elif args.future_se:
             raise NotImplementedError("Future SE is not implemented atm.")
-        # assert not args.stateful_se, "Not compatible at this moment"
-        # from slowbeast.symexe.futuresymbolicexecution import (
-        #    FutureSymbolicInterpreter as SymbolicInterpreter,
-        # )
         elif has_threads:
             dbg("Threads detected, enabling support for threads in SE")
             if args.threads_dpor:
@@ -639,9 +640,6 @@ def main():
             interpreter = SymbolicInterpreter(P, args.coop_channel, ohandler, opts)
         else:
             interpreter = SymbolicInterpreter(P, ohandler, opts)
-
-    opts.concretize_nondets = args.concretize_nondet
-    opts.uninit_is_nondet = args.uninitialized_nondet
 
     # user-defined error functions (issue error when called)
     if args.error_fn:

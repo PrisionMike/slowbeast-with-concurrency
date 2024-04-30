@@ -1,0 +1,61 @@
+ERROR
+Read of uninitialized byte
+
+Nondeterministic values:
+  x87 = <__thread_create_succeeded:32b> -> 0u (0)
+
+---- State ----
+status: ERROR
+ -- program counter --
+x90: 64b = load (*)t1
+-- Memory:
+-- Global objects:
+mo1 ('.str', alloc'd by g1), global, read-only, size: 2:32b
+  0 -> [48:8b, 0:8b]:[i8; 2]
+mo2 ('.str.1', alloc'd by g3), global, read-only, size: 12:32b
+  0 -> [98:8b, 105:8b, 103:8b, 115:8b, 104:8b, 111:8b, 116:8b, 95:8b, 115:8b, 46:8b, 99:8b, 0:8b]:[i8; 12]
+mo3 ('__PRETTY_FUNCTION__.reach_error', alloc'd by g5), global, read-only, size: 19:32b
+  0 -> [118:8b, 111:8b, 105:8b, 100:8b, 32:8b, 114:8b, 101:8b, 97:8b, 99:8b, 104:8b, 95:8b, 101:8b, 114:8b, 114:8b, 111:8b, 114:8b, 40:8b, 41:8b, 0:8b]:[i8; 19]
+mo4 ('v', alloc'd by g7), global, size: 8:32b
+  0 -> ptr(0:32b, 0:32b)
+mo5 ('.str.2', alloc'd by g9), global, read-only, size: 8:32b
+  0 -> [66:8b, 105:8b, 103:8b, 115:8b, 104:8b, 111:8b, 116:8b, 0:8b]:[i8; 8]
+-- Global bindings:
+g1 -> ptr(1:32b, 0:32b)
+g3 -> ptr(2:32b, 0:32b)
+g5 -> ptr(3:32b, 0:32b)
+g7 -> ptr(4:32b, 0:32b)
+g9 -> ptr(5:32b, 0:32b)
+-- Objects:
+mo6 ('<unnamed>', alloc'd by x82), size: 4:32b
+  0 -> 0:32b
+mo7 ('<unnamed>', alloc'd by t1), size: 8:32b
+  0 -> 1:8b
+  1 -> 0:8b
+  2 -> 0:8b
+  3 -> 0:8b
+  4 -> None
+  5 -> None
+  6 -> None
+  7 -> None
+mo8 ('<unnamed>', alloc'd by t2), size: 8:32b
+-- Call stack:
+ -- 0: main --
+x82 -> ptr(6:32b, 0:32b)
+t1 -> ptr(7:32b, 0:32b)
+t2 -> ptr(8:32b, 0:32b)
+x87 -> <__thread_create_succeeded:32b>
+x88 -> 1:32b
+scoped objects: mo6, mo7, mo8
+ -- nondets --
+x87 = <__thread_create_succeeded:32b>
+ -- constraints --
+[]
+ -- Threads --
+  0: Thread(0@x90: 64b = load (*)t1)
+  1: Thread(1@arg = alloc 8:32b bytes)
+ -- Exited threads waiting for join: {}
+ -- Threads waiting in join: {}
+ -- Mutexes (locked by): {}
+ -- Threads waiting for mutexes: {}
+ -- Events --

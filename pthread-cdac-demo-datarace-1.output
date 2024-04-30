@@ -1,0 +1,14 @@
+code parsed by llvm parser: /tmp/pthread-demo-datarace-1.i.bc
+The output dir exists, overwriting it
+Interrupted...
+Executed steps till branch: 0
+Executed instructions: 1668400
+Executed branch instructions: 283916
+Number of forks on branches: 51453 (forked on 18.122613730821794% of branches)
+Number of all forks: 51453 (from 283916 calls (18.122613730821794%) to fork())
+Executed paths: 102904
+Paths that reached exit: 102904
+Paths that abnormally terminated: 0
+Killed paths: 0
+Found errors: 0
+wall-time: 927.3465616703033, cpu-time: 928.896359225

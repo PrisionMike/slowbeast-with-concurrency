@@ -285,8 +285,6 @@ class LazySEState(SEState):
 class Thread:
     __slots__ = "pc", "cs", "_id", "_paused", "_detached", "_in_atomic", "_exit_val"
 
-    # ids = 0
-
     def __init__(self, tid, pc, callstack) -> None:
         self.pc = pc
         self.cs = callstack  # callstack
@@ -347,6 +345,8 @@ class Thread:
     def __repr__(self) -> str:
         return f"Thread[{self.get_id()}: pc: {self.pc}, cs: {self.cs}]"
 
+    def __eq__(self, value: object) -> bool:
+        return self.get_id() == value.get_id()
 
 def _get_event(pc: Union[Call, Load, Return, Store, ThreadJoin]) -> int:
     if isinstance(pc, Store):

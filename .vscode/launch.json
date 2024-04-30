@@ -1,0 +1,139 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "bigshot_p_funs",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/sb",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "args": [
+                "${workspaceFolder}/bigshot_p.c",
+                "-svcomp-witness",
+                "-entry",
+                "main",
+                "-pointer-bitwidth",
+                "32",
+                "-error-fn",
+                "reach_error",
+                "-check",
+                "no-data-race",
+                "-out-dir",
+                "${workspaceFolder}/bigshot_p_with_errorFn"
+            ],
+        },
+        {
+            "name": "no-data-race",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/sb",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "args": [
+                "${workspaceFolder}/drno.c",
+                "-svcomp-witness",
+                "-entry",
+                "main",
+                "-pointer-bitwidth",
+                "32",
+                "-exit-on-error",
+                "-check",
+                "no-data-race",
+                "-out-dir",
+                "${workspaceFolder}/drno"
+            ],
+        },
+        {
+            "name": "yes-data-race",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/sb",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "args": [
+                "${workspaceFolder}/dryes.c",
+                "-entry",
+                "main",
+                "-pointer-bitwidth",
+                "32",
+                "-exit-on-error",
+                "-check",
+                "no-data-race",
+                "-out-dir",
+                "${workspaceFolder}/dryes"
+            ],
+        },
+        {
+            "name": "S-bigshot-reach",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/sb",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "args": [
+                "${workspaceFolder}/bigshot_s.c",
+                "-svcomp-witness",
+                "-entry",
+                "main",
+                "-pointer-bitwidth",
+                "32",
+                "-check",
+                "unreach",
+                "-out-dir",
+                "${workspaceFolder}/pthread-bigshot-s"
+            ],
+        },
+        {
+            "name": "P-Bigshot-reach",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/sb",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "args": [
+                "${workspaceFolder}/bigshot_p.c",
+                "-svcomp-witness",
+                "-entry",
+                "main",
+                "-pointer-bitwidth",
+                "32",
+                "-check",
+                "unreach",
+                "-out-dir",
+                "${workspaceFolder}/pthread-bigshot-p"
+            ],
+        },
+        {
+            "name": "Any-File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/sb",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "args": [
+                "${workspaceFolder}/${input:fileName}",
+                "-svcomp-witness",
+                "-entry",
+                "main",
+                "-pointer-bitwidth",
+                "32",
+                "-check",
+                "no-data-race",
+                "-out-dir",
+                "${workspaceFolder}/${input:fileName}-output"
+            ],
+        }
+    ],
+    "inputs": [
+        {
+            "id": "fileName",
+            "type": "promptString",
+            "description": "Enter File name. It should be in current workspace",
+            "default": "_strcpy.c"
+        }
+    ]
+}

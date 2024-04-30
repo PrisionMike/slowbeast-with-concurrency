@@ -25,6 +25,8 @@ def sb_set_pointer_width(width: int) -> None:
     global POINTER_BIT_WIDTH
     assert width % 8 == 0
     POINTER_BIT_WIDTH = width
+    global _type_manager
+    _type_manager = TypeManager()
     # we must reset the types that use POINTER_BIT_WIDTH
 
 
@@ -82,12 +84,6 @@ class Type:
         if self.is_pointer():
             s += "*"
         return s
-
-
-#  FIXME: add type manager that will manage the types,
-#  mainly, we will not create a new object for every value,
-#  but the types will be shared (and thus we can also modify them
-#  easily)
 
 
 class PointerType(Type):

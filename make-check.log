@@ -1,0 +1,189 @@
+lit -j4 --path=/var/tmp/suyash/slowbeast -D OPTS="-se-step=block" tests/
+-- Testing: 108 tests, 4 workers --
+FAIL: Slowbeast C/LLVM tests :: unbounded-loop2-false.c (1 of 108)
+FAIL: Slowbeast C/LLVM tests :: bytes.c (2 of 108)
+FAIL: Slowbeast C/LLVM tests :: assume_regression1.c (3 of 108)
+FAIL: Slowbeast C/LLVM tests :: unbounded-simple-false.c (4 of 108)
+FAIL: Slowbeast C/LLVM tests :: float12.c (5 of 108)
+FAIL: Slowbeast C/LLVM tests :: concrete_overflow_regression.c (6 of 108)
+FAIL: Slowbeast C/LLVM tests :: simple-loop1.c (7 of 108)
+FAIL: Slowbeast C/LLVM tests :: xor3-regression-false.c (8 of 108)
+FAIL: Slowbeast C/LLVM tests :: struct3.c (9 of 108)
+FAIL: Slowbeast C/LLVM tests :: diamond_regression.c (10 of 108)
+FAIL: Slowbeast C/LLVM tests :: interproc1-false.c (11 of 108)
+FAIL: Slowbeast C/LLVM tests :: simple-loop.c (12 of 108)
+FAIL: Slowbeast C/LLVM tests :: terminator_01-false.c (13 of 108)
+FAIL: Slowbeast C/LLVM tests :: xor-regression.c (14 of 108)
+FAIL: Slowbeast C/LLVM tests :: sanfoundry.c (15 of 108)
+FAIL: Slowbeast C/LLVM tests :: string-false.c (16 of 108)
+FAIL: Slowbeast C/LLVM tests :: conjunctive23.c (17 of 108)
+FAIL: Slowbeast C/LLVM tests :: interproc1-3-false.c (18 of 108)
+FAIL: Slowbeast C/LLVM tests :: fptr.c (19 of 108)
+FAIL: Slowbeast C/LLVM tests :: signextension-1.c (20 of 108)
+FAIL: Slowbeast C/LLVM tests :: interproc3-false.c (21 of 108)
+FAIL: Slowbeast C/LLVM tests :: seq1.c (22 of 108)
+FAIL: Slowbeast C/LLVM tests :: struct2.c (23 of 108)
+FAIL: Slowbeast C/LLVM tests :: simple_4-1-false.c (24 of 108)
+FAIL: Slowbeast C/LLVM tests :: fork1.c (25 of 108)
+FAIL: Slowbeast C/LLVM tests :: simple_7.c (26 of 108)
+FAIL: Slowbeast C/LLVM tests :: xor2-regression.c (27 of 108)
+FAIL: Slowbeast C/LLVM tests :: mp_aa-ceq50.c (28 of 108)
+FAIL: Slowbeast C/LLVM tests :: array-static.c (29 of 108)
+FAIL: Slowbeast C/LLVM tests :: threads/threads-2.c (30 of 108)
+FAIL: Slowbeast C/LLVM tests :: simple_3-false.c (31 of 108)
+FAIL: Slowbeast C/LLVM tests :: interproc1-2-false.c (32 of 108)
+FAIL: Slowbeast C/LLVM tests :: floattoint.c (33 of 108)
+FAIL: Slowbeast C/LLVM tests :: interproc1-2.c (34 of 108)
+FAIL: Slowbeast C/LLVM tests :: simple-loop8.c (35 of 108)
+FAIL: Slowbeast C/LLVM tests :: interproc2-false.c (36 of 108)
+FAIL: Slowbeast C/LLVM tests :: array3.c (37 of 108)
+FAIL: Slowbeast C/LLVM tests :: ptrs1.c (38 of 108)
+FAIL: Slowbeast C/LLVM tests :: interproc1-3.c (39 of 108)
+FAIL: Slowbeast C/LLVM tests :: simple_3.c (40 of 108)
+FAIL: Slowbeast C/LLVM tests :: fabs.c (41 of 108)
+FAIL: Slowbeast C/LLVM tests :: global2.c (42 of 108)
+FAIL: Slowbeast C/LLVM tests :: threads/threads-1.c (43 of 108)
+FAIL: Slowbeast C/LLVM tests :: simple-loop4.c (44 of 108)
+FAIL: Slowbeast C/LLVM tests :: ptr-overwrite.c (45 of 108)
+FAIL: Slowbeast C/LLVM tests :: array2.c (46 of 108)
+FAIL: Slowbeast C/LLVM tests :: array5-false-def-behavior.c (47 of 108)
+FAIL: Slowbeast C/LLVM tests :: sum04-2.c (48 of 108)
+FAIL: Slowbeast C/LLVM tests :: interproc3.c (49 of 108)
+FAIL: Slowbeast C/LLVM tests :: nondet-false.c (50 of 108)
+FAIL: Slowbeast C/LLVM tests :: terminator_02-1-false.c (51 of 108)
+FAIL: Slowbeast C/LLVM tests :: array4.c (52 of 108)
+FAIL: Slowbeast C/LLVM tests :: simple_2.c (53 of 108)
+FAIL: Slowbeast C/LLVM tests :: interproc1.c (54 of 108)
+FAIL: Slowbeast C/LLVM tests :: simple_6.c (55 of 108)
+FAIL: Slowbeast C/LLVM tests :: string-init.c (56 of 108)
+FAIL: Slowbeast C/LLVM tests :: interproc2.c (57 of 108)
+FAIL: Slowbeast C/LLVM tests :: simple.c (58 of 108)
+FAIL: Slowbeast C/LLVM tests :: array1.c (59 of 108)
+FAIL: Slowbeast C/LLVM tests :: struct1.c (60 of 108)
+UNRESOLVED: Slowbeast C/LLVM tests :: concurrency-safety/simple-pors/run1.c (61 of 108)
+UNRESOLVED: Slowbeast C/LLVM tests :: concurrency-safety/cdac-demo3.c (62 of 108)
+UNRESOLVED: Slowbeast C/LLVM tests :: concurrency-safety/cdac-numerical-integration.c (63 of 108)
+UNRESOLVED: Slowbeast C/LLVM tests :: concurrency-safety/cdac-finding-k-matches.c (64 of 108)
+UNRESOLVED: Slowbeast C/LLVM tests :: concurrency-safety/cdac-demo1.c (65 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: benchmark51_polynomial.c (66 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: array-static-false.c (67 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: in-de20.c (68 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: inde.c (69 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: array-static-2.c (70 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: sum03-2.c (71 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: unsupported/inttofloat.c (72 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/Ex07.c (73 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: sumt7.c (74 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: enh-1.c (75 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: enh-2.c (76 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/termination-4.c (77 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: sumt4.c (78 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: terminator_02-2.c (79 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/termination-5.c (80 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: count_by_2.c (81 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: mono-crafted_6.c (82 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: unbounded-nested1.c (83 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: jm2006.c (84 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/while_infinite_loop_1.c (85 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/Sunset.c (86 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/WhileFalse.c (87 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/not-02-false.c (88 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: mono-crafted_11.c (89 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: unbounded2.c (90 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: unsupported/termination-2.c (91 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: unbounded-loop2.c (92 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: ps2-ll.c (93 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/WhileTrue.c (94 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: ptrconv.c (95 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/termination-1.c (96 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/termination-2-2.c (97 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: count_up_down-1.c (98 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/termination-6.c (99 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: unbounded-two-loops.c (100 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/termination-8.c (101 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: simple_4.c (102 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: unbounded-simple.c (103 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: simple_5.c (104 of 108)
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/termination-3.c (105 of 108)
+FAIL: Slowbeast C/LLVM tests :: symbolic-index.c (106 of 108)
+FAIL: Slowbeast C/LLVM tests :: global1.c (107 of 108)
+FAIL: Slowbeast C/LLVM tests :: float1.c (108 of 108)
+********************
+Unresolved Tests (5):
+  Slowbeast C/LLVM tests :: concurrency-safety/cdac-demo1.c
+  Slowbeast C/LLVM tests :: concurrency-safety/cdac-demo3.c
+  Slowbeast C/LLVM tests :: concurrency-safety/cdac-finding-k-matches.c
+  Slowbeast C/LLVM tests :: concurrency-safety/cdac-numerical-integration.c
+  Slowbeast C/LLVM tests :: concurrency-safety/simple-pors/run1.c
+
+********************
+Failed Tests (63):
+  Slowbeast C/LLVM tests :: array-static.c
+  Slowbeast C/LLVM tests :: array1.c
+  Slowbeast C/LLVM tests :: array2.c
+  Slowbeast C/LLVM tests :: array3.c
+  Slowbeast C/LLVM tests :: array4.c
+  Slowbeast C/LLVM tests :: array5-false-def-behavior.c
+  Slowbeast C/LLVM tests :: assume_regression1.c
+  Slowbeast C/LLVM tests :: bytes.c
+  Slowbeast C/LLVM tests :: concrete_overflow_regression.c
+  Slowbeast C/LLVM tests :: conjunctive23.c
+  Slowbeast C/LLVM tests :: diamond_regression.c
+  Slowbeast C/LLVM tests :: fabs.c
+  Slowbeast C/LLVM tests :: float1.c
+  Slowbeast C/LLVM tests :: float12.c
+  Slowbeast C/LLVM tests :: floattoint.c
+  Slowbeast C/LLVM tests :: fork1.c
+  Slowbeast C/LLVM tests :: fptr.c
+  Slowbeast C/LLVM tests :: global1.c
+  Slowbeast C/LLVM tests :: global2.c
+  Slowbeast C/LLVM tests :: interproc1-2-false.c
+  Slowbeast C/LLVM tests :: interproc1-2.c
+  Slowbeast C/LLVM tests :: interproc1-3-false.c
+  Slowbeast C/LLVM tests :: interproc1-3.c
+  Slowbeast C/LLVM tests :: interproc1-false.c
+  Slowbeast C/LLVM tests :: interproc1.c
+  Slowbeast C/LLVM tests :: interproc2-false.c
+  Slowbeast C/LLVM tests :: interproc2.c
+  Slowbeast C/LLVM tests :: interproc3-false.c
+  Slowbeast C/LLVM tests :: interproc3.c
+  Slowbeast C/LLVM tests :: mp_aa-ceq50.c
+  Slowbeast C/LLVM tests :: nondet-false.c
+  Slowbeast C/LLVM tests :: ptr-overwrite.c
+  Slowbeast C/LLVM tests :: ptrs1.c
+  Slowbeast C/LLVM tests :: sanfoundry.c
+  Slowbeast C/LLVM tests :: seq1.c
+  Slowbeast C/LLVM tests :: signextension-1.c
+  Slowbeast C/LLVM tests :: simple-loop.c
+  Slowbeast C/LLVM tests :: simple-loop1.c
+  Slowbeast C/LLVM tests :: simple-loop4.c
+  Slowbeast C/LLVM tests :: simple-loop8.c
+  Slowbeast C/LLVM tests :: simple.c
+  Slowbeast C/LLVM tests :: simple_2.c
+  Slowbeast C/LLVM tests :: simple_3-false.c
+  Slowbeast C/LLVM tests :: simple_3.c
+  Slowbeast C/LLVM tests :: simple_4-1-false.c
+  Slowbeast C/LLVM tests :: simple_6.c
+  Slowbeast C/LLVM tests :: simple_7.c
+  Slowbeast C/LLVM tests :: string-false.c
+  Slowbeast C/LLVM tests :: string-init.c
+  Slowbeast C/LLVM tests :: struct1.c
+  Slowbeast C/LLVM tests :: struct2.c
+  Slowbeast C/LLVM tests :: struct3.c
+  Slowbeast C/LLVM tests :: sum04-2.c
+  Slowbeast C/LLVM tests :: symbolic-index.c
+  Slowbeast C/LLVM tests :: terminator_01-false.c
+  Slowbeast C/LLVM tests :: terminator_02-1-false.c
+  Slowbeast C/LLVM tests :: threads/threads-1.c
+  Slowbeast C/LLVM tests :: threads/threads-2.c
+  Slowbeast C/LLVM tests :: unbounded-loop2-false.c
+  Slowbeast C/LLVM tests :: unbounded-simple-false.c
+  Slowbeast C/LLVM tests :: xor-regression.c
+  Slowbeast C/LLVM tests :: xor2-regression.c
+  Slowbeast C/LLVM tests :: xor3-regression-false.c
+
+
+Testing Time: 7.67s
+  Unsupported: 40
+  Unresolved :  5
+  Failed     : 63

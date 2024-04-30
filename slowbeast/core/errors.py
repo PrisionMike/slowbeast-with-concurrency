@@ -81,6 +81,7 @@ class MemError(Error):
     UNINIT_READ = 2
     INVALID_OBJ = 3
     UNSUPPORTED = 4
+    DATA_RACE = 5
 
     def __init__(self, t, descr=None) -> None:
         super(MemError, self).__init__(Error.MEM_ERROR, descr)
@@ -97,6 +98,9 @@ class MemError(Error):
 
     def is_unsupported(self):
         return self._memerr == MemError.UNSUPPORTED
+
+    def is_data_race_error(self):
+        return self._memerr == MemError.DATA_RACE
 
     def __repr__(self) -> str:
         err = self._memerr

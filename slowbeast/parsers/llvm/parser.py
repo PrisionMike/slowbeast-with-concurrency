@@ -1223,12 +1223,12 @@ class Parser:
         # because they may be operands of calls
         for f in m.functions:
             assert f.type.is_pointer, "Function pointer type is not a pointer"
-            succ, retty = parse_fun_ret_ty(self.llvmmodule, f.type.element_type)
+            succ, retty = parse_fun_ret_ty(self.llvmmodule, f.type.element_type) # retty has wrong bitwidth too. FIXME.
             if not succ:
                 raise NotImplementedError(
                     f"Cannot parse function return type: {f.type.element_type} of fun: {f.name}"
                 )
-            args = [Argument(get_sb_type(self.llvmmodule, a.type)) for a in f.arguments]
+            args = [Argument(get_sb_type(self.llvmmodule, a.type)) for a in f.arguments] # gets the bitwidth wrong. FIXME.
             fun = Function(f.name, args, retty)
             self.program.add_fun(fun)
             self._funs[f] = fun

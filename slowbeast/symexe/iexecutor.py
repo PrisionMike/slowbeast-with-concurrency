@@ -469,7 +469,6 @@ class IExecutor(ConcreteIExecutor):
         return None
 
     def exec_call(self, state: SEState, instr: Call) -> List[SEState]:
-        assert isinstance(instr, Call)
         fun = instr.called_function()
         if not isinstance(fun, Function):
             fun = self._resolve_function_pointer(state, fun)
@@ -537,7 +536,7 @@ class IExecutor(ConcreteIExecutor):
             else:
                 val = state.solver().fresh_value(fun.name(), ret_ty)
                 state.create_nondet(instr, val)
-            state.set(instr, val)
+            state.set(instr, val)       # NOTE: Call set to stack here.
         state.pc = state.pc.get_next_inst()
         return [state]
 

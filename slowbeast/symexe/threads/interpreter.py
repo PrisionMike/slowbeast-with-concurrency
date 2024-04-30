@@ -1,89 +1,13 @@
-from typing import Union
+from typing import List, Optional, Union
 
 from slowbeast.core.errors import GenericError
 from slowbeast.ir.function import Function
 from slowbeast.ir.instruction import Alloc, Call, Load, Store, ThreadJoin, Thread
 from slowbeast.symexe.interpreter import SymbolicInterpreter as SymexeInterpreter
 from slowbeast.symexe.options import SEOptions
-from slowbeast.symexe.threads.iexecutor import IExecutor
+from slowbeast.symexe.threads.iexecutor import IExecutor, may_be_glob_mem
+from slowbeast.symexe.threads.state import TSEState
 from slowbeast.util.debugging import print_stderr
-
-
-# def is_same_mem(state, mem1, mem2, bytes_num):
-#     p1 = state.eval(mem1)
-#     p2 = state.eval(mem2)
-#     if p1.is_concrete() and p2.is_concrete():
-#         # FIXME: compare also offsets
-#         return p1.object() == p2.object()
-#     # TODO: fork?
-#     return True
-#
-#
-# def is_same_val(state, op1, op2):
-#     """Return if True if reading mem1 and mem2 must result in the same value"""
-#     val1 = state.try_eval(op1)
-#     val2 = state.try_eval(op2)
-#     if val1 is None or val2 is None:
-#         return False
-#     return val1 == val2
-#
-#
-# def reads_same_val(state, loadop, storevalop, bytes_num):
-#     p1 = state.eval(loadop)
-#     val = state.try_eval(storevalop)
-#     if val is None:
-#         return False
-#     lval, err = state.memory.read(p1, bytes_num)
-#     if err:
-#         return False
-#     # TODO: handle symbolic values?
-#     return lval == val
-#
-#
-# def get_conflicting(state, thr):
-#     "Get threads that will conflict with 'thr' if executed"
-#     confl = []
-#     pc = state.thread(thr).pc
-#     isload, iswrite = isinstance(pc, Load), isinstance(pc, Store)
-#     if not isload and not iswrite:
-#         return confl
-#     bytes_num = pc.bytewidth()
-#     for idx, t in enumerate(state.threads()):
-#         if idx == thr:
-#             continue
-#         tpc = t.pc
-#         # we handle this differently
-#         # if isinstance(tpc, Return) and idx == 0:
-#         #    # return from main is always conflicting
-#         #    confl.append(idx)
-#         if isload and isinstance(tpc, Store):
-#             if is_same_mem(state, pc.operand(0), tpc.operand(1), bytes_num):
-#                 if not reads_same_val(state, pc.operand(0), tpc.operand(0), bytes_num):
-#                     confl.append(idx)
-#         elif iswrite:
-#             if isinstance(tpc, Store):
-#                 if is_same_mem(state, pc.operand(1), tpc.operand(1), bytes_num):
-#                     if not is_same_val(state, pc.operand(0), tpc.operand(0)):
-#                         confl.append(idx)
-#             elif isinstance(tpc, Load):
-#                 if is_same_mem(state, pc.operand(1), tpc.operand(0), bytes_num):
-#                     confl.append(idx)
-#     return confl
-#
-
-
-def may_be_glob_mem(state, mem: Alloc) -> bool:
-    ptr = state.try_eval(mem)
-    if ptr and ptr.object().is_concrete():
-        mo = state.memory.get_obj(ptr.object())
-        if mo is None:
-            return True
-        if mo.is_read_only():
-            # read only objects cannot be modified and so we do not care about them
-            return False
-        return mo.is_global() or mo.is_heap()
-
-    return True
 
 
 def _is_global_event_fun(fn) -> bool:
@@ -125,45 +49,45 @@ class SymbolicInterpreter(SymexeInterpreter):
             return _is_global_event_fun(fn)
         return False
 
-    def schedule(self, state):
-        l = state.num_threads()
-        if l == 0:
-            return []
-        # if the thread is in an atomic sequence, continue it...
-        t = state.thread()
-        if t.in_atomic():
-            if not t.is_paused():
-                return [state]
-            # this thread is dead-locked, but other can continue
-            state.set_killed(
-                f"Thread {t.get_id()} is stucked "
-                "(waits for a mutex inside an atomic sequence)"
-            )
-            return [state]
+    # def schedule(self, state: TSEState) -> List[Optional[TSEState]]:
+    #     l = state.num_threads()
+    #     if l == 0:
+    #         return []
+    #     # if the thread is in an atomic sequence, continue it...
+    #     t = state.thread()
+    #     if t.in_atomic():
+    #         if not t.is_paused():
+    #             return [state]
+    #         # this thread is dead-locked, but other can continue
+    #         state.set_killed(
+    #             f"Thread {t.get_id()} is stuck "
+    #             "(waits for a mutex inside an atomic sequence)"
+    #         )
+    #         return [state]
 
-        is_global_ev = self._is_global_event
-        for idx, t in enumerate(state.threads()):
-            if t.is_paused():
-                continue
-            if not is_global_ev(state, t.pc):
-                state.schedule(idx)
-                return [state]
+    #     # is_global_ev = self._is_global_event
+    #     # for idx, t in enumerate(state.threads()):
+    #     #     if t.is_paused():
+    #     #         continue
+    #     #     if not is_global_ev(state, t.pc):
+    #     #         state.schedule(idx)  
+    #     #         return [state]  # XXX Seems problematic
 
-        can_run = [idx for idx, t in enumerate(state.threads()) if not t.is_paused()]
-        if len(can_run) == 0:
-            state.set_error(GenericError("Deadlock detected"))
-            return [state]
-        if len(can_run) == 1:
-            state.schedule(can_run[0])
-            return [state]
+    #     can_run = [idx for idx, t in enumerate(state.threads()) if not t.is_paused()]
+    #     if len(can_run) == 0:
+    #         state.set_error(GenericError("Deadlock detected"))
+    #         return [state]
+    #     if len(can_run) == 1:
+    #         state.schedule(can_run[0])
+    #         return [state]
 
-        states = []
-        for idx in can_run:
-            s = state.copy()
-            s.schedule(idx)
-            states.append(s)
-        assert states
-        return states
+    #     states = []
+    #     for idx in can_run:
+    #         s = state.copy()
+    #         s.schedule(idx)
+    #         states.append(s)
+    #     assert states
+    #     return states
 
     def prepare(self) -> None:
         """
@@ -186,28 +110,40 @@ class SymbolicInterpreter(SymexeInterpreter):
                 s.memory.get_cs().set_values(main_args)
             s.sync_pc()
 
+    def check_deadlock(self, state) -> None:
+        """Kills the state if it is in deadlock"""
+        if state.thread().in_atomic() and state.thread().is_paused():
+            state.set_killed(
+            f"Thread {state.thread().get_id()} is stuck "
+            "(waits for a mutex inside an atomic sequence)"
+            )
+
     def run(self) -> int:
         self.prepare()
 
         # we're ready to go!
-        schedule = self.schedule
         try:
+            mhare_pyare_states = []
             while self.states:
+                print("-------------------------")
+                print("On the tree:", [x.get_id() for x in self.states])
                 newstates = []
                 state = self.get_next_state()
+                print("Parent (being executed):", state._id)
+                self.check_deadlock(state)
                 self.interact_if_needed(state)
-                for s in schedule(state):
-                    if s.is_ready():
-                        newstates += self._executor.execute(s, s.pc)
-                        for ns in newstates:
-                            ns.sync_pc()
-                    else:
-                        newstates.append(s)
-
-                # self.states_num += len(newstates)
-                # if self.states_num % 100 == 0:
-                #    print("Searched states: {0}".format(self.states_num))
+                # state.get_id() in (121,156,157,184,185,158,165,171) # (state.get_id() >= 171) or 
+                # state.get_id() % 1000 == 0 and state.get_id() >= 4000 
+                if state.is_ready():
+                    newstates += self._executor.execute(state, state.pc) 
+                else:
+                    newstates.append(state)
+                print("Children:",[(x.get_id(), x.status()) for x in newstates])
                 self.handle_new_states(newstates)
+                for ns in newstates:
+                    if ns.exited():
+                        mhare_pyare_states.append(ns.get_id())
+
         except Exception as e:
             print_stderr(f"Fatal error while executing '{state.pc}'", color="red")
             state.dump()
@@ -244,6 +180,7 @@ def has_conflicts(state, events, states_with_events) -> bool:
 
 
 class DPORSymbolicInterpreter(SymbolicInterpreter):
+
     def __init__(self, P, ohandler=None, opts: SEOptions = SEOptions()) -> None:
         super().__init__(P, ohandler, opts)
         print("Running symbolic execution with DPOR")
@@ -434,3 +371,67 @@ class DPORSymbolicInterpreter(SymbolicInterpreter):
 
             handle_new_states(newstates)
         return state
+
+
+
+# def is_same_mem(state, mem1, mem2, bytes_num):
+#     p1 = state.eval(mem1)
+#     p2 = state.eval(mem2)
+#     if p1.is_concrete() and p2.is_concrete():
+#         # FIXME: compare also offsets
+#         return p1.object() == p2.object()
+#     # TODO: fork?
+#     return True
+#
+#
+# def is_same_val(state, op1, op2):
+#     """Return if True if reading mem1 and mem2 must result in the same value"""
+#     val1 = state.try_eval(op1)
+#     val2 = state.try_eval(op2)
+#     if val1 is None or val2 is None:
+#         return False
+#     return val1 == val2
+#
+#
+# def reads_same_val(state, loadop, storevalop, bytes_num):
+#     p1 = state.eval(loadop)
+#     val = state.try_eval(storevalop)
+#     if val is None:
+#         return False
+#     lval, err = state.memory.read(p1, bytes_num)
+#     if err:
+#         return False
+#     # TODO: handle symbolic values?
+#     return lval == val
+#
+#
+# def get_conflicting(state, thr):
+#     "Get threads that will conflict with 'thr' if executed"
+#     confl = []
+#     pc = state.thread(thr).pc
+#     isload, iswrite = isinstance(pc, Load), isinstance(pc, Store)
+#     if not isload and not iswrite:
+#         return confl
+#     bytes_num = pc.bytewidth()
+#     for idx, t in enumerate(state.threads()):
+#         if idx == thr:
+#             continue
+#         tpc = t.pc
+#         # we handle this differently
+#         # if isinstance(tpc, Return) and idx == 0:
+#         #    # return from main is always conflicting
+#         #    confl.append(idx)
+#         if isload and isinstance(tpc, Store):
+#             if is_same_mem(state, pc.operand(0), tpc.operand(1), bytes_num):
+#                 if not reads_same_val(state, pc.operand(0), tpc.operand(0), bytes_num):
+#                     confl.append(idx)
+#         elif iswrite:
+#             if isinstance(tpc, Store):
+#                 if is_same_mem(state, pc.operand(1), tpc.operand(1), bytes_num):
+#                     if not is_same_val(state, pc.operand(0), tpc.operand(0)):
+#                         confl.append(idx)
+#             elif isinstance(tpc, Load):
+#                 if is_same_mem(state, pc.operand(1), tpc.operand(0), bytes_num):
+#                     confl.append(idx)
+#     return confl
+#

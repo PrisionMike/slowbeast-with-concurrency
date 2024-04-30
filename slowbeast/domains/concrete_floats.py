@@ -20,10 +20,10 @@ from numpy import (
 from slowbeast.domains.concrete_value import ConcreteVal, ConcreteBool
 from slowbeast.ir.types import type_mgr, FloatType, Type
 from slowbeast.util.debugging import FIXME
-from .concrete_bitvec import ConcreteBitVec
-from .domain import Domain
-from .value import Value
-from ..ir.instruction import FpOp
+from slowbeast.domains.concrete_bitvec import ConcreteBitVec
+from slowbeast.domains.domain import Domain
+from slowbeast.domains.value import Value
+from slowbeast.ir.instruction import FpOp
 
 
 def concrete_float_val_to_bytes(x):

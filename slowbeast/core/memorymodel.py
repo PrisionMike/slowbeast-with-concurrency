@@ -75,7 +75,7 @@ class MemoryModel:
         to_op: Load,
         from_op: Union[BinaryOperation, Alloc, Load, GlobalVariable],
         bytes_num: int,
-        bitsnum: Optional[int] = None,
+        bitsnum: Optional[int] = None
     ) -> List[SEState]:
         frm = state.get(from_op)
         if frm is None:

@@ -2,8 +2,12 @@ from sys import stdout
 from typing import Union, Optional, List, TextIO
 
 from slowbeast.core.callstack import CallStack
+from slowbeast.core.errors import GenericError
 from slowbeast.core.state import ExecutionState
-from slowbeast.ir.instruction import Alloc, GlobalVariable, ThreadJoin
+from slowbeast.domains.concrete_bitvec import ConcreteBitVec
+from slowbeast.domains.expr import Expr
+from slowbeast.domains.pointer import Pointer
+from slowbeast.ir.instruction import Alloc, GlobalVariable, ThreadJoin, ValueInstruction
 from slowbeast.symexe.state import SEState as BaseState, Thread, Event
 from slowbeast.util.debugging import ldbgv
 
@@ -21,6 +25,8 @@ class TSEState(BaseState):
         "_event_trace",
         "_events",
         "_conflicts",
+        "_tainted_locations",
+        "_race_alert"
     )
 
     def __init__(
@@ -29,7 +35,11 @@ class TSEState(BaseState):
         super().__init__(executor, pc, m, solver, constraints)
         self._last_tid = 0
         self._current_thread = 0
-        self._threads = [Thread(0, pc, self.memory.get_cs() if m else None)]
+        # [Thread(0, pc, self.memory.get_cs() if m else None)]
+        if m:
+            self._threads = { 0: Thread(0, pc, self.memory.get_cs())}
+        else:
+            None
         # threads waiting in join until the joined thread exits
         self._wait_join = {}
         self._exited_threads = {}
@@ -39,18 +49,20 @@ class TSEState(BaseState):
         self._mutexes = {}
         self._wait_mutex = {}
         self._conflicts = []
+        self._tainted_locations = []
+        self._race_alert = False
 
     def _thread_idx(self, thr: Thread) -> int:
-        if isinstance(thr, Thread):
-            return self._threads.index(thr)
-        for idx, t in enumerate(self._threads):
-            if t.get_id() == thr:
+        '''Return ID of a given thread. Thread's own ID'''
+        for idx in self._threads:
+            if self._threads[idx] == thr:
                 return idx
-        return None
+        else:
+            return None
 
     def _copy_to(self, new: ExecutionState) -> None:
         super()._copy_to(new)
-        new._threads = [t.copy() for t in self._threads]
+        new._threads = { id: thr.copy() for id,thr in self._threads.items() }
         new._wait_join = self._wait_join.copy()
         new._exited_threads = self._exited_threads.copy()
         new._last_tid = self._last_tid
@@ -62,6 +74,7 @@ class TSEState(BaseState):
         # FIXME: do COW (also for wait and exited threads ...)
         new._mutexes = self._mutexes.copy()
         new._wait_mutex = {mtx: W.copy() for mtx, W in self._wait_mutex.items() if W}
+        new._race_alert = self._race_alert
 
     def trace(self):
         return self._event_trace
@@ -93,6 +106,11 @@ class TSEState(BaseState):
         if self._threads:
             self._threads[self._current_thread].pc = self.pc
 
+    def sync_cs(self) -> None:
+        """ Synchronise callstack"""
+        if self._threads:
+            self.thread().cs = self.memory.get_cs()
+    
     def add_event(self) -> None:
         self._events.append(Event(self))
 
@@ -104,16 +122,12 @@ class TSEState(BaseState):
     def events(self):
         return self._events
 
-    def schedule(self, idx: int) -> None:
+    def schedule(self, idx) -> None:
         if self._current_thread == idx:
             return
-        assert idx < len(self._threads)
-        # sync current thread
-        thr = self._threads[self._current_thread]
-        thr.pc, thr.cs = self.pc, self.memory.get_cs()
 
         # schedule new thread
-        thr: Thread = self._threads[idx]
+        thr: Thread = self.thread(idx)
         assert thr, self._threads
         self.pc = thr.pc
         self.memory.set_cs(thr.cs)
@@ -127,7 +141,7 @@ class TSEState(BaseState):
         cs.push_call(None, thread_fn, args)
         t = Thread(self._last_tid, pc, cs)
         assert not t.is_paused()
-        self._threads.append(t)
+        self._threads[self._last_tid] = t
         # self._trace.append(f"add thread {t.get_id()}")
         return t
 
@@ -200,34 +214,32 @@ class TSEState(BaseState):
         tid = self._current_thread if idx is None else idx
         assert self.mutex_locked_by(mtx) is not None, "Waiting for unlocked mutex"
         self.pause_thread(idx)
-        self._wait_mutex.setdefault(mtx, set()).add(self.thread(tid).get_id())
+        self._wait_mutex.setdefault(mtx, set()).add(tid)
 
-    def exit_thread(self, retval, tid: Optional[Thread] = None) -> None:
+    def exit_thread(self, retval, tid=None) -> None:
         """Exit thread and wait for join (if not detached)"""
-        if tid is None:
-            tid = self.thread().get_id()
+        tid = self._current_thread if tid is None else tid
         # self._trace.append(f"exit thread {tid} with val {retval}")
         assert tid not in self._exited_threads
         self._exited_threads[tid] = retval
-        tidx = self._thread_idx(tid)
-        self.remove_thread(tidx)
+        self.remove_thread(tid)
 
         if tid in self._wait_join:
             # self._trace.append(f"thread {tid} was waited for by {self._wait_join[tid]}")
-            # idx of the thread that is waiting on 'tid' to exit
-            waitidx = self._thread_idx(self._wait_join[tid])
-            assert self.thread(waitidx).is_paused(), self._wait_join
-            self.unpause_thread(waitidx)
-            t = self.thread(waitidx)
-            # pass the return value
-            assert isinstance(t.pc, ThreadJoin), t
-            t.cs.set(t.pc, retval)
-            t.pc = t.pc.get_next_inst()
-            self._wait_join.pop(tid)
+            # idx's of the threads that are waiting on 'tid' to exit
+            waiting_thread_ids = self._wait_join.pop(tid)
+            for waitidx in waiting_thread_ids:
+                assert self.thread(waitidx).is_paused(), self._wait_join
+                self.unpause_thread(waitidx)
+                t = self.thread(waitidx)
+                # pass the return value
+                assert isinstance(t.pc, ThreadJoin), t
+                t.cs.set(t.pc, retval)
+                t.pc = t.pc.get_next_inst()
 
     def join_threads(self, tid, totid: Optional[Thread] = None) -> None:
         """
-        tid: id of the thread to join
+        tid: id of the thread that joins
         totid: id of the thread to which to join (None means the current thread)
         """
         # self._trace.append(
@@ -243,24 +255,17 @@ class TSEState(BaseState):
             # )
             return
 
-        assert tid not in self._wait_join, f"{tid} :: {self._wait_join}"
-        if totid is None:
-            # self._trace.append(
-            #    f"thread {tid} is waited in join by {self.thread().get_id()}"
-            # )
-            self._wait_join[tid] = self.thread().get_id()
-            toidx = self._current_thread
-        else:
-            # self._trace.append(f"thread {tid} is waited in join by {totid}")
-            self._wait_join[tid] = totid
-            toidx = self._thread_idx(totid)
+        toidx = self._current_thread if totid is None else self._thread_idx(totid)
+        if tid not in self._wait_join:
+            self._wait_join[tid] = []
+        if toidx not in self._wait_join[tid]:
+            self._wait_join[tid].append(toidx)
         self.pause_thread(toidx)
 
     def remove_thread(self, idx=None) -> None:
         # self._trace.append(f"removing thread {self.thread(idx).get_id()}")
         self._threads.pop(self._current_thread if idx is None else idx)
-        # schedule thread 0 (if there is any) -- user will reschedule if
-        # desired
+        # schedule thread 0 (if there is any)
         if self._threads:
             self.pc = self._threads[0].pc
             self.memory.set_cs(self._threads[0].cs)
@@ -274,8 +279,19 @@ class TSEState(BaseState):
     def num_threads(self) -> int:
         return len(self._threads)
 
-    def threads(self) -> List[Thread]:
-        return self._threads
+    def race_condition_possible(self) -> bool:
+        """ Sets `race_alert` flag if more than 1 thread is active."""
+        sleeping_threads = [thread.is_paused() for thread in self._threads.values()]
+        if all(sleeping_threads):
+            self.set_error(GenericError("Deadlock detected"))
+            return False
+        self._race_alert = sleeping_threads.count(False) > 1
+        if not self._race_alert:
+            self._tainted_locations = []
+        return self._race_alert
+        
+    def threads(self) -> iter:
+        return self._threads.values()
 
     def add_conflict(self, state) -> None:
         self._conflicts.append((state.get_last_event(), state))
@@ -307,7 +323,7 @@ class TSEState(BaseState):
         write(" -- Events --\n")
         for it in self._events:
             write(str(it) + "\n")
-
+    
     # write(" -- Trace --\n")
     # for it in self._trace:
     #    write(it + "\n")

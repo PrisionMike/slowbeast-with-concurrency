@@ -1,0 +1,1629 @@
+lit -j4 --path=/var/tmp/suyash/slowbeast -a tests/
+-- Testing: 108 tests, 4 workers --
+FAIL: Slowbeast C/LLVM tests :: string-false.c (1 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: string-false.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/string-false.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/string-false.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/string-false.c &>/var/tmp/suyash/slowbeast/tests/Output/string-false.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/string-false.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/string-false.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/string-false.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/string-false.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/string-false.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/string-false.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: unbounded-loop2-false.c (2 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: unbounded-loop2-false.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/unbounded-loop2-false.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/unbounded-loop2-false.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/unbounded-loop2-false.c &>/var/tmp/suyash/slowbeast/tests/Output/unbounded-loop2-false.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/unbounded-loop2-false.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/unbounded-loop2-false.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/unbounded-loop2-false.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/unbounded-loop2-false.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/unbounded-loop2-false.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/unbounded-loop2-false.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: simple-loop1.c (3 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: simple-loop1.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 4';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/simple-loop1.c.tmp-out
+: 'RUN: at line 5';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple-loop1.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/simple-loop1.c &>/var/tmp/suyash/slowbeast/tests/Output/simple-loop1.c.tmp.log
+: 'RUN: at line 6';   cat /var/tmp/suyash/slowbeast/tests/Output/simple-loop1.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/simple-loop1.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 4"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/simple-loop1.c.tmp-out"
+$ ":" "RUN: at line 5"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple-loop1.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/simple-loop1.c"
+$ ":" "RUN: at line 6"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/simple-loop1.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: concrete_overflow_regression.c (4 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: concrete_overflow_regression.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 1';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/concrete_overflow_regression.c.tmp-out
+: 'RUN: at line 2';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/concrete_overflow_regression.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/concrete_overflow_regression.c &>/var/tmp/suyash/slowbeast/tests/Output/concrete_overflow_regression.c.tmp.log
+: 'RUN: at line 3';   cat /var/tmp/suyash/slowbeast/tests/Output/concrete_overflow_regression.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/concrete_overflow_regression.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 1"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/concrete_overflow_regression.c.tmp-out"
+$ ":" "RUN: at line 2"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/concrete_overflow_regression.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/concrete_overflow_regression.c"
+$ ":" "RUN: at line 3"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/concrete_overflow_regression.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: float12.c (5 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: float12.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/float12.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/float12.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/float12.c &>/var/tmp/suyash/slowbeast/tests/Output/float12.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/float12.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/float12.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/float12.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/float12.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/float12.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/float12.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: simple-loop.c (6 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: simple-loop.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 4';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/simple-loop.c.tmp-out
+: 'RUN: at line 5';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple-loop.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/simple-loop.c &>/var/tmp/suyash/slowbeast/tests/Output/simple-loop.c.tmp.log
+: 'RUN: at line 6';   cat /var/tmp/suyash/slowbeast/tests/Output/simple-loop.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/simple-loop.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 4"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/simple-loop.c.tmp-out"
+$ ":" "RUN: at line 5"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple-loop.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/simple-loop.c"
+$ ":" "RUN: at line 6"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/simple-loop.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: unbounded-simple-false.c (7 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: unbounded-simple-false.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/unbounded-simple-false.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/unbounded-simple-false.c.tmp-out -se-exit-on-error  /var/tmp/suyash/slowbeast/tests/c/unbounded-simple-false.c &>/var/tmp/suyash/slowbeast/tests/Output/unbounded-simple-false.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/unbounded-simple-false.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/unbounded-simple-false.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/unbounded-simple-false.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/unbounded-simple-false.c.tmp-out" "-se-exit-on-error" "/var/tmp/suyash/slowbeast/tests/c/unbounded-simple-false.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/unbounded-simple-false.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: interproc1-false.c (8 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: interproc1-false.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/interproc1-false.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc1-false.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/interproc1-false.c &>/var/tmp/suyash/slowbeast/tests/Output/interproc1-false.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/interproc1-false.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/interproc1-false.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/interproc1-false.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc1-false.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/interproc1-false.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/interproc1-false.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: sanfoundry.c (9 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: sanfoundry.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 4';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/sanfoundry.c.tmp-out
+: 'RUN: at line 5';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/sanfoundry.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/sanfoundry.c &>/var/tmp/suyash/slowbeast/tests/Output/sanfoundry.c.tmp.log
+: 'RUN: at line 6';   cat /var/tmp/suyash/slowbeast/tests/Output/sanfoundry.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/sanfoundry.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 4"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/sanfoundry.c.tmp-out"
+$ ":" "RUN: at line 5"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/sanfoundry.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/sanfoundry.c"
+$ ":" "RUN: at line 6"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/sanfoundry.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: simple_3-false.c (10 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: simple_3-false.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/simple_3-false.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple_3-false.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/simple_3-false.c &>/var/tmp/suyash/slowbeast/tests/Output/simple_3-false.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/simple_3-false.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/simple_3-false.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/simple_3-false.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple_3-false.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/simple_3-false.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/simple_3-false.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: interproc1.c (11 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: interproc1.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/interproc1.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc1.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/interproc1.c &>/var/tmp/suyash/slowbeast/tests/Output/interproc1.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/interproc1.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/interproc1.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/interproc1.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc1.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/interproc1.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/interproc1.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: interproc1-3.c (12 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: interproc1-3.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/interproc1-3.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc1-3.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/interproc1-3.c &>/var/tmp/suyash/slowbeast/tests/Output/interproc1-3.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/interproc1-3.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/interproc1-3.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/interproc1-3.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc1-3.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/interproc1-3.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/interproc1-3.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: array5-false-def-behavior.c (13 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: array5-false-def-behavior.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/array5-false-def-behavior.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/array5-false-def-behavior.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/array5-false-def-behavior.c &>/var/tmp/suyash/slowbeast/tests/Output/array5-false-def-behavior.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/array5-false-def-behavior.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/array5-false-def-behavior.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/array5-false-def-behavior.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/array5-false-def-behavior.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/array5-false-def-behavior.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/array5-false-def-behavior.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: simple_2.c (14 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: simple_2.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/simple_2.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple_2.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/simple_2.c &>/var/tmp/suyash/slowbeast/tests/Output/simple_2.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/simple_2.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/simple_2.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/simple_2.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple_2.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/simple_2.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/simple_2.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: xor3-regression-false.c (15 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: xor3-regression-false.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/xor3-regression-false.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/xor3-regression-false.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/xor3-regression-false.c &>/var/tmp/suyash/slowbeast/tests/Output/xor3-regression-false.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/xor3-regression-false.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/xor3-regression-false.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/xor3-regression-false.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/xor3-regression-false.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/xor3-regression-false.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/xor3-regression-false.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: simple-loop4.c (16 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: simple-loop4.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 4';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/simple-loop4.c.tmp-out
+: 'RUN: at line 5';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple-loop4.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/simple-loop4.c &>/var/tmp/suyash/slowbeast/tests/Output/simple-loop4.c.tmp.log
+: 'RUN: at line 6';   cat /var/tmp/suyash/slowbeast/tests/Output/simple-loop4.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/simple-loop4.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 4"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/simple-loop4.c.tmp-out"
+$ ":" "RUN: at line 5"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple-loop4.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/simple-loop4.c"
+$ ":" "RUN: at line 6"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/simple-loop4.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: conjunctive23.c (17 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: conjunctive23.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 4';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/conjunctive23.c.tmp-out
+: 'RUN: at line 5';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/conjunctive23.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/conjunctive23.c &>/var/tmp/suyash/slowbeast/tests/Output/conjunctive23.c.tmp.log
+: 'RUN: at line 6';   cat /var/tmp/suyash/slowbeast/tests/Output/conjunctive23.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/conjunctive23.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 4"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/conjunctive23.c.tmp-out"
+$ ":" "RUN: at line 5"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/conjunctive23.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/conjunctive23.c"
+$ ":" "RUN: at line 6"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/conjunctive23.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: ptr-overwrite.c (18 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: ptr-overwrite.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 4';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/ptr-overwrite.c.tmp-out
+: 'RUN: at line 5';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/ptr-overwrite.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/ptr-overwrite.c &>/var/tmp/suyash/slowbeast/tests/Output/ptr-overwrite.c.tmp.log
+: 'RUN: at line 6';   cat /var/tmp/suyash/slowbeast/tests/Output/ptr-overwrite.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/ptr-overwrite.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 4"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/ptr-overwrite.c.tmp-out"
+$ ":" "RUN: at line 5"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/ptr-overwrite.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/ptr-overwrite.c"
+$ ":" "RUN: at line 6"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/ptr-overwrite.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: fabs.c (19 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: fabs.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 4';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/fabs.c.tmp-out
+: 'RUN: at line 5';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/fabs.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/fabs.c &>/var/tmp/suyash/slowbeast/tests/Output/fabs.c.tmp.log
+: 'RUN: at line 6';   cat /var/tmp/suyash/slowbeast/tests/Output/fabs.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/fabs.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 4"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/fabs.c.tmp-out"
+$ ":" "RUN: at line 5"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/fabs.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/fabs.c"
+$ ":" "RUN: at line 6"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/fabs.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: diamond_regression.c (20 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: diamond_regression.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/diamond_regression.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/diamond_regression.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/diamond_regression.c &>/var/tmp/suyash/slowbeast/tests/Output/diamond_regression.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/diamond_regression.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/diamond_regression.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/diamond_regression.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/diamond_regression.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/diamond_regression.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/diamond_regression.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: interproc2.c (21 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: interproc2.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/interproc2.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc2.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/interproc2.c &>/var/tmp/suyash/slowbeast/tests/Output/interproc2.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/interproc2.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/interproc2.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/interproc2.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc2.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/interproc2.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/interproc2.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: simple_4-1-false.c (22 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: simple_4-1-false.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/simple_4-1-false.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple_4-1-false.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/simple_4-1-false.c &>/var/tmp/suyash/slowbeast/tests/Output/simple_4-1-false.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/simple_4-1-false.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/simple_4-1-false.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/simple_4-1-false.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple_4-1-false.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/simple_4-1-false.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/simple_4-1-false.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: interproc3-false.c (23 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: interproc3-false.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/interproc3-false.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc3-false.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/interproc3-false.c &>/var/tmp/suyash/slowbeast/tests/Output/interproc3-false.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/interproc3-false.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/interproc3-false.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/interproc3-false.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc3-false.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/interproc3-false.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/interproc3-false.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: struct1.c (24 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: struct1.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/struct1.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/struct1.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/struct1.c &>/var/tmp/suyash/slowbeast/tests/Output/struct1.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/struct1.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/struct1.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/struct1.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/struct1.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/struct1.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/struct1.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: terminator_01-false.c (25 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: terminator_01-false.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/terminator_01-false.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -se-exit-on-error -out-dir=/var/tmp/suyash/slowbeast/tests/Output/terminator_01-false.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/terminator_01-false.c &>/var/tmp/suyash/slowbeast/tests/Output/terminator_01-false.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/terminator_01-false.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/terminator_01-false.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/terminator_01-false.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-se-exit-on-error" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/terminator_01-false.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/terminator_01-false.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/terminator_01-false.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: struct3.c (26 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: struct3.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/struct3.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/struct3.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/struct3.c &>/var/tmp/suyash/slowbeast/tests/Output/struct3.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/struct3.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/struct3.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/struct3.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/struct3.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/struct3.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/struct3.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: simple_3.c (27 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: simple_3.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 4';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/simple_3.c.tmp-out
+: 'RUN: at line 5';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple_3.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/simple_3.c &>/var/tmp/suyash/slowbeast/tests/Output/simple_3.c.tmp.log
+: 'RUN: at line 6';   cat /var/tmp/suyash/slowbeast/tests/Output/simple_3.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/simple_3.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 4"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/simple_3.c.tmp-out"
+$ ":" "RUN: at line 5"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple_3.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/simple_3.c"
+$ ":" "RUN: at line 6"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/simple_3.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: simple_7.c (28 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: simple_7.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 7';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/simple_7.c.tmp-out
+: 'RUN: at line 8';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple_7.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/simple_7.c &>/var/tmp/suyash/slowbeast/tests/Output/simple_7.c.tmp.log
+: 'RUN: at line 9';   cat /var/tmp/suyash/slowbeast/tests/Output/simple_7.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/simple_7.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 7"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/simple_7.c.tmp-out"
+$ ":" "RUN: at line 8"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple_7.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/simple_7.c"
+$ ":" "RUN: at line 9"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/simple_7.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: interproc1-3-false.c (29 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: interproc1-3-false.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/interproc1-3-false.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc1-3-false.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/interproc1-3-false.c &>/var/tmp/suyash/slowbeast/tests/Output/interproc1-3-false.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/interproc1-3-false.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/interproc1-3-false.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/interproc1-3-false.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc1-3-false.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/interproc1-3-false.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/interproc1-3-false.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: array2.c (30 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: array2.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/array2.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/array2.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/array2.c &>/var/tmp/suyash/slowbeast/tests/Output/array2.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/array2.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/array2.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/array2.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/array2.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/array2.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/array2.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: simple-loop8.c (31 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: simple-loop8.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 4';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/simple-loop8.c.tmp-out
+: 'RUN: at line 5';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple-loop8.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/simple-loop8.c &>/var/tmp/suyash/slowbeast/tests/Output/simple-loop8.c.tmp.log
+: 'RUN: at line 6';   cat /var/tmp/suyash/slowbeast/tests/Output/simple-loop8.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/simple-loop8.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 4"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/simple-loop8.c.tmp-out"
+$ ":" "RUN: at line 5"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple-loop8.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/simple-loop8.c"
+$ ":" "RUN: at line 6"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/simple-loop8.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: simple.c (32 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: simple.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 4';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/simple.c.tmp-out
+: 'RUN: at line 5';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/simple.c &>/var/tmp/suyash/slowbeast/tests/Output/simple.c.tmp.log
+: 'RUN: at line 6';   cat /var/tmp/suyash/slowbeast/tests/Output/simple.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/simple.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 4"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/simple.c.tmp-out"
+$ ":" "RUN: at line 5"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/simple.c"
+$ ":" "RUN: at line 6"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/simple.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: symbolic-index.c (33 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: symbolic-index.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/symbolic-index.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/symbolic-index.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/symbolic-index.c &>/var/tmp/suyash/slowbeast/tests/Output/symbolic-index.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/symbolic-index.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/symbolic-index.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/symbolic-index.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/symbolic-index.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/symbolic-index.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/symbolic-index.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: interproc1-2.c (34 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: interproc1-2.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/interproc1-2.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc1-2.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/interproc1-2.c &>/var/tmp/suyash/slowbeast/tests/Output/interproc1-2.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/interproc1-2.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/interproc1-2.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/interproc1-2.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc1-2.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/interproc1-2.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/interproc1-2.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: nondet-false.c (35 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: nondet-false.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/nondet-false.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/nondet-false.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/nondet-false.c &>/var/tmp/suyash/slowbeast/tests/Output/nondet-false.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/nondet-false.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/nondet-false.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/nondet-false.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/nondet-false.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/nondet-false.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/nondet-false.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: array4.c (36 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: array4.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/array4.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/array4.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/array4.c &>/var/tmp/suyash/slowbeast/tests/Output/array4.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/array4.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/array4.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/array4.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/array4.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/array4.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/array4.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: struct2.c (37 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: struct2.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/struct2.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/struct2.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/struct2.c &>/var/tmp/suyash/slowbeast/tests/Output/struct2.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/struct2.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/struct2.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/struct2.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/struct2.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/struct2.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/struct2.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: array1.c (38 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: array1.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/array1.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/array1.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/array1.c &>/var/tmp/suyash/slowbeast/tests/Output/array1.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/array1.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/array1.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/array1.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/array1.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/array1.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/array1.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: array-static-false.c (39 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: array-static-false.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 6';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/array-static-false.c.tmp-out
+: 'RUN: at line 7';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/array-static-false.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/array-static-false.c &>/var/tmp/suyash/slowbeast/tests/Output/array-static-false.c.tmp.log
+: 'RUN: at line 8';   cat /var/tmp/suyash/slowbeast/tests/Output/array-static-false.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/array-static-false.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 6"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/array-static-false.c.tmp-out"
+$ ":" "RUN: at line 7"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/array-static-false.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/array-static-false.c"
+$ ":" "RUN: at line 8"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/array-static-false.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: array-static.c (40 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: array-static.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/array-static.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/array-static.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/array-static.c &>/var/tmp/suyash/slowbeast/tests/Output/array-static.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/array-static.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/array-static.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/array-static.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/array-static.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/array-static.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/array-static.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: ptrs1.c (41 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: ptrs1.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/ptrs1.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/ptrs1.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/ptrs1.c &>/var/tmp/suyash/slowbeast/tests/Output/ptrs1.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/ptrs1.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/ptrs1.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/ptrs1.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/ptrs1.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/ptrs1.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/ptrs1.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: simple_6.c (42 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: simple_6.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 6';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/simple_6.c.tmp-out
+: 'RUN: at line 7';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple_6.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/simple_6.c &>/var/tmp/suyash/slowbeast/tests/Output/simple_6.c.tmp.log
+: 'RUN: at line 8';   cat /var/tmp/suyash/slowbeast/tests/Output/simple_6.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/simple_6.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 6"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/simple_6.c.tmp-out"
+$ ":" "RUN: at line 7"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/simple_6.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/simple_6.c"
+$ ":" "RUN: at line 8"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/simple_6.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: interproc1-2-false.c (43 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: interproc1-2-false.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/interproc1-2-false.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc1-2-false.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/interproc1-2-false.c &>/var/tmp/suyash/slowbeast/tests/Output/interproc1-2-false.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/interproc1-2-false.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/interproc1-2-false.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/interproc1-2-false.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc1-2-false.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/interproc1-2-false.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/interproc1-2-false.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: string-init.c (44 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: string-init.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/string-init.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/string-init.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/string-init.c &>/var/tmp/suyash/slowbeast/tests/Output/string-init.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/string-init.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/string-init.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/string-init.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/string-init.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/string-init.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/string-init.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: interproc2-false.c (45 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: interproc2-false.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/interproc2-false.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc2-false.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/interproc2-false.c &>/var/tmp/suyash/slowbeast/tests/Output/interproc2-false.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/interproc2-false.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/interproc2-false.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/interproc2-false.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc2-false.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/interproc2-false.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/interproc2-false.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: seq1.c (46 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: seq1.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 6';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/seq1.c.tmp-out
+: 'RUN: at line 7';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/seq1.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/seq1.c &>/var/tmp/suyash/slowbeast/tests/Output/seq1.c.tmp.log
+: 'RUN: at line 8';   cat /var/tmp/suyash/slowbeast/tests/Output/seq1.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/seq1.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 6"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/seq1.c.tmp-out"
+$ ":" "RUN: at line 7"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/seq1.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/seq1.c"
+$ ":" "RUN: at line 8"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/seq1.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: global1.c (47 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: global1.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/global1.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/global1.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/global1.c &>/var/tmp/suyash/slowbeast/tests/Output/global1.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/global1.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/global1.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/global1.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/global1.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/global1.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/global1.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: xor2-regression.c (48 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: xor2-regression.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/xor2-regression.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/xor2-regression.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/xor2-regression.c &>/var/tmp/suyash/slowbeast/tests/Output/xor2-regression.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/xor2-regression.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/xor2-regression.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/xor2-regression.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/xor2-regression.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/xor2-regression.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/xor2-regression.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: interproc3.c (49 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: interproc3.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/interproc3.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc3.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/interproc3.c &>/var/tmp/suyash/slowbeast/tests/Output/interproc3.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/interproc3.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/interproc3.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/interproc3.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/interproc3.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/interproc3.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/interproc3.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: signextension-1.c (50 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: signextension-1.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/signextension-1.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/signextension-1.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/signextension-1.c &>/var/tmp/suyash/slowbeast/tests/Output/signextension-1.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/signextension-1.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/signextension-1.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/signextension-1.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/signextension-1.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/signextension-1.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/signextension-1.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: xor-regression.c (51 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: xor-regression.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/xor-regression.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/xor-regression.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/xor-regression.c &>/var/tmp/suyash/slowbeast/tests/Output/xor-regression.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/xor-regression.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/xor-regression.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/xor-regression.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/xor-regression.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/xor-regression.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/xor-regression.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+FAIL: Slowbeast C/LLVM tests :: mp_aa-ceq50.c (52 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: mp_aa-ceq50.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/mp_aa-ceq50.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/mp_aa-ceq50.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/mp_aa-ceq50.c &>/var/tmp/suyash/slowbeast/tests/Output/mp_aa-ceq50.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/mp_aa-ceq50.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/mp_aa-ceq50.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/mp_aa-ceq50.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/mp_aa-ceq50.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/mp_aa-ceq50.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/mp_aa-ceq50.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+UNRESOLVED: Slowbeast C/LLVM tests :: concurrency-safety/cdac-numerical-integration.c (53 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: concurrency-safety/cdac-numerical-integration.c' FAILED ********************
+Test has no 'RUN:' line
+********************
+UNRESOLVED: Slowbeast C/LLVM tests :: concurrency-safety/cdac-finding-k-matches.c (54 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: concurrency-safety/cdac-finding-k-matches.c' FAILED ********************
+Test has no 'RUN:' line
+********************
+UNRESOLVED: Slowbeast C/LLVM tests :: concurrency-safety/cdac-demo3.c (55 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: concurrency-safety/cdac-demo3.c' FAILED ********************
+Test has no 'RUN:' line
+********************
+UNRESOLVED: Slowbeast C/LLVM tests :: concurrency-safety/cdac-demo1.c (56 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: concurrency-safety/cdac-demo1.c' FAILED ********************
+Test has no 'RUN:' line
+********************
+UNRESOLVED: Slowbeast C/LLVM tests :: concurrency-safety/simple-pors/run1.c (57 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: concurrency-safety/simple-pors/run1.c' FAILED ********************
+Test has no 'RUN:' line
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: threads/threads-2.c (58 of 108)
+Test requires the following unavailable features: se
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: threads/threads-1.c (59 of 108)
+Test requires the following unavailable features: se
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: global2.c (60 of 108)
+Test requires the following unavailable features: se
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: fork1.c (61 of 108)
+Test requires the following unavailable features: se
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: float1.c (62 of 108)
+Test requires the following unavailable features: bounded
+********************
+FAIL: Slowbeast C/LLVM tests :: floattoint.c (63 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: floattoint.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 4';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/floattoint.c.tmp-out
+: 'RUN: at line 5';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/floattoint.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/floattoint.c &>/var/tmp/suyash/slowbeast/tests/Output/floattoint.c.tmp.log
+: 'RUN: at line 6';   cat /var/tmp/suyash/slowbeast/tests/Output/floattoint.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/floattoint.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 4"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/floattoint.c.tmp-out"
+$ ":" "RUN: at line 5"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/floattoint.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/floattoint.c"
+$ ":" "RUN: at line 6"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/floattoint.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: array3.c (64 of 108)
+Test requires the following unavailable features: bounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: sum03-2.c (65 of 108)
+Test requires the following unavailable features: unbounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: unsupported/inttofloat.c (66 of 108)
+Test requires the following unavailable features: unsupported
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/Ex07.c (67 of 108)
+Test requires the following unavailable features: termination
+********************
+FAIL: Slowbeast C/LLVM tests :: terminator_02-1-false.c (68 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: terminator_02-1-false.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 3';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/terminator_02-1-false.c.tmp-out
+: 'RUN: at line 4';   /var/tmp/suyash/slowbeast/sb -se-exit-on-error -out-dir=/var/tmp/suyash/slowbeast/tests/Output/terminator_02-1-false.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/terminator_02-1-false.c &>/var/tmp/suyash/slowbeast/tests/Output/terminator_02-1-false.c.tmp.log
+: 'RUN: at line 5';   cat /var/tmp/suyash/slowbeast/tests/Output/terminator_02-1-false.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/terminator_02-1-false.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 3"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/terminator_02-1-false.c.tmp-out"
+$ ":" "RUN: at line 4"
+$ "/var/tmp/suyash/slowbeast/sb" "-se-exit-on-error" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/terminator_02-1-false.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/terminator_02-1-false.c"
+$ ":" "RUN: at line 5"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/terminator_02-1-false.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: fptr.c (69 of 108)
+Test requires the following unavailable features: se
+********************
+FAIL: Slowbeast C/LLVM tests :: sum04-2.c (70 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: sum04-2.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 5';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/sum04-2.c.tmp-out
+: 'RUN: at line 6';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/sum04-2.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/sum04-2.c &>/var/tmp/suyash/slowbeast/tests/Output/sum04-2.c.tmp.log
+: 'RUN: at line 7';   cat /var/tmp/suyash/slowbeast/tests/Output/sum04-2.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/sum04-2.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 5"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/sum04-2.c.tmp-out"
+$ ":" "RUN: at line 6"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/sum04-2.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/sum04-2.c"
+$ ":" "RUN: at line 7"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/sum04-2.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: sumt7.c (71 of 108)
+Test requires the following unavailable features: bself
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: assume_regression1.c (72 of 108)
+Test requires the following unavailable features: bounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: enh-1.c (73 of 108)
+Test requires the following unavailable features: unbounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: enh-2.c (74 of 108)
+Test requires the following unavailable features: unbounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/while_infinite_loop_1.c (75 of 108)
+Test requires the following unavailable features: termination
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: terminator_02-2.c (76 of 108)
+Test requires the following unavailable features: unbounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/termination-1.c (77 of 108)
+Test requires the following unavailable features: termination
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/not-02-false.c (78 of 108)
+Test requires the following unavailable features: termination
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: in-de20.c (79 of 108)
+Test requires the following unavailable features: bself
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: sumt4.c (80 of 108)
+Test requires the following unavailable features: bself
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: unbounded-nested1.c (81 of 108)
+Test requires the following unavailable features: unbounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: unbounded-loop2.c (82 of 108)
+Test requires the following unavailable features: unbounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/termination-3.c (83 of 108)
+Test requires the following unavailable features: termination
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: count_up_down-1.c (84 of 108)
+Test requires the following unavailable features: bself
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: ps2-ll.c (85 of 108)
+Test requires the following unavailable features: bself
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/WhileFalse.c (86 of 108)
+Test requires the following unavailable features: termination
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/WhileTrue.c (87 of 108)
+Test requires the following unavailable features: termination
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/termination-6.c (88 of 108)
+Test requires the following unavailable features: termination
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/Sunset.c (89 of 108)
+Test requires the following unavailable features: termination
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/termination-4.c (90 of 108)
+Test requires the following unavailable features: termination
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: count_by_2.c (91 of 108)
+Test requires the following unavailable features: unbounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: simple_4.c (92 of 108)
+Test requires the following unavailable features: unbounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: simple_5.c (93 of 108)
+Test requires the following unavailable features: unbounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: unsupported/termination-2.c (94 of 108)
+Test requires the following unavailable features: termination
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: ptrconv.c (95 of 108)
+Test requires the following unavailable features: unbounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: unbounded-two-loops.c (96 of 108)
+Test requires the following unavailable features: unbounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/termination-8.c (97 of 108)
+Test requires the following unavailable features: termination
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: mono-crafted_11.c (98 of 108)
+Test requires the following unavailable features: unbounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: mono-crafted_6.c (99 of 108)
+Test requires the following unavailable features: unbounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: bytes.c (100 of 108)
+Test requires the following unavailable features: bounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: unbounded-simple.c (101 of 108)
+Test requires the following unavailable features: unbounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: jm2006.c (102 of 108)
+Test requires the following unavailable features: bself
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: unbounded2.c (103 of 108)
+Test requires the following unavailable features: unbounded
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/termination-2-2.c (104 of 108)
+Test requires the following unavailable features: termination
+********************
+UNSUPPORTED: Slowbeast C/LLVM tests :: termination/termination-5.c (105 of 108)
+Test requires the following unavailable features: termination
+********************
+FAIL: Slowbeast C/LLVM tests :: array-static-2.c (106 of 108)
+******************** TEST 'Slowbeast C/LLVM tests :: array-static-2.c' FAILED ********************
+Script:
+--
+: 'RUN: at line 6';   rm -rf /var/tmp/suyash/slowbeast/tests/Output/array-static-2.c.tmp-out
+: 'RUN: at line 7';   /var/tmp/suyash/slowbeast/sb -out-dir=/var/tmp/suyash/slowbeast/tests/Output/array-static-2.c.tmp-out  /var/tmp/suyash/slowbeast/tests/c/array-static-2.c &>/var/tmp/suyash/slowbeast/tests/Output/array-static-2.c.tmp.log
+: 'RUN: at line 8';   cat /var/tmp/suyash/slowbeast/tests/Output/array-static-2.c.tmp.log | FileCheck /var/tmp/suyash/slowbeast/tests/c/array-static-2.c
+--
+Exit Code: 127
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 6"
+$ "rm" "-rf" "/var/tmp/suyash/slowbeast/tests/Output/array-static-2.c.tmp-out"
+$ ":" "RUN: at line 7"
+$ "/var/tmp/suyash/slowbeast/sb" "-out-dir=/var/tmp/suyash/slowbeast/tests/Output/array-static-2.c.tmp-out" "/var/tmp/suyash/slowbeast/tests/c/array-static-2.c"
+$ ":" "RUN: at line 8"
+$ "FileCheck" "/var/tmp/suyash/slowbeast/tests/c/array-static-2.c"
+# command stderr:
+'FileCheck': command not found
+error: command failed with exit status: 127
+
+--
+
+********************
+********************
+Unresolved Tests (5):
+  Slowbeast C/LLVM tests :: concurrency-safety/cdac-demo1.c
+  Slowbeast C/LLVM tests :: concurrency-safety/cdac-demo3.c
+  Slowbeast C/LLVM tests :: concurrency-safety/cdac-finding-k-matches.c
+  Slowbeast C/LLVM tests :: concurrency-safety/cdac-numerical-integration.c
+  Slowbeast C/LLVM tests :: concurrency-safety/simple-pors/run1.c
+
+********************
+Failed Tests (55):
+  Slowbeast C/LLVM tests :: array-static-false.c
+  Slowbeast C/LLVM tests :: array-static.c
+  Slowbeast C/LLVM tests :: array1.c
+  Slowbeast C/LLVM tests :: array2.c
+  Slowbeast C/LLVM tests :: array4.c
+  Slowbeast C/LLVM tests :: array5-false-def-behavior.c
+  Slowbeast C/LLVM tests :: concrete_overflow_regression.c
+  Slowbeast C/LLVM tests :: conjunctive23.c
+  Slowbeast C/LLVM tests :: diamond_regression.c
+  Slowbeast C/LLVM tests :: fabs.c
+  Slowbeast C/LLVM tests :: float12.c
+  Slowbeast C/LLVM tests :: floattoint.c
+  Slowbeast C/LLVM tests :: global1.c
+  Slowbeast C/LLVM tests :: interproc1-2-false.c
+  Slowbeast C/LLVM tests :: interproc1-2.c
+  Slowbeast C/LLVM tests :: interproc1-3-false.c
+  Slowbeast C/LLVM tests :: interproc1-3.c
+  Slowbeast C/LLVM tests :: interproc1-false.c
+  Slowbeast C/LLVM tests :: interproc1.c
+  Slowbeast C/LLVM tests :: interproc2-false.c
+  Slowbeast C/LLVM tests :: interproc2.c
+  Slowbeast C/LLVM tests :: interproc3-false.c
+  Slowbeast C/LLVM tests :: interproc3.c
+  Slowbeast C/LLVM tests :: mp_aa-ceq50.c
+  Slowbeast C/LLVM tests :: nondet-false.c
+  Slowbeast C/LLVM tests :: ptr-overwrite.c
+  Slowbeast C/LLVM tests :: ptrs1.c
+  Slowbeast C/LLVM tests :: sanfoundry.c
+  Slowbeast C/LLVM tests :: seq1.c
+  Slowbeast C/LLVM tests :: signextension-1.c
+  Slowbeast C/LLVM tests :: simple-loop.c
+  Slowbeast C/LLVM tests :: simple-loop1.c
+  Slowbeast C/LLVM tests :: simple-loop4.c
+  Slowbeast C/LLVM tests :: simple-loop8.c
+  Slowbeast C/LLVM tests :: simple.c
+  Slowbeast C/LLVM tests :: simple_2.c
+  Slowbeast C/LLVM tests :: simple_3-false.c
+  Slowbeast C/LLVM tests :: simple_3.c
+  Slowbeast C/LLVM tests :: simple_4-1-false.c
+  Slowbeast C/LLVM tests :: simple_6.c
+  Slowbeast C/LLVM tests :: simple_7.c
+  Slowbeast C/LLVM tests :: string-false.c
+  Slowbeast C/LLVM tests :: string-init.c
+  Slowbeast C/LLVM tests :: struct1.c
+  Slowbeast C/LLVM tests :: struct2.c
+  Slowbeast C/LLVM tests :: struct3.c
+  Slowbeast C/LLVM tests :: sum04-2.c
+  Slowbeast C/LLVM tests :: symbolic-index.c
+  Slowbeast C/LLVM tests :: terminator_01-false.c
+  Slowbeast C/LLVM tests :: terminator_02-1-false.c
+  Slowbeast C/LLVM tests :: unbounded-loop2-false.c
+  Slowbeast C/LLVM tests :: unbounded-simple-false.c
+  Slowbeast C/LLVM tests :: xor-regression.c
+  Slowbeast C/LLVM tests :: xor2-regression.c
+  Slowbeast C/LLVM tests :: xor3-regression-false.c
+
+
+Testing Time: 338.63s
+  Skipped    : 43
+  Unsupported:  5
+  Unresolved :  5
+  Failed     : 55

@@ -40,9 +40,6 @@ class IExecutor:
         self._executed_instrs = 0
         self._executed_blks = 0
 
-    # def set_memory_model(self, mm):
-    #    self.memorymodel = mm
-
     def get_memory_model(self) -> SymbolicMemoryModel:
         assert self.memorymodel is not None
         return self.memorymodel
@@ -83,8 +80,6 @@ class IExecutor:
         return states
 
     def exec_load(self, state: SEState, instr: Load) -> List[SEState]:
-        assert isinstance(instr, Load)
-
         states = self.memorymodel.read(
             state, instr, instr.pointer_operand(), instr.bytewidth(), instr.bitwidth()
         )
@@ -353,8 +348,10 @@ class IExecutor:
         """
         Execute the next instruction in the state and modify the state accordingly.
         """
+        if instr is None:
+            instr = state.pc
         # debug print
-        if __debug__:
+        if __debug__ and hasattr(instr, "get_metadata"):
             dbgloc = instr.get_metadata("dbgloc")
             ldbgv(
                 "({2}) {3} {0}: {1}",

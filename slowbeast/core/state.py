@@ -132,13 +132,10 @@ class ExecutionState:
         """
         Associate a value to with a register (in the current stack frame).
 
-        It holds that:
+        It holds that: NOTE
           self.set(x, v)
           assert self.eval(x) == v
         """
-        # if __debug__:
-        #    h = f" ({hex(v.value())})" if v and v.is_concrete() and v.is_bv() else ""
-        #    dbgv(f"[{what}] -> {v}{h}", color="green", verbose_lvl=3)
         # XXX: rename to bind?
         self.memory.set(what, v)
 
