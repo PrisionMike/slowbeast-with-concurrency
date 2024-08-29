@@ -5,6 +5,7 @@ from slowbeast.ir.function import Function
 from slowbeast.ir.instruction import Alloc, Call, Load, Store, ThreadJoin, Thread
 from slowbeast.symexe.interpreter import SymbolicInterpreter as SymexeInterpreter
 from slowbeast.symexe.options import SEOptions
+from slowbeast.symexe.state import SEState
 from slowbeast.symexe.threads.iexecutor import IExecutor, may_be_glob_mem
 from slowbeast.symexe.threads.state import TSEState
 from slowbeast.util.debugging import print_stderr
@@ -185,253 +186,42 @@ class DPORSymbolicInterpreter(SymbolicInterpreter):
         super().__init__(P, ohandler, opts)
         print("Running symbolic execution with DPOR")
 
-    def _schedule_atomic(self, state) -> bool:
-        assert state.num_threads() > 0
-        # if the thread is in an atomic sequence, continue it...
-        t = state.thread()
-        if t.in_atomic():
-            if not t.is_paused():
-                return True
-            # this thread is dead-locked, but other can continue
-            state.set_killed(
-                f"Thread {t.get_id()} is stucked "
-                "(waits for a mutex inside an atomic sequence)"
-            )
-            return False
+    def get_extended_states(self) -> TSEState:
+        pass
 
-        is_global_ev = self._is_global_event
-        for idx, t in enumerate(state.threads()):
-            if t.is_paused():
-                continue
-            if not is_global_ev(state, t.pc):
-                state.schedule(idx)
-                return True
-        return False
-
-    def step(self, state):
-        # execute a step and then finish any atomic/non-global events that
-        # follow
-        assert state.is_ready()
-        queue, states = [], []
-        execute = self._executor.execute
-        is_global_ev = self._is_global_event
-        if is_global_ev(state, state.pc):
-            state.add_event()
-        tmp = execute(state, state.pc)
-        for ns in tmp:
-            ns.sync_pc()
-            (queue, states)[0 if ns.is_ready() else 1].append(ns)
-
-        sched_atomic = self._schedule_atomic
-        while queue:
-            newq = []
-            for s in queue:
-                if sched_atomic(state):
-                    if is_global_ev(s, s.pc):
-                        s.add_event()
-                    tmp = execute(s, s.pc)
-                    for ns in tmp:
-                        ns.sync_pc()
-                        (newq, states)[0 if ns.is_ready() else 1].append(ns)
-                else:
-                    states.append(s)
-            queue = newq
-        return states
-
-    def step_thread(self, state, idx):
-        # execute a step and then finish any atomic/non-global events that
-        # follow
-        assert state.is_ready()
-        queue, states = [], []
-        execute = self._executor.execute
-        is_global_ev = self._is_global_event
-        state.schedule(idx)
-        if is_global_ev(state, state.pc):
-            state.add_event()
-        tmp = execute(state, state.pc)
-        for ns in tmp:
-            ns.sync_pc()
-            (queue, states)[0 if ns.is_ready() else 1].append(ns)
-
-        is_global_ev = self._is_global_event
-        while queue:
-            newq = []
-            for s in queue:
-                assert s.num_threads() > 0
-                t = s.thread()
-                # if the thread is in an atomic sequence, continue it...
-                if t.is_paused():
-                    if t.in_atomic():
-                        state.set_killed(
-                            f"Thread {t.get_id()} is stucked "
-                            "(waits for a mutex inside an atomic sequence)"
-                        )
-                    states.append(state)
-                    continue
-                if is_global_ev(s, s.pc):
-                    if not t.in_atomic():
-                        states.append(state)
-                        continue
-                    s.add_event()
-                tmp = execute(s, s.pc)
-                for ns in tmp:
-                    ns.sync_pc()
-                    (newq, states)[0 if ns.is_ready() else 1].append(ns)
-            queue = newq
-        return states
-
-    def step_threads(self, state, tids):
-        step_thread = self.step_thread
-        ready, nonready = [state], []
-        for tid in tids:
-            newready = []
-            for s in ready:
-                idx = s._thread_idx(tid)
-                assert idx is not None
-                tmp = step_thread(s, idx)
-                for ts in tmp:
-                    (newready, nonready)[0 if ts.is_ready() else 1].append(ts)
-            ready = newready
-        return ready + nonready
+    def get_enabled_states(self) -> TSEState:
+        pass
 
     def run(self) -> int:
+        # Implement Explore()
+        # RUN AT CHOOSE IN MAIN ALGO.
         self.prepare()
+        executing_states = self.get_executing_states()
+        avoiding_states = self.get_avoiding_states()
+        assisting_states = self.get_assisting_states()
 
-        # we're ready to go!
-        state = None
+        self.explore(executing_states, avoiding_states, assisting_states)
+    
+    def prepare(self) -> None:
+        # Should set explore to {phi phi phi}
+        return super().prepare()
+    
+    # Set C
+    def get_executing_states(self) -> TSEState:
+        pass
 
-        try:
-            state = self._run()
-        except Exception as e:
-            print_stderr(
-                f"Fatal error while executing '{state.pc if state else '<no state>'}'",
-                color="red",
-            )
-            state.dump()
-            raise e
+    # Set A in the algorithm
+    def get_assisting_states(self) -> TSEState:
+        pass
 
-        self.report()
+    # Set D
+    def get_avoiding_states(self) -> TSEState:
+        pass
 
-        return 0
+    # Set U
+    def get_known_states(self) -> TSEState:
+        pass
 
-    def _run(self):
-        get_next = self.get_next_state
-        step = self.step
-        step_thread = self.step_thread
-        handle_new_states = self.handle_new_states
-        while self.states:
-            state = get_next()
-            assert state.is_ready(), state.status()
-            can_run = [
-                idx for idx, t in enumerate(state.threads()) if not t.is_paused()
-            ]
-            if len(can_run) == 0:  # nothing to run
-                state.set_error(GenericError("Deadlock detected"))
-                newstates = [state]
-            elif len(can_run) == 1:  # only one possible thread to run
-                state.schedule(can_run[0])
-                newstates = step(state)
-            else:
-                # more options, fork!
-                newstates = []
-                oldevs = state.events()
-                ev = state.get_last_event()
-                states_with_events = []
-                # execute an event in each thread and gather all the new
-                # states and events
-                for idx in can_run:
-                    s = state.copy()
-                    tid = state.thread_id(idx)
-                    tmp = step_thread(s, idx)
-                    for ns in tmp:
-                        if not ns.is_ready():
-                            newstates.append(ns)
-                            continue
-                        events = ns.events()
-                        assert events[len(oldevs) - 1] is ev
-                        states_with_events.append((tid, ns, events[len(oldevs) :]))
-
-                independent = set()
-                for tid, ns, events in states_with_events:
-                    if not has_conflicts(ns, events, states_with_events):
-                        independent.add(tid)
-                # move all independent threads
-                if independent:
-                    if len(independent) == len(states_with_events):
-                        # if all threads did an independent event, pick one
-                        # and move the others
-                        independent.remove(states_with_events[0][0])
-                        states_with_events = [states_with_events[0]]
-                    for tid, ns, events in states_with_events:
-                        if tid in independent:
-                            continue
-                        newstates += self.step_threads(ns, independent)
-                else:
-                    newstates += [s for _, s, _ in states_with_events]
-
-            handle_new_states(newstates)
-        return state
-
-
-
-# def is_same_mem(state, mem1, mem2, bytes_num):
-#     p1 = state.eval(mem1)
-#     p2 = state.eval(mem2)
-#     if p1.is_concrete() and p2.is_concrete():
-#         # FIXME: compare also offsets
-#         return p1.object() == p2.object()
-#     # TODO: fork?
-#     return True
-#
-#
-# def is_same_val(state, op1, op2):
-#     """Return if True if reading mem1 and mem2 must result in the same value"""
-#     val1 = state.try_eval(op1)
-#     val2 = state.try_eval(op2)
-#     if val1 is None or val2 is None:
-#         return False
-#     return val1 == val2
-#
-#
-# def reads_same_val(state, loadop, storevalop, bytes_num):
-#     p1 = state.eval(loadop)
-#     val = state.try_eval(storevalop)
-#     if val is None:
-#         return False
-#     lval, err = state.memory.read(p1, bytes_num)
-#     if err:
-#         return False
-#     # TODO: handle symbolic values?
-#     return lval == val
-#
-#
-# def get_conflicting(state, thr):
-#     "Get threads that will conflict with 'thr' if executed"
-#     confl = []
-#     pc = state.thread(thr).pc
-#     isload, iswrite = isinstance(pc, Load), isinstance(pc, Store)
-#     if not isload and not iswrite:
-#         return confl
-#     bytes_num = pc.bytewidth()
-#     for idx, t in enumerate(state.threads()):
-#         if idx == thr:
-#             continue
-#         tpc = t.pc
-#         # we handle this differently
-#         # if isinstance(tpc, Return) and idx == 0:
-#         #    # return from main is always conflicting
-#         #    confl.append(idx)
-#         if isload and isinstance(tpc, Store):
-#             if is_same_mem(state, pc.operand(0), tpc.operand(1), bytes_num):
-#                 if not reads_same_val(state, pc.operand(0), tpc.operand(0), bytes_num):
-#                     confl.append(idx)
-#         elif iswrite:
-#             if isinstance(tpc, Store):
-#                 if is_same_mem(state, pc.operand(1), tpc.operand(1), bytes_num):
-#                     if not is_same_val(state, pc.operand(0), tpc.operand(0)):
-#                         confl.append(idx)
-#             elif isinstance(tpc, Load):
-#                 if is_same_mem(state, pc.operand(1), tpc.operand(0), bytes_num):
-#                     confl.append(idx)
-#     return confl
-#
+    # Set G
+    def get_deletable_states(self) -> TSEState:
+        pass

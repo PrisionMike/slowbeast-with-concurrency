@@ -1,5 +1,5 @@
 from sys import stdout
-from typing import Union, Optional, List, TextIO
+from typing import Union, Optional, List, TextIO, Self
 
 from slowbeast.core.callstack import CallStack
 from slowbeast.core.errors import GenericError
@@ -43,9 +43,10 @@ class TSEState(BaseState):
         # threads waiting in join until the joined thread exits
         self._wait_join = {}
         self._exited_threads = {}
+        # Trace of all the events. Uniquely defines the state.
         self._event_trace = []
         # self._trace = []
-        self._events = []  # the sequence of events (for DPOR)
+        # self._events = []  # the sequence of events (for DPOR)
         self._mutexes = {}
         self._wait_mutex = {}
         self._conflicts = []
@@ -323,7 +324,13 @@ class TSEState(BaseState):
         write(" -- Events --\n")
         for it in self._events:
             write(str(it) + "\n")
-    
-    # write(" -- Trace --\n")
-    # for it in self._trace:
-    #    write(it + "\n")
+
+    def get_extention_states(self) -> List[Self]:
+        pass
+
+    # Implement either one below and complement the other with above.
+    def get_conflicting_states(self) -> List[Self]:
+        pass
+
+    def get_enabled_states(self) -> List[Self]:
+        pass

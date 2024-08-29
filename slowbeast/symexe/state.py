@@ -293,7 +293,6 @@ class Thread:
         self._detached = False
         self._in_atomic = False
         self._exit_val = None
-        # Thread.ids += 1
 
     def copy(self) -> "Thread":
         n = copy(self)  # shallow copy
