@@ -1,5 +1,5 @@
 from sys import stdout
-from typing import Union, Optional, List, TextIO, Self
+from typing import Union, Optional, List, TextIO, Self, Set
 
 from slowbeast.core.callstack import CallStack
 from slowbeast.core.errors import GenericError
@@ -7,7 +7,7 @@ from slowbeast.core.state import ExecutionState
 from slowbeast.domains.concrete_bitvec import ConcreteBitVec
 from slowbeast.domains.expr import Expr
 from slowbeast.domains.pointer import Pointer
-from slowbeast.ir.instruction import Alloc, GlobalVariable, ThreadJoin, ValueInstruction
+from slowbeast.ir.instruction import Alloc, GlobalVariable, Instruction, ThreadJoin, ValueInstruction
 from slowbeast.symexe.state import SEState as BaseState, Thread, Event
 from slowbeast.util.debugging import ldbgv
 
@@ -325,12 +325,50 @@ class TSEState(BaseState):
         for it in self._events:
             write(str(it) + "\n")
 
-    def get_extention_states(self) -> List[Self]:
+    def get_extented_instructions(self) -> Set[Instruction]:
+        conf = self.get_conflicting_instructions()
+        enabled = self.get_enabled_instructions()
+        # return conf union enabled
+        return None
+
+    # Implement either one below then complement the other with above.
+    def get_conflicting_instructions(self) -> List[Self]:
         pass
 
-    # Implement either one below and complement the other with above.
-    def get_conflicting_states(self) -> List[Self]:
+    def get_enabled_instructions(self) -> List[Self]:
         pass
 
-    def get_enabled_states(self) -> List[Self]:
+    def extend(instructions: Set[Instruction]) -> None:
+        """ Extend the current state with the set of provided instructions."""
+        # Find where the instructions fit.
+        # Execute them all.
         pass
+
+class UEvent:
+    """New Event class. U (Unfolding) added to avoid conflict."""
+    def __init__(self, tid: int = 0, action: Optional[Instruction] = None, program_location : int = 0 ) -> None:
+        self.tid = tid
+        self.action = action
+        self.program_location = program_location
+
+class Configuration():
+    """ Just a wrapper around event set. Doesn't check for formal criteria"""
+    def __init__(self, events: Optional[set]=None):
+        if events is None:
+            self.events = set()
+        else:
+            self.events = set()
+
+    def remove(self, event: Event | set):
+        if type(event) == set:
+            self.events -= event
+        else:
+            self.events.pop(event)
+    
+    def add(self, event: Event | set):
+        if type(event) == Event:
+            self.events.add(event)
+        else:
+            self.events |= event
+    
+    

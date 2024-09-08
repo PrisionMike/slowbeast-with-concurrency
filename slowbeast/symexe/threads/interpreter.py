@@ -1,6 +1,7 @@
 from typing import List, Optional, Union
 
 from slowbeast.core.errors import GenericError
+from slowbeast.interpreter.interpreter import GlobalInit
 from slowbeast.ir.function import Function
 from slowbeast.ir.instruction import Alloc, Call, Load, Store, ThreadJoin, Thread
 from slowbeast.symexe.interpreter import SymbolicInterpreter as SymexeInterpreter
@@ -193,33 +194,96 @@ class DPORSymbolicInterpreter(SymbolicInterpreter):
         pass
 
     def run(self) -> int:
-        # Implement Explore()
-        # RUN AT CHOOSE IN MAIN ALGO.
         self.prepare()
-        executing_states = self.get_executing_states()
-        avoiding_states = self.get_avoiding_states()
-        assisting_states = self.get_assisting_states()
+        self.executing_state = self.get_executing_state() # C
+        self.avoiding_state = self.get_avoiding_state() # D
+        self.assisting_state = self.get_assisting_state() # A
+        self.master_state = self.get_master_state() # U
 
-        self.explore(executing_states, avoiding_states, assisting_states)
+        self.explore()
     
+    def explore(self) -> None:
+        """ Tentative 'run' command."""
+        self.master_state.extend(self.executing_state.get_extented_instructions())
+        
+        enabled_in_c = self.executing_state.get_enabled_instructions()
+        if enabled_in_c.len() == 0 \
+            or enabled_in_c is None:
+            return
+        
+        state_a = self.get_assisting_state()
+        if state_a is None:
+            exec_instruction = enabled_in_c[0]
+        else:
+            for e in state_a.trace:
+                if e in enabled_in_c:
+                    exec_instruction = e
+                    break
+        assert exec_instruction is not None, "event not chosen properly in Explore"
+        
+        
+        
+    
+
     def prepare(self) -> None:
         # Should set explore to {phi phi phi}
-        return super().prepare()
+        self.executing_state = None
+        self.avoiding_state = None
+        self.assisting_state = None
+        self.master_state = self._executor.create_state() # Should be initial state.
+        
+        # Copied from parent class.
+        # push call to main to call stack
+        entry = self.get_program().entry()
+        self.master_state.push_call(None, entry)
+        main_args = self._main_args(self.master_state)
+        assert self.master_state.num_threads() == 1
+        if main_args:
+            self.master_state.get_cs().set_values(main_args)
+        self.master_state.sync_pc()
+        self.run_static()
     
+    def run_static(self) -> None:
+        """Run static actors (e.g. initialize globals)"""
+        # fake the program counter for the executor
+        ginit = GlobalInit()
+
+        self.master_state.pc = ginit
+
+        globs = self._program.globals()
+        for G in globs:
+            # bind the global to the state
+            self.master_state.memory.allocate_global(G, zeroed=G.is_zeroed())
+
+            if not G.has_init():
+                continue
+            for i in G.init():
+                # Hack for concurrent program: FIXME
+                if self.get_options().threads:
+                    ret = self._executor.execute_single_thread(self.master_state, i)
+                else:
+                    ret = self._executor.execute(self.master_state, i)
+                assert len(ret) == 1, "Unhandled initialization"
+                assert ret[
+                    0
+                ].is_ready(), (
+                    "Generated errorneous state during initialization of globals"
+                )
+                    
     # Set C
-    def get_executing_states(self) -> TSEState:
+    def get_executing_state(self) -> TSEState:
         pass
 
     # Set A in the algorithm
-    def get_assisting_states(self) -> TSEState:
+    def get_assisting_state(self) -> TSEState:
         pass
 
     # Set D
-    def get_avoiding_states(self) -> TSEState:
+    def get_avoiding_state(self) -> TSEState:
         pass
 
     # Set U
-    def get_known_states(self) -> TSEState:
+    def get_master_state(self) -> TSEState:
         pass
 
     # Set G
