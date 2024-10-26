@@ -21,8 +21,6 @@ class TSEState(BaseState):
         "_wait_mutex",
         "_mutexes",
         "_last_tid",
-        # "_trace",
-        "_event_trace",
         "_events",
         "_conflicts",
         "_tainted_locations",
@@ -40,18 +38,16 @@ class TSEState(BaseState):
             self._threads = { 0: Thread(0, pc, self.memory.get_cs())}
         else:
             None
-        # threads waiting in join until the joined thread exits
         self._wait_join = {}
         self._exited_threads = {}
-        # Trace of all the events. Uniquely defines the state.
-        self._event_trace = []
-        # self._trace = []
-        # self._events = []  # the sequence of events (for DPOR)
         self._mutexes = {}
         self._wait_mutex = {}
         self._conflicts = []
         self._tainted_locations = []
         self._race_alert = False
+        self.is_bot = False
+        self.causes = None
+        self.caused_by = None
 
     def _thread_idx(self, thr: Thread) -> int:
         '''Return ID of a given thread. Thread's own ID'''
@@ -344,31 +340,7 @@ class TSEState(BaseState):
         # Execute them all.
         pass
 
-class UEvent:
-    """New Event class. U (Unfolding) added to avoid conflict."""
-    def __init__(self, tid: int = 0, action: Optional[Instruction] = None, program_location : int = 0 ) -> None:
-        self.tid = tid
-        self.action = action
-        self.program_location = program_location
-
-class Configuration():
-    """ Just a wrapper around event set. Doesn't check for formal criteria"""
-    def __init__(self, events: Optional[set]=None):
-        if events is None:
-            self.events = set()
-        else:
-            self.events = set()
-
-    def remove(self, event: Event | set):
-        if type(event) == set:
-            self.events -= event
-        else:
-            self.events.pop(event)
-    
-    def add(self, event: Event | set):
-        if type(event) == Event:
-            self.events.add(event)
-        else:
-            self.events |= event
-    
-    
+    @classmethod
+    def createBottom(cls):
+        return cls(is_bot = True)
+        
