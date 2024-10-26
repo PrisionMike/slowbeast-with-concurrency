@@ -22,7 +22,7 @@ class TSEState(BaseState):
         "_mutexes",
         "_last_tid",
         "_events",
-        "_conflicts",
+        "conflicts",
         "_tainted_locations",
         "_race_alert"
     )
@@ -42,12 +42,15 @@ class TSEState(BaseState):
         self._exited_threads = {}
         self._mutexes = {}
         self._wait_mutex = {}
-        self._conflicts = []
+        self.conflicts : Set[TSEState] = Set()
+        self.immediate_conflicts : Set[TSEState] = Set()
         self._tainted_locations = []
         self._race_alert = False
         self.is_bot = False
-        self.causes = None
-        self.caused_by = None
+        self.causes : Optional[TSEState] = None
+        self.caused_by : TSEState = self # Only bottom event can self reference itself.
+        self.transition : Instruction = None
+        self.data_race : bool = False
 
     def _thread_idx(self, thr: Thread) -> int:
         '''Return ID of a given thread. Thread's own ID'''
@@ -290,22 +293,6 @@ class TSEState(BaseState):
     def threads(self) -> iter:
         return self._threads.values()
 
-    def add_conflict(self, state) -> None:
-        self._conflicts.append((state.get_last_event(), state))
-
-    def filter_conflicts(self, ev=None):
-        if ev is None:
-            ev = self.get_last_event()
-        ret, newc = [], []
-        conflicts = ev.conflicts
-        for cev, s in self._conflicts:
-            if conflicts(cev):
-                ret.append(s)
-            else:
-                newc.append((cev, s))
-        self._conflicts = newc
-        return ret
-
     def dump(self, stream: TextIO = stdout) -> None:
         super().dump(stream)
         write = stream.write
@@ -320,25 +307,6 @@ class TSEState(BaseState):
         write(" -- Events --\n")
         for it in self._events:
             write(str(it) + "\n")
-
-    def get_extented_instructions(self) -> Set[Instruction]:
-        conf = self.get_conflicting_instructions()
-        enabled = self.get_enabled_instructions()
-        # return conf union enabled
-        return None
-
-    # Implement either one below then complement the other with above.
-    def get_conflicting_instructions(self) -> List[Self]:
-        pass
-
-    def get_enabled_instructions(self) -> List[Self]:
-        pass
-
-    def extend(instructions: Set[Instruction]) -> None:
-        """ Extend the current state with the set of provided instructions."""
-        # Find where the instructions fit.
-        # Execute them all.
-        pass
 
     @classmethod
     def createBottom(cls):
