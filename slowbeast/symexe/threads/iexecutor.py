@@ -157,21 +157,11 @@ class IExecutor(BaseIExecutor):
         state.pc = rs.get_next_inst()
         return [state]
 
-    def execute(self, state: TSEState, instr: Instruction) -> List[Optional[TSEState]]:
-
+    def execute(self, state: TSEState) -> List[Optional[TSEState]]:
         if state.num_threads() == 0:
             return []
         
         self.check_race = state.race_condition_possible() and 'no-data-race' in self._opts.check
-        
-        # We explore all possible interleavings. DFS - Right to Left.
-        # Each instruction will return the number of active threads times the usual number of returned states.
-        # - For each active non-atomic thread: (Since unpausing is done by active threads, we don't have to execute them)
-        #   - Clone the state.
-        #   - Schedule the thread in this state.
-        #   - push the returned output states in the output stack.
-        # - Return the stack.
-        # instr is irrelevant.
         states = []
         for t in state.threads():
             if not t.is_paused():
