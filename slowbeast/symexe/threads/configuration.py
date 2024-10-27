@@ -28,16 +28,19 @@ class Configuration:
         map( draw_immediate_conflicts, combinations(self.extended_events,2) )
         return not event.data_race
     
-    def remove_event(self, event: TSEState):
-        assert event in self.events, "Removing event not in configuration"
-        stop_traversal : bool = False
-        while self.max_event:
-            if self.max_event.is_bot or stop_traversal:
-                break
-            if event == self.max_event:
-                stop_traversal = True
-            self.max_event = self.max_event.caused_by
-            self.events.remove(event)
+    # def remove_event(self, event: TSEState):
+    #     """Likely unused"""
+    #     assert event in self.events, "Removing event not in configuration"
+    #     stop_traversal : bool = False
+    #     while self.max_event:
+    #         if self.max_event.is_bot or stop_traversal:
+    #             break
+    #         if event == self.max_event:
+    #             stop_traversal = True
+    #         self.max_event = self.max_event.caused_by
+    #         self.events.remove(event)
+    
+
 
 def draw_immediate_conflicts( e1 : TSEState, e2 : TSEState) -> None:
     """ TODO 'Immediate' parameterisation no longer required I think. Do check."""
@@ -88,7 +91,19 @@ def data_race_check( i1: Instruction, i2 : Instruction) -> bool:
         i1.pointer_operand() == i2.pointer_operand()
     )
 
-class Unfolding(Configuration):
-    """ Causally complete partially ordered set of events, along with their conflict relations."""
-    def __init__(self):
-        pass
+# class Unfolding(Configuration):
+#     """ Causally complete partially ordered set of events, along with their conflict relations."""
+#     def __init__(self, bottom_event : Optional[TSEState] = None):
+#         super.__init__(bottom_event)
+    
+#     def add_events(self, extension_set : Set[TSEState] ) -> None:
+#         if not extension_set:
+#             return
+#         else:
+#             event = extension_set.pop()
+#             parent_event = event.caused_by
+#             extension_set.add(event)
+#             for e in extension_set:
+#                 parent_event.causes.add(e)
+                
+    
