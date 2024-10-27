@@ -9,6 +9,7 @@ from slowbeast.domains.expr import Expr
 from slowbeast.domains.pointer import Pointer
 from slowbeast.ir.instruction import Alloc, GlobalVariable, Instruction, ThreadJoin, ValueInstruction
 from slowbeast.symexe.state import SEState as BaseState, Thread, Event
+from slowbeast.symexe.threads.iexecutor import IExecutor
 from slowbeast.util.debugging import ldbgv
 
 
@@ -28,7 +29,7 @@ class TSEState(BaseState):
     )
 
     def __init__(
-        self, executor=None, pc=None, m=None, solver=None, constraints=None
+        self, executor : IExecutor, pc=None, m=None, solver=None, constraints=None
     ) -> None:
         super().__init__(executor, pc, m, solver, constraints)
         self._last_tid = 0
@@ -42,14 +43,14 @@ class TSEState(BaseState):
         self._exited_threads = {}
         self._mutexes = {}
         self._wait_mutex = {}
-        self.conflicts : Set[TSEState] = Set()
-        self.immediate_conflicts : Set[TSEState] = Set()
+        self.conflicts : Set[Self] = set()
+        self.immediate_conflicts : Set[Self] = set()
         self._tainted_locations = []
         self._race_alert = False
         self.is_bot = False
-        self.causes : Optional[TSEState] = None
-        self.caused_by : TSEState = self # Only bottom event can self reference itself.
-        self.transition : Instruction = None
+        self.causes : Set[Self] = set()
+        self.caused_by : Self = self # Only bottom event can self reference itself.
+        self.transition : Optional[Instruction] = None # None for bottom event
         self.data_race : bool = False
 
     def _thread_idx(self, thr: Thread) -> int:
@@ -308,7 +309,12 @@ class TSEState(BaseState):
         for it in self._events:
             write(str(it) + "\n")
 
-    @classmethod
-    def createBottom(cls):
-        return cls(is_bot = True)
+    def exec(self) -> Set[Self]:
+        self.transition = self.pc
+        output_states = Set(self.executor.execute(self))
+        for s in output_states:
+            pass
+
+    def createBottom(self) -> Self:
+        return self
         
