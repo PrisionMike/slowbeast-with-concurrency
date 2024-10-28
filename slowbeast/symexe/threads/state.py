@@ -14,6 +14,8 @@ from slowbeast.util.debugging import ldbgv
 
 
 class TSEState(BaseState):
+    """TODO: Deprecate all things which shouldn't be owned by the state but should only be owned by a specific thread:
+    state.pc, _current_thread,"""
     __slots__ = (
         "_threads",
         "_current_thread",
@@ -50,7 +52,7 @@ class TSEState(BaseState):
         self.is_bot = False
         self.causes : Set[Self] = set()
         self.caused_by : Self = self # Only bottom event can self reference itself.
-        self.transition : Optional[Instruction] = None # None for bottom event
+        self.transition : Optional[Transition] = None # None for bottom event
         self.data_race : bool = False
 
     def _thread_idx(self, thr: Thread) -> int:
@@ -61,21 +63,18 @@ class TSEState(BaseState):
         else:
             return None
 
-    def _copy_to(self, new: ExecutionState) -> None:
+    def _copy_to(self, new: Self) -> None:
         super()._copy_to(new)
         new._threads = { id: thr.copy() for id,thr in self._threads.items() }
         new._wait_join = self._wait_join.copy()
         new._exited_threads = self._exited_threads.copy()
         new._last_tid = self._last_tid
         new._current_thread = self._current_thread
-        # new._trace = self._trace.copy()
-        new._event_trace = self._event_trace.copy()
-        new._events = self._events.copy()
-        new._conflicts = self._conflicts.copy()
-        # FIXME: do COW (also for wait and exited threads ...)
         new._mutexes = self._mutexes.copy()
         new._wait_mutex = {mtx: W.copy() for mtx, W in self._wait_mutex.items() if W}
         new._race_alert = self._race_alert
+        new.conflicts = self.conflicts
+        new.is_bot = self.is_bot
 
     def trace(self):
         return self._event_trace
@@ -133,8 +132,6 @@ class TSEState(BaseState):
         self.pc = thr.pc
         self.memory.set_cs(thr.cs)
         self._current_thread = idx
-
-        self._event_trace.append((self.thread_id(), self.pc))
 
     def add_thread(self, thread_fn, pc, args) -> Thread:
         self._last_tid += 1
@@ -310,11 +307,18 @@ class TSEState(BaseState):
             write(str(it) + "\n")
 
     def exec(self) -> Set[Self]:
-        self.transition = self.pc
-        output_states = Set(self.executor.execute(self))
+        output_states = self.executor.execute(self)
         for s in output_states:
-            pass
+            s.caused_by = self
+            self.causes.add(s) 
 
     def createBottom(self) -> Self:
         return self
+    
+
+
+class Transition:
+    def __init__(self, thread_id : int, action: Instruction) -> None:
+        self.action = action
+        self.thread_id = thread_id
         

@@ -182,7 +182,7 @@ class SEState(ExecutionState):
         if self._nondets_ro:
             self._nondets = copy(self._nondets)
             self._nondets_ro = False
-        # we can have only one nonded for a given allocation
+        # we can have only one nondet for a given allocation
         if n.is_nondet_load() and self.nondet_load_of(n.alloc) is not None:
             raise RuntimeError(
                 "Multiple nondets of the same load unsupported atm: "

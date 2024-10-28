@@ -1,12 +1,13 @@
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from slowbeast.core.errors import GenericError, MemError
 from slowbeast.domains.concrete import concrete_value
-from slowbeast.ir.instruction import Alloc, Instruction, Load, Store, ThreadJoin, Return, Thread
+from slowbeast.ir.instruction import Alloc, Instruction, Load, Store, ThreadJoin, Return
 from slowbeast.ir.types import get_offset_type
 from slowbeast.symexe.iexecutor import IExecutor as BaseIExecutor
 from slowbeast.symexe.memorymodel import SymbolicMemoryModel
-from slowbeast.symexe.threads.state import TSEState
+from slowbeast.symexe.state import Thread
+from slowbeast.symexe.threads.state import TSEState, Transition
 from slowbeast.util.debugging import ldbgv, dbgv
 
 
@@ -99,14 +100,14 @@ class IExecutor(BaseIExecutor):
             state.start_atomic()
         return super().call_fun(state, instr, fun)
 
-    def exec_thread(self, state, instr):
+    def exec_thread(self, state, instr) -> Set[TSEState]:
         fun = instr.called_function()
         ldbgv("-- THREAD {0} --", (fun.name(),))
         if fun.is_undefined():
             state.set_error(
                 GenericError(f"Spawning thread with undefined function: {fun.name()}")
             )
-            return [state]
+            return set(state)
         # map values to arguments
         # TODO: do we want to allow this? Less actual parameters than formal parameters?
         # assert len(instr.operands()) == len(fun.arguments())
@@ -122,19 +123,18 @@ class IExecutor(BaseIExecutor):
 
         state.pc = state.pc.get_next_inst()
         state.set(instr, concrete_value(t.get_id(), get_offset_type()))
-        # newstate.set(instr, concrete_value(t.get_id(), get_offset_type()))
-        return [state]
+        return set(state)
 
-    def exec_thread_join(self, state, instr: ThreadJoin):
+    def exec_thread_join(self, state, instr: ThreadJoin) -> Set[TSEState]:
         assert len(instr.operands()) == 1
         tid = state.eval(instr.operand(0))
         if not tid.is_concrete():
             state.set_killed("Symbolic thread values are unsupported yet")
         else:
             state.join_threads(tid.value())
-        return [state]
+        return set(state)
 
-    def exec_ret(self, state, instr: Return):
+    def exec_ret(self, state, instr: Return) -> Set[TSEState]:
         # obtain the return value (if any)
         ret = None
         if len(instr.operands()) != 0:  # returns something
@@ -149,63 +149,64 @@ class IExecutor(BaseIExecutor):
         rs = state.pop_call()
         if rs is None:  # popped the last frame
             state.exit_thread(ret)
-            return [state]
+            return set(state)
 
         if ret:
             state.set(rs, ret)
 
         state.pc = rs.get_next_inst()
-        return [state]
+        return set(state)
 
-    def execute(self, state: TSEState) -> List[Optional[TSEState]]:
+    def execute(self, state: TSEState) -> Set[TSEState]:
+                
+        states = set()
         if state.num_threads() == 0:
-            return []
+            return states
         
-        self.check_race = state.race_condition_possible() and 'no-data-race' in self._opts.check
-        states = []
-        for t in state.threads():
-            if not t.is_paused():
-                s = state.copy()    # Copy even when just one thread. Inefficient. XXX
-                s.schedule(t.get_id())
-                self.check_race = self.check_race and not t.in_atomic()
-                states += self.execute_single_thread(s, s.pc)
+        for t in state._threads:
+            if not state.thread(t).is_paused():
+                # self.check_race = self.check_race and not t.in_atomic()
+                states.add(self.execute_single_thread(state, t))
                 for ns in states:
                     ns.sync_pc()
                     ns.sync_cs()
         return states
     
-    def execute_single_thread(self, state: TSEState, instr: Instruction) -> List[TSEState]:
+    def execute_single_thread(self, state: TSEState, thread_id: int) -> Set[TSEState]:
+        s = state.copy()
+        instr = s.thread(thread_id)
+        s.transition = Transition(thread_id, instr)
         if isinstance(instr, Thread):
-            return self.exec_thread(state, instr)
+            return self.exec_thread(s, instr)
         if isinstance(instr, ThreadJoin):
-            return self.exec_thread_join(state, instr)
+            return self.exec_thread_join(s, instr)
         if isinstance(instr, Return):
-            return self.exec_ret(state, instr)
-        if self.check_race:
-            if isinstance(instr, Store):
-                return self.tainted_write(state, instr)
-            elif isinstance(instr, Load):
-                return self.tainted_read(state, instr)
+            return self.exec_ret(s, instr)
+        # if self.check_race:
+        #     if isinstance(s, Store):
+        #         return self.tainted_write(s, instr)
+        #     elif isinstance(instr, Load):
+        #         return self.tainted_read(s, instr)
 
-        return super().execute(state, instr)
+        return set(super().execute(state, instr))
 
-    def tainted_read(self, state: TSEState, instr: Load):
-        if instr.pointer_operand() in state._tainted_locations:
-            err = MemError(MemError.DATA_RACE, " DATA RACE DETECTED: " + str(instr.pointer_operand()))
-            state.set_error(err)
-            return state
-        else:
-            return super().execute(state, instr)
+    # def tainted_read(self, state: TSEState, instr: Load):
+    #     if instr.pointer_operand() in state._tainted_locations:
+    #         err = MemError(MemError.DATA_RACE, " DATA RACE DETECTED: " + str(instr.pointer_operand()))
+    #         state.set_error(err)
+    #         return state
+    #     else:
+    #         return super().execute(state, instr)
 
-    def tainted_write(self, state: TSEState, instr: Store):
-        if instr.pointer_operand() in state._tainted_locations:
-            err = MemError(MemError.DATA_RACE, " DATA RACE DETECTED: " + str(instr.pointer_operand()))
-            state.set_error(err)
-            return state
-        else:
-            if may_be_glob_mem(state, instr.pointer_operand()):
-                state._tainted_locations.append(instr.pointer_operand())
-            return super().execute(state, instr)
+    # def tainted_write(self, state: TSEState, instr: Store):
+    #     if instr.pointer_operand() in state._tainted_locations:
+    #         err = MemError(MemError.DATA_RACE, " DATA RACE DETECTED: " + str(instr.pointer_operand()))
+    #         state.set_error(err)
+    #         return state
+    #     else:
+    #         if may_be_glob_mem(state, instr.pointer_operand()):
+    #             state._tainted_locations.append(instr.pointer_operand())
+    #         return super().execute(state, instr)
 
     # def exec_thread_exit(self, state, instr: ThreadExit):
     #    assert isinstance(instr, ThreadExit)

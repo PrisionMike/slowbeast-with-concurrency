@@ -39,17 +39,15 @@ class Configuration:
     #             stop_traversal = True
     #         self.max_event = self.max_event.caused_by
     #         self.events.remove(event)
-    
-
 
 def draw_immediate_conflicts( e1 : TSEState, e2 : TSEState) -> None:
     """ TODO 'Immediate' parameterisation no longer required I think. Do check."""
     assert e1.caused_by == e2.caused_by, "Can't have immediate conflict without a common parent"
-    if e1.current_thread == e2.current_thread:
+    if e1.transition.thread_id == e2.transition.thread_id:
         add_immediate_conflict(e1, e2)
     else:
-        i1 : Instruction = e1.transition
-        i2 : Instruction = e2.transition
+        i1 : Instruction = e1.transition.action
+        i2 : Instruction = e2.transition.action
         r1 : Commutativity = are_commutative(i1, i2)
         r2 : Commutativity = are_commutative(i2, i1)
         if r1.result or r2.result:
