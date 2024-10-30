@@ -1,5 +1,7 @@
+from typing import List, Set
 from slowbeast.symexe.options import SEOptions
-from slowbeast.symexe.threads.configuration import Unfolding, Configuration
+from slowbeast.symexe.threads.configuration import Configuration
+from slowbeast.symexe.threads.iexecutor import IExecutor
 from slowbeast.symexe.threads.interpreter import SymbolicInterpreter
 from slowbeast.symexe.threads.state import TSEState
 
@@ -8,63 +10,37 @@ class PORSymbolicInterpreter(SymbolicInterpreter):
 
     def __init__(self, P, ohandler=None, opts: SEOptions = SEOptions()) -> None:
         print("Initiating the UPOR executor")
-        super().__init__(P, ohandler, opts)
-        self.bot_state = TSEState.createBottom()
-        self.unfolding = Unfolding()
-
-    def get_extended_states(self) -> TSEState:
-        pass
-
-    def get_enabled_states(self) -> TSEState:
-        pass
+        super().__init__(P, ohandler, opts, IExecutor())
+    
+    def initial_states(self) -> TSEState:
+        return self._executor.create_state()
 
     def run(self) -> int:
         self.prepare()
-        self.bot_state = self.initial_states()[0]
-        self.unfolding.events[0] = self.bot_state
-        self.running_config = Configuration()
+        self.bot_state : TSEState = self.initial_states()[0]
+        self.bot_state.makeBottom()
+        self.config = Configuration(self.bot_state)
+        self.avoiding_set : Set[TSEState] = {}
+        self.adjoining_set : Set[TSEState] = {}
+        # Om Shree Ganeshay Namah!
+        self.explore()
     
-    def explore(self, current_config: Configuration, 
-                avoiding_config: Configuration, 
-                assisting_config: Configuration ) -> None:
+    def explore(self) -> None:
         """ DFS exploring and creating possible configurations."""
-        self.master_state.extend(self.executing_state.get_extented_instructions())
-        
-        enabled_in_c = self.executing_state.get_enabled_instructions()
-        if enabled_in_c.len() == 0 \
-            or enabled_in_c is None:
+        if self.config.enabled_events == {}:
             return
-        
-        state_a = self.get_assisting_state()
-        if state_a is None:
-            exec_instruction = enabled_in_c[0]
+        if self.adjoining_set != {}:
+            event = self.adjoining_set.intersection(self.config.enabled_events).pop()
         else:
-            for e in state_a.trace:
-                if e in enabled_in_c:
-                    exec_instruction = e
-                    break
-        assert exec_instruction is not None, "event not chosen properly in Explore"
+            event = self.config.enabled_events.pop()
         
+        self.config.add_event(event)
+        self.adjoining_set.discard(event)
+        self.explore()
+        if event.conflicts != {}:
+            # FIXME it doesn't work if you change the configuration. You need to send
+            # CUe without changing C.
+            self.config.events.remove(event) # FIXME remove_event
+            self.avoiding_set.add(event)
+        # if there exists an alternative J : explore (C, DUe, J\C)
         
-        
-    
-                    
-    # Set C
-    def get_executing_state(self) -> TSEState:
-        pass
-
-    # Set A in the algorithm
-    def get_assisting_state(self) -> TSEState:
-        pass
-
-    # Set D
-    def get_avoiding_state(self) -> TSEState:
-        pass
-
-    # Set U
-    def get_master_state(self) -> TSEState:
-        pass
-
-    # Set G
-    def get_deletable_states(self) -> TSEState:
-        pass

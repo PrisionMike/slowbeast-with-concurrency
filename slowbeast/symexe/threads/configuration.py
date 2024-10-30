@@ -11,7 +11,7 @@ class Configuration:
     
     def __init__(self, bottom_event : Optional[TSEState] = None):
         self.events : Set[TSEState] = Set()
-        self.extended_events : Set[TSEState] = Set()
+        # self.extended_events : Set[TSEState] = Set()
         self.enabled_events : Set[TSEState] = Set()
         self.conflicting_extension : Set[TSEState] = Set()
         self.bottom_event = bottom_event
@@ -24,10 +24,12 @@ class Configuration:
         assert event in self.enabled_events, "Can't add non-enabled event"
         self.events.add(event)
         self.max_event = event
-        self.extended_events = event.exec() # Execute main instruction. Inherits conflict relations.
-        map( draw_immediate_conflicts, combinations(self.extended_events,2) )
+        self.enabled_events = event.exec()
+        map( draw_immediate_conflicts, combinations(self.enabled_events,2) )
         return not event.data_race
     
+    # def exec(self) -> None:
+    #     self.max_event.exec()
     # def remove_event(self, event: TSEState):
     #     """Likely unused"""
     #     assert event in self.events, "Removing event not in configuration"
@@ -80,7 +82,6 @@ def lock_check( i1: Instruction, i2 : Instruction) -> bool:
         Type(i2) == Call and i2.called_function() == 'pthread_mutex_unlock' and
         i1.operand(0) == i2.operand(0)
     )
-
 
 def data_race_check( i1: Instruction, i2 : Instruction) -> bool:
     return (

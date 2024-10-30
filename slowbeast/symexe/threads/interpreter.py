@@ -23,8 +23,8 @@ def _is_global_event_fun(fn) -> bool:
 
 
 class SymbolicInterpreter(SymexeInterpreter):
-    def __init__(self, P, ohandler=None, opts: SEOptions = SEOptions()) -> None:
-        super().__init__(P, ohandler, opts, ExecutorClass=IExecutor)
+    def __init__(self, P, ohandler=None, opts: SEOptions = SEOptions(), executor = IExecutor()) -> None:
+        super().__init__(P, ohandler, opts, ExecutorClass=executor)
 
     def _is_global_event(self, state, pc: Union[Call, Load, Store, ThreadJoin]) -> bool:
         if isinstance(pc, Load):

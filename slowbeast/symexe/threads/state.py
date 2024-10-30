@@ -54,6 +54,7 @@ class TSEState(BaseState):
         self.caused_by : Self = self # Only bottom event can self reference itself.
         self.transition : Optional[Transition] = None # None for bottom event
         self.data_race : bool = False
+        self.bottom : Optional[Self] = None # Bottom Event. One per instance. Kinda redundant but OK.
 
     def _thread_idx(self, thr: Thread) -> int:
         '''Return ID of a given thread. Thread's own ID'''
@@ -64,6 +65,7 @@ class TSEState(BaseState):
             return None
 
     def _copy_to(self, new: Self) -> None:
+        assert not self.is_bot, "Don't copy the bottom state"
         super()._copy_to(new)
         new._threads = { id: thr.copy() for id,thr in self._threads.items() }
         new._wait_join = self._wait_join.copy()
@@ -74,7 +76,6 @@ class TSEState(BaseState):
         new._wait_mutex = {mtx: W.copy() for mtx, W in self._wait_mutex.items() if W}
         new._race_alert = self._race_alert
         new.conflicts = self.conflicts
-        new.is_bot = self.is_bot
 
     def trace(self):
         return self._event_trace
@@ -310,11 +311,12 @@ class TSEState(BaseState):
         output_states = self.executor.execute(self)
         for s in output_states:
             s.caused_by = self
-            self.causes.add(s) 
+            self.causes.add(s)
+        return output_states
 
-    def createBottom(self) -> Self:
-        return self
-    
+    def makeBottom(self) -> None:
+        # TODO
+        self.is_bot = True
 
 
 class Transition:
