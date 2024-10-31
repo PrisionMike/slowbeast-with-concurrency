@@ -22,7 +22,6 @@ class PORSymbolicInterpreter(SymbolicInterpreter):
         self.config = Configuration(self.bot_state)
         self.avoiding_set : Set[TSEState] = {}
         self.adjoining_set : Set[TSEState] = {}
-        # Om Shree Ganeshay Namah!
         self.explore()
     
     def explore(self) -> None:
@@ -34,13 +33,15 @@ class PORSymbolicInterpreter(SymbolicInterpreter):
         else:
             event = self.config.enabled_events.pop()
         
-        self.config.add_event(event)
+        data_race_result = self.config.add_event(event)
+        if data_race_result:
+            print("*********** DATA RACE DETECTED ***********")
+            exit()
         self.adjoining_set.discard(event)
         self.explore()
         if event.conflicts != {}:
-            # FIXME it doesn't work if you change the configuration. You need to send
-            # CUe without changing C.
-            self.config.events.remove(event) # FIXME remove_event
+            self.config.remove_event(event)
             self.avoiding_set.add(event)
-        # if there exists an alternative J : explore (C, DUe, J\C)
+            self.adjoining_set = self.adjoining_set.union(event.conflicts)
+            self.explore()
         

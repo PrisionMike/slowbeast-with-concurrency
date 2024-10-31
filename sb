@@ -619,12 +619,12 @@ def main():
         elif has_threads:
             dbg("Threads detected, enabling support for threads in SE")
             if args.threads_dpor:
-                from slowbeast.symexe.threads.interpreter import (
-                    DPORSymbolicInterpreter as SymbolicInterpreter,
+                from slowbeast.symexe.threads.interpreterDataRace import (
+                    PORSymbolicInterpreter as SymbolicInterpreter,
                 )
             else:
-                from slowbeast.symexe.threads.interpreter import (
-                    SymbolicInterpreter as SymbolicInterpreter,
+                from slowbeast.symexe.threads.interpreterDataRace import (
+                    PORSymbolicInterpreter as SymbolicInterpreter,
                 )
         elif args.coop_channel:
             from slowbeast.symexe.cooperative import (

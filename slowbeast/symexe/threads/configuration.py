@@ -25,38 +25,37 @@ class Configuration:
         self.events.add(event)
         self.max_event = event
         self.enabled_events = event.exec()
-        map( draw_immediate_conflicts, combinations(self.enabled_events,2) )
+        map( self.draw_immediate_conflicts, combinations(self.enabled_events,2) )
         return not event.data_race
     
     # def exec(self) -> None:
     #     self.max_event.exec()
-    # def remove_event(self, event: TSEState):
-    #     """Likely unused"""
-    #     assert event in self.events, "Removing event not in configuration"
-    #     stop_traversal : bool = False
-    #     while self.max_event:
-    #         if self.max_event.is_bot or stop_traversal:
-    #             break
-    #         if event == self.max_event:
-    #             stop_traversal = True
-    #         self.max_event = self.max_event.caused_by
-    #         self.events.remove(event)
+    def remove_event(self, event: TSEState):
+        # assert event in self.events, "Removing event not in configuration"
+        stop_traversal : bool = False
+        while self.max_event:
+            if self.max_event.is_bot or stop_traversal:
+                break
+            if event == self.max_event:
+                stop_traversal = True
+            self.max_event = self.max_event.caused_by
+            self.events.remove(event)
 
-def draw_immediate_conflicts( e1 : TSEState, e2 : TSEState) -> None:
-    """ TODO 'Immediate' parameterisation no longer required I think. Do check."""
-    assert e1.caused_by == e2.caused_by, "Can't have immediate conflict without a common parent"
-    if e1.transition.thread_id == e2.transition.thread_id:
-        add_immediate_conflict(e1, e2)
-    else:
-        i1 : Instruction = e1.transition.action
-        i2 : Instruction = e2.transition.action
-        r1 : Commutativity = are_commutative(i1, i2)
-        r2 : Commutativity = are_commutative(i2, i1)
-        if r1.result or r2.result:
-            if r1.data_race or r2.data_race:
-                e1.caused_by.data_race = True
+    def draw_immediate_conflicts( e1 : TSEState, e2 : TSEState) -> None:
+        """ TODO 'Immediate' parameterisation no longer required I think. Do check."""
+        assert e1.caused_by == e2.caused_by, "Can't have immediate conflict without a common parent"
+        if e1.transition.thread_id == e2.transition.thread_id:
             add_immediate_conflict(e1, e2)
-    return
+        else:
+            i1 : Instruction = e1.transition.action
+            i2 : Instruction = e2.transition.action
+            r1 : Commutativity = are_commutative(i1, i2)
+            r2 : Commutativity = are_commutative(i2, i1)
+            if r1.result or r2.result:
+                if r1.data_race or r2.data_race:
+                    e1.caused_by.data_race = True
+                add_immediate_conflict(e1, e2)
+        return
 
 def add_immediate_conflict(e1 : TSEState, e2 : TSEState) -> None:
     """Makes sure both immediate and inherited conflicts are updated."""
