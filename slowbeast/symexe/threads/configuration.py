@@ -1,6 +1,6 @@
-from enum import Enum
+from __future__ import annotations
 from itertools import combinations
-from typing import List, Optional, Set, Type
+from typing import Type
 
 from slowbeast.ir.instruction import Call, Instruction, Load, Store
 from slowbeast.symexe.threads.state import TSEState
@@ -9,13 +9,13 @@ from slowbeast.symexe.threads.state import TSEState
 class Configuration:
     """ Conflict free causally complete (linearly ordered) set of events (states)"""
     
-    def __init__(self, bottom_event : Optional[TSEState] = None):
-        self.events : Set[TSEState] = Set()
+    def __init__(self, bottom_event : TSEState | None = None):
+        self.events : set[TSEState] = set()
         # self.extended_events : Set[TSEState] = Set()
-        self.enabled_events : Set[TSEState] = Set()
-        self.conflicting_extension : Set[TSEState] = Set()
+        self.enabled_events : set[TSEState] = set()
+        self.conflicting_extension : set[TSEState] = set()
         self.bottom_event = bottom_event
-        self.max_event : Optional[TSEState] = bottom_event
+        self.max_event : TSEState | None = bottom_event
         if self.bottom_event is not None:
             self.events.add(self.bottom_event)
     

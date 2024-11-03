@@ -13,11 +13,12 @@ class PORSymbolicInterpreter(SymbolicInterpreter):
         super().__init__(P, ohandler, opts, IExecutor())
     
     def initial_states(self) -> TSEState:
-        return self._executor.create_state()
+        mem = self.executor.get_memory_model().create_memory()
+        return TSEState(self.executor, None, mem, self.executor.solver)
 
     def run(self) -> int:
         self.prepare()
-        self.bot_state : TSEState = self.initial_states()[0]
+        self.bot_state : TSEState = self.initial_states()
         self.bot_state.makeBottom()
         self.config = Configuration(self.bot_state)
         self.avoiding_set : Set[TSEState] = {}

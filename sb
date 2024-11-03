@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+from logging import warning
 from os import mkdir
 from os import readlink
 from os.path import islink, dirname, abspath
@@ -561,7 +562,7 @@ def main():
         from slowbeast.bse.bself import BSELFOptions
 
         if parser.created_thread_fun():
-            warn("program contains threads, but BSE does not support them.")
+            warning("program contains threads, but BSE does not support them.")
 
         opts = BSELFOptions()
         opts.replay_errors = args.replay_errors

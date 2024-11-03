@@ -26,7 +26,7 @@ def compile_c(path, outp=None, addargs=None):
         outp = pathjoin("/tmp/", basename(path) + ".bc")
 
     cmd = [
-        "clang",
+        "clang-14",
         "-D__inline=",
         "-fgnu89-inline",
         "-fbracket-depth=100000",

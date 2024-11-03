@@ -17,8 +17,6 @@ int main()
   pthread_create(&t2, 0, thread2, 0);
   pthread_join(t1, 0);
   pthread_join(t2, 0);
-
-  printf("%i", v);
   
   return 0;
 }

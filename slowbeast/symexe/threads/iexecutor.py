@@ -1,13 +1,13 @@
-from typing import List, Optional, Set
+from __future__ import annotations
 
-from slowbeast.core.errors import GenericError, MemError
+from slowbeast.core.errors import GenericError
 from slowbeast.domains.concrete import concrete_value
-from slowbeast.ir.instruction import Alloc, Instruction, Load, Store, ThreadJoin, Return
+from slowbeast.ir.instruction import Alloc, Instruction, ThreadJoin, Return
 from slowbeast.ir.types import get_offset_type
 from slowbeast.symexe.iexecutor import IExecutor as BaseIExecutor
-from slowbeast.symexe.memorymodel import SymbolicMemoryModel
+# from slowbeast.symexe.memorymodel import SymbolicMemoryModel
 from slowbeast.symexe.state import Thread
-from slowbeast.symexe.threads.state import TSEState, Transition
+# from slowbeast.symexe.threads.state import TSEState
 from slowbeast.util.debugging import ldbgv, dbgv
 
 
@@ -24,20 +24,25 @@ def may_be_glob_mem(state, mem: Alloc) -> bool:
 
     return True
 
+class Transition:
+    def __init__(self, thread_id : int, action: Instruction) -> None:
+        self.action = action
+        self.thread_id = thread_id
+
 
 class IExecutor(BaseIExecutor):
     def __init__(
-        self, program, solver, opts, memorymodel: Optional[SymbolicMemoryModel] = None
+        self, program, solver, opts, memorymodel: SymbolicMemoryModel | None = None # type: ignore
     ) -> None:
         super().__init__(program, solver, opts, memorymodel)
-        self.check_race = False
+        # self.check_race = False
 
-    def create_state(self, pc=None, m=None) -> TSEState:
-        if m is None:
-            m = self.get_memory_model().create_memory()
-        # if self.get_options().incremental_solving:
-        #    return IncrementalSEState(self, pc, m)
-        return TSEState(self, pc, m, self.solver)
+    # def create_state(self, pc=None, m=None) -> TSEState:
+    #     if m is None:
+    #         m = self.get_memory_model().create_memory()
+    #     # if self.get_options().incremental_solving:
+    #     #    return IncrementalSEState(self, pc, m)
+    #     return TSEState(self, pc, m, self.solver)
 
     def exec_undef_fun(self, state, instr, fun):
         fnname = fun.name()
@@ -100,7 +105,7 @@ class IExecutor(BaseIExecutor):
             state.start_atomic()
         return super().call_fun(state, instr, fun)
 
-    def exec_thread(self, state, instr) -> Set[TSEState]:
+    def exec_thread(self, state, instr) -> set[TSEState]: # type: ignore
         fun = instr.called_function()
         ldbgv("-- THREAD {0} --", (fun.name(),))
         if fun.is_undefined():
@@ -125,7 +130,7 @@ class IExecutor(BaseIExecutor):
         state.set(instr, concrete_value(t.get_id(), get_offset_type()))
         return set(state)
 
-    def exec_thread_join(self, state, instr: ThreadJoin) -> Set[TSEState]:
+    def exec_thread_join(self, state, instr: ThreadJoin) -> set[TSEState]:
         assert len(instr.operands()) == 1
         tid = state.eval(instr.operand(0))
         if not tid.is_concrete():
@@ -134,7 +139,7 @@ class IExecutor(BaseIExecutor):
             state.join_threads(tid.value())
         return set(state)
 
-    def exec_ret(self, state, instr: Return) -> Set[TSEState]:
+    def exec_ret(self, state, instr: Return) -> set[TSEState]:
         # obtain the return value (if any)
         ret = None
         if len(instr.operands()) != 0:  # returns something
@@ -157,7 +162,7 @@ class IExecutor(BaseIExecutor):
         state.pc = rs.get_next_inst()
         return set(state)
 
-    def execute(self, state: TSEState) -> Set[TSEState]:
+    def execute(self, state: TSEState) -> set[TSEState]:
                 
         states = set()
         if state.num_threads() == 0:
@@ -172,7 +177,7 @@ class IExecutor(BaseIExecutor):
                     ns.sync_cs()
         return states
     
-    def execute_single_thread(self, state: TSEState, thread_id: int) -> Set[TSEState]:
+    def execute_single_thread(self, state: TSEState, thread_id: int) -> set[TSEState]:
         s = state.copy()
         instr = s.thread(thread_id)
         s.transition = Transition(thread_id, instr)

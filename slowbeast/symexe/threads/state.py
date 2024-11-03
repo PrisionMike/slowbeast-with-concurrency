@@ -1,5 +1,7 @@
+
+from __future__ import annotations
 from sys import stdout
-from typing import Union, Optional, List, TextIO, Self, Set
+from typing import TextIO, Self
 
 from slowbeast.core.callstack import CallStack
 from slowbeast.core.errors import GenericError
@@ -45,16 +47,16 @@ class TSEState(BaseState):
         self._exited_threads = {}
         self._mutexes = {}
         self._wait_mutex = {}
-        self.conflicts : Set[Self] = set()
-        self.immediate_conflicts : Set[Self] = set()
+        self.conflicts : set[Self] = set()
+        self.immediate_conflicts : set[Self] = set()
         self._tainted_locations = []
         self._race_alert = False
         self.is_bot = False
-        self.causes : Set[Self] = set()
+        self.causes : set[Self] = set()
         self.caused_by : Self = self # Only bottom event can self reference itself.
-        self.transition : Optional[Transition] = None # None for bottom event
+        self.transition : Transition | None = None # type: ignore # None for bottom event
         self.data_race : bool = False
-        self.bottom : Optional[Self] = None # Bottom Event. One per instance. Kinda redundant but OK.
+        self.bottom : Self | None = None # Bottom Event. One per instance. Kinda redundant but OK.
 
     def _thread_idx(self, thr: Thread) -> int:
         '''Return ID of a given thread. Thread's own ID'''
@@ -80,28 +82,28 @@ class TSEState(BaseState):
     def trace(self):
         return self._event_trace
 
-    def lazy_eval(self, v: Union[Alloc, GlobalVariable]):
-        value = self.try_eval(v)
-        if value is None:
-            vtype = v.type()
-            if vtype.is_pointer():
-                if isinstance(
-                    v, (Alloc, GlobalVariable)
-                ):  # FIXME: this is hack, do it generally for pointers
-                    self.executor().memorymodel.lazy_allocate(self, v)
-                    return self.try_eval(v)
-                name = f"unknown_ptr_{v.as_value()}"
-            else:
-                name = f"unknown_{v.as_value()}"
-            value = self.solver().symbolic_value(name, v.type())
-            ldbgv(
-                "Created new nondet value {0} = {1}",
-                (v.as_value(), value),
-                color="dark_blue",
-            )
-            self.set(v, value)
-            self.create_nondet(v, value)
-        return value
+    # def lazy_eval(self, v: Union[Alloc, GlobalVariable]):
+    #     value = self.try_eval(v)
+    #     if value is None:
+    #         vtype = v.type()
+    #         if vtype.is_pointer():
+    #             if isinstance(
+    #                 v, (Alloc, GlobalVariable)
+    #             ):  # FIXME: this is hack, do it generally for pointers
+    #                 self.executor().memorymodel.lazy_allocate(self, v)
+    #                 return self.try_eval(v)
+    #             name = f"unknown_ptr_{v.as_value()}"
+    #         else:
+    #             name = f"unknown_{v.as_value()}"
+    #         value = self.solver().symbolic_value(name, v.type())
+    #         ldbgv(
+    #             "Created new nondet value {0} = {1}",
+    #             (v.as_value(), value),
+    #             color="dark_blue",
+    #         )
+    #         self.set(v, value)
+    #         self.create_nondet(v, value)
+    #     return value
 
     def sync_pc(self) -> None:
         if self._threads:
@@ -236,7 +238,7 @@ class TSEState(BaseState):
                 t.cs.set(t.pc, retval)
                 t.pc = t.pc.get_next_inst()
 
-    def join_threads(self, tid, totid: Optional[Thread] = None) -> None:
+    def join_threads(self, tid, totid: Thread | None = None) -> None:
         """
         tid: id of the thread that joins
         totid: id of the thread to which to join (None means the current thread)
@@ -307,7 +309,7 @@ class TSEState(BaseState):
         for it in self._events:
             write(str(it) + "\n")
 
-    def exec(self) -> Set[Self]:
+    def exec(self) -> set[Self]:
         output_states = self.executor.execute(self)
         for s in output_states:
             s.caused_by = self
@@ -317,10 +319,4 @@ class TSEState(BaseState):
     def makeBottom(self) -> None:
         # TODO
         self.is_bot = True
-
-
-class Transition:
-    def __init__(self, thread_id : int, action: Instruction) -> None:
-        self.action = action
-        self.thread_id = thread_id
         

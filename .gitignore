@@ -12,3 +12,4 @@ slowbeast_test_bkp
 *.bc
 
 sv-benchmarks
+.sb-venv

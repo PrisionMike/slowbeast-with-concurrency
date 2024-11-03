@@ -1,7 +1,7 @@
 from struct import pack, unpack
 from typing import Optional, Union
 
-from numpy.core import float_
+from numpy import float64
 
 from slowbeast.domains.concrete_bitvec import ConcreteBitVec, to_signed
 from slowbeast.domains.concrete_bool import ConcreteBoolDomain
@@ -104,7 +104,7 @@ class ConcreteDomain(Domain):
                 return ConcreteBool(c)
             if isinstance(c, int):
                 return ConcreteBitVec(c, bw)
-            if isinstance(c, (float, float_)):
+            if isinstance(c, (float, float64)):
                 return ConcreteFloat(c, bw)
         elif isinstance(bw_or_ty, Type):
             if bw_or_ty.is_bool():

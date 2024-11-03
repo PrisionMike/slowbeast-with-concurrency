@@ -1,7 +1,9 @@
 from typing import List, Optional, Union
 from slowbeast.ir.function import Function
 from slowbeast.ir.instruction import Alloc, Call, Load, Store, ThreadJoin, Thread
+from slowbeast.solvers.symcrete import SymbolicSolver
 from slowbeast.symexe.interpreter import SymbolicInterpreter as SymexeInterpreter
+from slowbeast.symexe.memorymodel import SymbolicMemoryModel
 from slowbeast.symexe.options import SEOptions
 from slowbeast.symexe.threads.iexecutor import IExecutor, may_be_glob_mem
 from slowbeast.util.debugging import print_stderr
@@ -23,7 +25,9 @@ def _is_global_event_fun(fn) -> bool:
 
 
 class SymbolicInterpreter(SymexeInterpreter):
-    def __init__(self, P, ohandler=None, opts: SEOptions = SEOptions(), executor = IExecutor()) -> None:
+    def __init__(self, P, ohandler=None, opts: SEOptions = SEOptions(), executor = None) -> None:
+        if executor is None:
+            executor = IExecutor(P, SymbolicSolver(), opts, SymbolicMemoryModel(opts))
         super().__init__(P, ohandler, opts, ExecutorClass=executor)
 
     def _is_global_event(self, state, pc: Union[Call, Load, Store, ThreadJoin]) -> bool:
