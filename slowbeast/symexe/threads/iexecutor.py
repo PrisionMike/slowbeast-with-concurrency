@@ -5,8 +5,10 @@ from slowbeast.domains.concrete import concrete_value
 from slowbeast.ir.instruction import Alloc, Instruction, ThreadJoin, Return
 from slowbeast.ir.types import get_offset_type
 from slowbeast.symexe.iexecutor import IExecutor as BaseIExecutor
+
 # from slowbeast.symexe.memorymodel import SymbolicMemoryModel
 from slowbeast.symexe.state import Thread
+
 # from slowbeast.symexe.threads.state import TSEState
 from slowbeast.util.debugging import ldbgv, dbgv
 
@@ -24,15 +26,20 @@ def may_be_glob_mem(state, mem: Alloc) -> bool:
 
     return True
 
+
 class Transition:
-    def __init__(self, thread_id : int, action: Instruction) -> None:
+    def __init__(self, thread_id: int, action: Instruction) -> None:
         self.action = action
         self.thread_id = thread_id
 
 
 class IExecutor(BaseIExecutor):
     def __init__(
-        self, program, solver, opts, memorymodel: SymbolicMemoryModel | None = None # type: ignore
+        self,
+        program,
+        solver,
+        opts,
+        memorymodel: SymbolicMemoryModel | None = None,  # noqa:F821
     ) -> None:
         super().__init__(program, solver, opts, memorymodel)
         # self.check_race = False
@@ -105,7 +112,7 @@ class IExecutor(BaseIExecutor):
             state.start_atomic()
         return super().call_fun(state, instr, fun)
 
-    def exec_thread(self, state, instr) -> set[TSEState]: # type: ignore
+    def exec_thread(self, state, instr) -> set[TSEState]:  # type: ignore
         fun = instr.called_function()
         ldbgv("-- THREAD {0} --", (fun.name(),))
         if fun.is_undefined():
@@ -163,11 +170,11 @@ class IExecutor(BaseIExecutor):
         return set(state)
 
     def execute(self, state: TSEState) -> set[TSEState]:
-                
+
         states = set()
         if state.num_threads() == 0:
             return states
-        
+
         for t in state._threads:
             if not state.thread(t).is_paused():
                 # self.check_race = self.check_race and not t.in_atomic()
@@ -176,7 +183,7 @@ class IExecutor(BaseIExecutor):
                     ns.sync_pc()
                     ns.sync_cs()
         return states
-    
+
     def execute_single_thread(self, state: TSEState, thread_id: int) -> set[TSEState]:
         s = state.copy()
         instr = s.thread(thread_id)
