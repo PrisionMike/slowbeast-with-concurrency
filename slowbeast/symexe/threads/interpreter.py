@@ -28,7 +28,7 @@ class SymbolicInterpreter(SymexeInterpreter):
     def __init__(self, P, ohandler=None, opts: SEOptions = SEOptions(), executor = None) -> None:
         if executor is None:
             executor = IExecutor(P, SymbolicSolver(), opts, SymbolicMemoryModel(opts))
-        super().__init__(P, ohandler, opts, ExecutorClass=executor)
+        super().__init__(P, ohandler, opts, executor)
 
     def _is_global_event(self, state, pc: Union[Call, Load, Store, ThreadJoin]) -> bool:
         if isinstance(pc, Load):
