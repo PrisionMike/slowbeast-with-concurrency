@@ -27,7 +27,10 @@ class TSEState(BaseState):
         "conflicts",
         "immediate_conflicts",
         "data_race",
-        "trace",
+        "causes",
+        "caused_by",
+        "transition",
+        "is_bot",
     )
 
     def __init__(
@@ -45,9 +48,16 @@ class TSEState(BaseState):
         self._exited_threads = {}
         self._mutexes = {}
         self._wait_mutex = {}
+        self.conflicts: set[Self] = set()
+        self.immediate_conflicts: set[Self] = set()
         self.is_bot = False
+        self.causes: set[Self] = set()
+        self.caused_by: Self = self  # Only bottom event can self reference itself.
+        self.transition: Transition | None = None  # noqa:F821 None for bottom event
         self.data_race: bool = False
-        self.trace: Trace = Trace()
+        # self.bottom: Self | None = (
+        #     None  # Bottom Event. One per instance. Kinda redundant but OK.
+        # )
 
     def _thread_idx(self, thr: Thread) -> int:
         """Return ID of a given thread. Thread's own ID"""
@@ -287,30 +297,3 @@ class TSEState(BaseState):
 
     def makeBottom(self) -> None:
         self.is_bot = True
-
-
-class Event:
-    def __init__(self, tid: int, instr: Instruction):
-        self.tid = tid
-        self.instr = instr
-
-
-class Trace:
-    def __init__(self, sequence: list[Event] = []):
-        self.sequence = sequence
-
-    def append(self, e: Event):
-        self.sequence.append(e)
-
-    def happens_before_i(self, e1: Event, e2: Event):
-        assert e1 in self.sequence, "{e1} not in current execution trace"
-        assert e2 in self.sequence, "{e2} not in current execution trace"
-
-    def prefix(self, e: Event) -> Self:
-        return Trace(self.sequence[: self.sequence.index(e)])
-
-    def suffix_indep(self, e: Event) -> Self:
-        assert e in self.sequence
-
-    def godfather(self, prefix: list[Event], w: list[Event]) -> set(Event):
-        assert self.sequence[: len(prefix)] == prefix
