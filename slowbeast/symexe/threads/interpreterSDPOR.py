@@ -8,10 +8,10 @@ from slowbeast.symexe.threads.state import TSEState
 from slowbeast.interpreter.interpreter import GlobalInit
 
 
-class PORSymbolicInterpreter(SymbolicInterpreter):
+class SPORSymbolicInterpreter(SymbolicInterpreter):
 
     def __init__(self, P, ohandler=None, opts: SEOptions = SEOptions()) -> None:
-        print("Initiating the UPOR executor")
+        print("Initiating the SPOR executor")
         super().__init__(P, ohandler, opts, None)
 
     def initial_states(self) -> TSEState:
