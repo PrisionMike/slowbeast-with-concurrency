@@ -7,6 +7,7 @@ from slowbeast.core.errors import GenericError
 from slowbeast.ir.instruction import ThreadJoin
 from slowbeast.symexe.state import SEState as BaseState, Thread, Event
 from slowbeast.symexe.threads.iexecutor import IExecutor
+from slowbeast.symexe.threads.trace import Trace
 
 
 class TSEState(BaseState):
@@ -28,6 +29,8 @@ class TSEState(BaseState):
         "immediate_conflicts",
         "data_race",
         "trace",
+        "bakctrack",
+        # "terminal_action",
     )
 
     def __init__(
@@ -48,6 +51,8 @@ class TSEState(BaseState):
         self.is_bot = False
         self.data_race: bool = False
         self.trace: Trace = Trace()
+        self.backtrack: set[int] = set()
+        # self.terminal_action = Action()
 
     def _thread_idx(self, thr: Thread) -> int:
         """Return ID of a given thread. Thread's own ID"""
@@ -278,39 +283,6 @@ class TSEState(BaseState):
         for it in self._events:
             write(str(it) + "\n")
 
-    def exec(self) -> set[Self]:
-        output_states = self.executor.execute(self)
-        for s in output_states:
-            s.caused_by = self
-            self.causes.add(s)
+    def exec(self, thread: int) -> set[Self]:
+        output_states = self.executor.execute_single_thread(self, thread)
         return output_states
-
-    def makeBottom(self) -> None:
-        self.is_bot = True
-
-
-class Event:
-    def __init__(self, tid: int, instr: Instruction):
-        self.tid = tid
-        self.instr = instr
-
-
-class Trace:
-    def __init__(self, sequence: list[Event] = []):
-        self.sequence = sequence
-
-    def append(self, e: Event):
-        self.sequence.append(e)
-
-    def happens_before_i(self, e1: Event, e2: Event):
-        assert e1 in self.sequence, "{e1} not in current execution trace"
-        assert e2 in self.sequence, "{e2} not in current execution trace"
-
-    def prefix(self, e: Event) -> Self:
-        return Trace(self.sequence[: self.sequence.index(e)])
-
-    def suffix_indep(self, e: Event) -> Self:
-        assert e in self.sequence
-
-    def godfather(self, prefix: list[Event], w: list[Event]) -> set(Event):
-        assert self.sequence[: len(prefix)] == prefix

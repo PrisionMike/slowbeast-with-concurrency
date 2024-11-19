@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from slowbeast.core.errors import GenericError
 from slowbeast.domains.concrete import concrete_value
-from slowbeast.ir.instruction import Alloc, Instruction, ThreadJoin, Return
+from slowbeast.ir.instruction import Alloc, ThreadJoin, Return
 from slowbeast.ir.types import get_offset_type
 from slowbeast.symexe.iexecutor import IExecutor as BaseIExecutor
+from slowbeast.symexe.threads.trace import Action
 
 # from slowbeast.symexe.memorymodel import SymbolicMemoryModel
 from slowbeast.symexe.state import Thread
@@ -25,12 +26,6 @@ def may_be_glob_mem(state, mem: Alloc) -> bool:
         return mo.is_global() or mo.is_heap()
 
     return True
-
-
-class Transition:
-    def __init__(self, thread_id: int, action: Instruction) -> None:
-        self.action = action
-        self.thread_id = thread_id
 
 
 class IExecutor(BaseIExecutor):
@@ -187,7 +182,8 @@ class IExecutor(BaseIExecutor):
     def execute_single_thread(self, state: TSEState, thread_id: int) -> set[TSEState]:
         s = state.copy()
         instr = s.thread(thread_id)
-        s.transition = Transition(thread_id, instr)
+        action = Action(thread_id, instr)
+        s.trace.append(action)
         if isinstance(instr, Thread):
             return self.exec_thread(s, instr)
         if isinstance(instr, ThreadJoin):
@@ -220,16 +216,16 @@ class IExecutor(BaseIExecutor):
     #             state._tainted_locations.append(instr.pointer_operand())
     #         return super().execute(state, instr)
 
-    # def exec_thread_exit(self, state, instr: ThreadExit):
-    #    assert isinstance(instr, ThreadExit)
+    def exec_thread_exit(self, state, instr: ThreadExit):
+        assert isinstance(instr, ThreadExit)
 
-    #    # obtain the return value (if any)
-    #    ret = None
-    #    if len(instr.operands()) != 0:  # returns something
-    #        ret = state.eval(instr.operand(0))
-    #        assert (
-    #            ret is not None
-    #        ), f"No return value even though there should be: {instr}"
+        # obtain the return value (if any)
+        ret = None
+        if len(instr.operands()) != 0:  # returns something
+            ret = state.eval(instr.operand(0))
+            assert (
+                ret is not None
+            ), f"No return value even though there should be: {instr}"
 
-    #    state.exit_thread(ret)
-    #    return [state]
+        state.exit_thread(ret)
+        return set(state)

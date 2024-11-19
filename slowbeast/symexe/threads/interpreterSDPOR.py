@@ -2,7 +2,8 @@ from __future__ import annotations
 
 # from typing import Set
 from slowbeast.symexe.options import SEOptions
-from slowbeast.symexe.threads.configuration import Configuration
+
+# from slowbeast.symexe.threads.configuration import Configuration
 from slowbeast.symexe.threads.interpreter import SymbolicInterpreter
 from slowbeast.symexe.threads.state import TSEState
 from slowbeast.interpreter.interpreter import GlobalInit
@@ -29,14 +30,14 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
         Result is a set of states before starting executing
         the entry function.
         """
-        self.bot_state = self.initial_states()
+        self.init_state = self.initial_states()
         self.run_static()
 
         # push call to main to call stack
         entry = self.get_program().entry()
-        self.bot_state.push_call(None, entry)
+        self.init_state.push_call(None, entry)
         main_args = self._main_args(s)
-        assert self.bot_state.num_threads() == 1
+        assert self.init_state.num_threads() == 1
         if main_args:
             s.memory.get_cs().set_values(main_args)
         s.sync_pc()
@@ -48,21 +49,21 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
         """
         # fake the program counter for the executor
         ginit = GlobalInit()
-        self.bot_state.pc = ginit
+        self.init_state.pc = ginit
 
         globs = self._program.globals()
         for G in globs:
             # bind the global to the state
-            self.bot_state.memory.allocate_global(G, zeroed=G.is_zeroed())
+            self.init_state.memory.allocate_global(G, zeroed=G.is_zeroed())
 
             if not G.has_init():
                 continue
             for i in G.init():
                 # Hack for concurrent program: FIXME
                 if self.get_options().threads:
-                    ret = self._executor.execute_single_thread(self.bot_state, i)
+                    ret = self._executor.execute_single_thread(self.init_state, i)
                 else:
-                    ret = self._executor.execute(self.bot_state, i)
+                    ret = self._executor.execute(self.init_state, i)
                 assert len(ret) == 1, "Unhandled initialization"
                 # assert ret[0] is s, "Unhandled initialization instruction"
                 assert ret[
@@ -73,30 +74,58 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
 
     def run(self) -> int:
         self.prepare()
-        self.bot_state: TSEState = self.initial_states()
-        self.bot_state.makeBottom()
-        self.config = Configuration(self.bot_state)
-        self.avoiding_set: set[TSEState] = {}
-        self.adjoining_set: set[TSEState] = {}
-        self.explore()
+        self.init_state: TSEState = self.initial_states()
 
-    def explore(self) -> None:
-        """DFS exploring and creating possible configurations."""
-        if self.config.enabled_events == {}:
-            return
-        if self.adjoining_set != {}:
-            event = self.adjoining_set.intersection(self.config.enabled_events).pop()
+        self.explore(self.init_state, set())
+
+    def explore(self, state: TSEState, sleep: set) -> None:
+        """Source - DPOR. We don't evaluate causal relation with actions in pc but we can. TODO"""
+        enabled = get_enabled_threads(state)
+        current_trace = state.trace
+        for thread in enabled.difference(sleep):
+            current_trace.backtrack = set(thread)
+            for ithread in current_trace.backtrack.difference(sleep):
+                extended_trace = current_trace.append(
+                    ithread
+                )  # FIXME convert to action.
+                sample_state = (
+                    newstates.pop()
+                )  # All output states will have the same trace. We just need one.
+                ctrace = sample_state.trace
+                newstates.add(sample_state)
+                for racist_action in ctrace.racist:
+                    godfather = ctrace.godfathers(racist_action)
+                    prefix_event = ctrace.preceding_action(racist_action)
+                    if not godfather.intersection(prefix_event.backtrack):
+                        prefix_event.backtrack.add(godfather.pop())
+                for s in newstates:
+                    s.trace = ctrace
+                    newsleep = set()
+                    for q in sleep:
+                        if not dependent_threads(s, thread, q):
+                            newsleep.add(q)
+                    self.explore(s, newsleep)
+                    sleep.add(thread)
+
+
+def dependent_threads(pstate: TSEState, p: int, q: int) -> bool:
+    """pstate = state with p executed. pqstate wasted. TODO optimise."""
+    if p == q:
+        return True
+    if q not in get_enabled_threads(pstate):
+        return False
+    else:
+        pqstate = pstate.exec(q)
+        if pqstate.trace[-2] in pqstate.trace[-1].caused_by:
+            return True
         else:
-            event = self.config.enabled_events.pop()
+            return False
 
-        data_race_result = self.config.add_event(event)
-        if data_race_result:
-            print("*********** DATA RACE DETECTED ***********")
-            exit()
-        self.adjoining_set.discard(event)
-        self.explore()
-        if event.conflicts != {}:
-            self.config.remove_event(event)
-            self.avoiding_set.add(event)
-            self.adjoining_set = self.adjoining_set.union(event.conflicts)
-            self.explore()
+
+def get_enabled_threads(state: TSEState) -> set[int]:
+    enabled = set()
+    for thread in state.threads():
+        if not thread.is_paused():
+            enabled.add(thread)
+    # TODO: make sure threads waiting to be joined are not included as well.
+    return enabled
