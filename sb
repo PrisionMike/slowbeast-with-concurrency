@@ -370,11 +370,13 @@ def print_stats(engine):
         print_stdout(
             "Number of forks on branches: {0} (forked on {1}% of branches)".format(
                 executor.stats.branch_forks,
-                0
-                if executor.stats.branchings == 0
-                else 100
-                * float(executor.stats.branch_forks)
-                / executor.stats.branchings,
+                (
+                    0
+                    if executor.stats.branchings == 0
+                    else 100
+                    * float(executor.stats.branch_forks)
+                    / executor.stats.branchings
+                ),
             ),
             color="CYAN",
         )
@@ -383,9 +385,11 @@ def print_stats(engine):
             "Number of all forks: {0} (from {1} calls ({2}%) to fork())".format(
                 executor.stats.forks,
                 executor.stats.fork_calls,
-                0
-                if executor.stats.fork_calls == 0
-                else 100 * float(executor.stats.forks) / executor.stats.fork_calls,
+                (
+                    0
+                    if executor.stats.fork_calls == 0
+                    else 100 * float(executor.stats.forks) / executor.stats.fork_calls
+                ),
             ),
             color="CYAN",
         )
@@ -457,7 +461,11 @@ def main():
             unsupp_undefs.split(",") if unsupp_undefs else None,
             args.check,
         )
-        arglist = ["-Xclang", "-disable-O0-optnone", "-fno-vectorize", "-fno-slp-vectorize"] if args.external_invariants == "clam" else []
+        arglist = (
+            ["-Xclang", "-disable-O0-optnone", "-fno-vectorize", "-fno-slp-vectorize"]
+            if args.external_invariants == "clam"
+            else []
+        )
         arglist += ["-m32" if args.pointer_bitwidth == 32 else "-m64"]
         code = compile_and_link(
             args.prog,
@@ -620,12 +628,12 @@ def main():
         elif has_threads:
             dbg("Threads detected, enabling support for threads in SE")
             if args.threads_dpor:
-                from slowbeast.symexe.threads.interpreterDataRace import (
-                    PORSymbolicInterpreter as SymbolicInterpreter,
+                from slowbeast.symexe.threads.interpreterSDPOR import (
+                    SPORSymbolicInterpreter as SymbolicInterpreter,
                 )
             else:
-                from slowbeast.symexe.threads.interpreterDataRace import (
-                    PORSymbolicInterpreter as SymbolicInterpreter,
+                from slowbeast.symexe.threads.interpreter import (
+                    SymbolicInterpreter as SymbolicInterpreter,
                 )
         elif args.coop_channel:
             from slowbeast.symexe.cooperative import (

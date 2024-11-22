@@ -25,7 +25,9 @@ def _is_global_event_fun(fn) -> bool:
 
 
 class SymbolicInterpreter(SymexeInterpreter):
-    def __init__(self, P, ohandler=None, opts: SEOptions = SEOptions(), executor = None) -> None:
+    def __init__(
+        self, P, ohandler=None, opts: SEOptions = SEOptions(), executor=None
+    ) -> None:
         if executor is None:
             executor = IExecutor(P, SymbolicSolver(), opts, SymbolicMemoryModel(opts))
         super().__init__(P, ohandler, opts, executor)
@@ -71,7 +73,7 @@ class SymbolicInterpreter(SymexeInterpreter):
     #     #     if t.is_paused():
     #     #         continue
     #     #     if not is_global_ev(state, t.pc):
-    #     #         state.schedule(idx)  
+    #     #         state.schedule(idx)
     #     #         return [state]  # XXX Seems problematic
 
     #     can_run = [idx for idx, t in enumerate(state.threads()) if not t.is_paused()]
@@ -115,8 +117,8 @@ class SymbolicInterpreter(SymexeInterpreter):
         """Kills the state if it is in deadlock"""
         if state.thread().in_atomic() and state.thread().is_paused():
             state.set_killed(
-            f"Thread {state.thread().get_id()} is stuck "
-            "(waits for a mutex inside an atomic sequence)"
+                f"Thread {state.thread().get_id()} is stuck "
+                "(waits for a mutex inside an atomic sequence)"
             )
 
     def run(self) -> int:
@@ -133,13 +135,13 @@ class SymbolicInterpreter(SymexeInterpreter):
                 print("Parent (being executed):", state._id)
                 self.check_deadlock(state)
                 self.interact_if_needed(state)
-                # state.get_id() in (121,156,157,184,185,158,165,171) # (state.get_id() >= 171) or 
-                # state.get_id() % 1000 == 0 and state.get_id() >= 4000 
+                # state.get_id() in (121,156,157,184,185,158,165,171) # (state.get_id() >= 171) or
+                # state.get_id() % 1000 == 0 and state.get_id() >= 4000
                 if state.is_ready():
-                    newstates += self._executor.execute(state, state.pc) 
+                    newstates += self._executor.execute(state, state.pc)
                 else:
                     newstates.append(state)
-                print("Children:",[(x.get_id(), x.status()) for x in newstates])
+                print("Children:", [(x.get_id(), x.status()) for x in newstates])
                 self.handle_new_states(newstates)
                 for ns in newstates:
                     if ns.exited():

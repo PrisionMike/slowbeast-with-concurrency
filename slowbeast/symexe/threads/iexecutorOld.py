@@ -1,15 +1,12 @@
-from __future__ import annotations
+from typing import Optional
 
 from slowbeast.core.errors import GenericError
 from slowbeast.domains.concrete import concrete_value
-from slowbeast.ir.instruction import Alloc, ThreadJoin, Return
+from slowbeast.ir.instruction import ThreadJoin, Return, Thread, Alloc
 from slowbeast.ir.types import get_offset_type
 from slowbeast.symexe.iexecutor import IExecutor as BaseIExecutor
-
-# from slowbeast.symexe.memorymodel import SymbolicMemoryModel
-from slowbeast.symexe.state import Thread
-
-# from slowbeast.symexe.threads.state import TSEState
+from slowbeast.symexe.memorymodel import SymbolicMemoryModel
+from slowbeast.symexe.threads.state_backup import TSEState
 from slowbeast.util.debugging import ldbgv, dbgv
 
 
@@ -29,21 +26,16 @@ def may_be_glob_mem(state, mem: Alloc) -> bool:
 
 class IExecutor(BaseIExecutor):
     def __init__(
-        self,
-        program,
-        solver,
-        opts,
-        memorymodel: SymbolicMemoryModel | None = None,  # noqa:F821
+        self, program, solver, opts, memorymodel: Optional[SymbolicMemoryModel] = None
     ) -> None:
         super().__init__(program, solver, opts, memorymodel)
-        # self.check_race = False
 
-    # def create_state(self, pc=None, m=None) -> TSEState:
-    #     if m is None:
-    #         m = self.get_memory_model().create_memory()
-    #     # if self.get_options().incremental_solving:
-    #     #    return IncrementalSEState(self, pc, m)
-    #     return TSEState(self, pc, m, self.solver)
+    def create_state(self, pc=None, m=None) -> TSEState:
+        if m is None:
+            m = self.get_memory_model().create_memory()
+        # if self.get_options().incremental_solving:
+        #    return IncrementalSEState(self, pc, m)
+        return TSEState(self, pc, m, self.solver)
 
     def exec_undef_fun(self, state, instr, fun):
         fnname = fun.name()
@@ -106,7 +98,7 @@ class IExecutor(BaseIExecutor):
             state.start_atomic()
         return super().call_fun(state, instr, fun)
 
-    def exec_thread(self, state, instr) -> list[TSEState]:  # type: ignore
+    def exec_thread(self, state, instr):
         fun = instr.called_function()
         ldbgv("-- THREAD {0} --", (fun.name(),))
         if fun.is_undefined():
@@ -127,11 +119,27 @@ class IExecutor(BaseIExecutor):
         }
         t = state.add_thread(fun, fun.bblock(0).instruction(0), mapping or {})
 
+        # we executed the thread inst, so move
         state.pc = state.pc.get_next_inst()
         state.set(instr, concrete_value(t.get_id(), get_offset_type()))
         return [state]
 
-    def exec_thread_join(self, state, instr: ThreadJoin) -> list[TSEState]:
+    # def exec_thread_exit(self, state, instr: ThreadExit):
+    #    assert isinstance(instr, ThreadExit)
+
+    #    # obtain the return value (if any)
+    #    ret = None
+    #    if len(instr.operands()) != 0:  # returns something
+    #        ret = state.eval(instr.operand(0))
+    #        assert (
+    #            ret is not None
+    #        ), f"No return value even though there should be: {instr}"
+
+    #    state.exit_thread(ret)
+    #    return [state]
+
+    def exec_thread_join(self, state, instr: ThreadJoin):
+        assert isinstance(instr, ThreadJoin)
         assert len(instr.operands()) == 1
         tid = state.eval(instr.operand(0))
         if not tid.is_concrete():
@@ -140,7 +148,9 @@ class IExecutor(BaseIExecutor):
             state.join_threads(tid.value())
         return [state]
 
-    def exec_ret(self, state, instr: Return) -> list[TSEState]:
+    def exec_ret(self, state, instr: Return):
+        assert isinstance(instr, Return)
+
         # obtain the return value (if any)
         ret = None
         if len(instr.operands()) != 0:  # returns something
@@ -154,6 +164,18 @@ class IExecutor(BaseIExecutor):
         # pop the call frame and get the return site
         rs = state.pop_call()
         if rs is None:  # popped the last frame
+            # if ret is not None and ret.is_pointer():
+            #    state.set_error(GenericError("Returning a pointer from main function"))
+            #    return [state]
+
+            # if state.thread().get_id() == 0:
+            #    # this is the main thread exiting, exit the whole program
+            #    # FIXME: we should call dtors and so on...
+            #    state.set_exited(0)
+            # else:
+            #    # this is the same as calling pthread_exit
+            #    # FIXME: set the retval to 'ret'
+            #    state.exit_thread()
             state.exit_thread(ret)
             return [state]
 
@@ -163,71 +185,17 @@ class IExecutor(BaseIExecutor):
         state.pc = rs.get_next_inst()
         return [state]
 
-    def execute(self, state: TSEState) -> list[TSEState]:
+    def execute(self, state, instr):
+        # state._trace.append(
+        #    "({2}) {0}: {1}".format(
+        #        "--" if not instr.bblock() else instr.fun().name(),
+        #        instr,
+        #        state.thread().get_id(),
+        #    ),
+        # )
 
-        states = []
-        if state.num_threads() == 0:
-            return states
-
-        for t in state._threads:
-            if not state.thread(t).is_paused():
-                # self.check_race = self.check_race and not t.in_atomic()
-                states.append(self.execute_single_thread(state, t))
-                for ns in states:
-                    ns.sync_pc()
-                    ns.sync_cs()
-        return states
-
-    def execute_single_thread(self, state: TSEState, thread_id: int) -> list[TSEState]:
-        s = state.copy()
-        instr = s.thread(thread_id).pc
-        # action = Action(thread_id, instr)
-        # s.trace.append(action)
         if isinstance(instr, Thread):
-            return self.exec_thread(s, instr)
+            return self.exec_thread(state, instr)
         if isinstance(instr, ThreadJoin):
-            return self.exec_thread_join(s, instr)
-        if isinstance(instr, Return):
-            return self.exec_ret(s, instr)
-        # if self.check_race:
-        #     if isinstance(s, Store):
-        #         return self.tainted_write(s, instr)
-        #     elif isinstance(instr, Load):
-        #         return self.tainted_read(s, instr)
-
-        return super().execute(state, instr)
-
-    # def tainted_read(self, state: TSEState, instr: Load):
-    #     if instr.pointer_operand() in state._tainted_locations:
-    #         err = MemError(MemError.DATA_RACE, " DATA RACE DETECTED: " + str(instr.pointer_operand()))
-    #         state.set_error(err)
-    #         return state
-    #     else:
-    #         return super().execute(state, instr)
-
-    # def tainted_write(self, state: TSEState, instr: Store):
-    #     if instr.pointer_operand() in state._tainted_locations:
-    #         err = MemError(MemError.DATA_RACE, " DATA RACE DETECTED: " + str(instr.pointer_operand()))
-    #         state.set_error(err)
-    #         return state
-    #     else:
-    #         if may_be_glob_mem(state, instr.pointer_operand()):
-    #             state._tainted_locations.append(instr.pointer_operand())
-    #         return super().execute(state, instr)
-
-    def exec_thread_exit(self, state, instr: ThreadExit):
-        assert isinstance(instr, ThreadExit)
-
-        # obtain the return value (if any)
-        ret = None
-        if len(instr.operands()) != 0:  # returns something
-            ret = state.eval(instr.operand(0))
-            assert (
-                ret is not None
-            ), f"No return value even though there should be: {instr}"
-
-        state.exit_thread(ret)
-        return set(state)
-
-    def exec_legacy(self, state, instr):
+            return self.exec_thread_join(state, instr)
         return super().execute(state, instr)

@@ -64,6 +64,27 @@
                 "-check",
                 "no-data-race",
                 "-out-dir",
+                "${workspaceFolder}/dryes",
+                "-threads-dpor"
+            ],
+        },
+        {
+            "name": "ydr-old",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/sb",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "args": [
+                "${workspaceFolder}/dryes.c",
+                "-entry",
+                "main",
+                "-pointer-bitwidth",
+                "32",
+                "-exit-on-error",
+                "-check",
+                "no-data-race",
+                "-out-dir",
                 "${workspaceFolder}/dryes"
             ],
         },

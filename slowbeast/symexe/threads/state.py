@@ -3,10 +3,13 @@ from sys import stdout
 from typing import TextIO, Self
 
 from slowbeast.core.callstack import CallStack
-from slowbeast.core.errors import GenericError
-from slowbeast.ir.instruction import ThreadJoin
+
+# from slowbeast.core.errors import GenericError
+from slowbeast.ir.instruction import ThreadJoin, Store, Load
 from slowbeast.symexe.state import SEState as BaseState, Thread, Event
-from slowbeast.symexe.threads.iexecutor import IExecutor
+from slowbeast.symexe.threads.trace import Action
+
+# from slowbeast.symexe.threads.iexecutor import IExecutor
 from slowbeast.symexe.threads.trace import Trace
 
 
@@ -34,7 +37,12 @@ class TSEState(BaseState):
     )
 
     def __init__(
-        self, executor: IExecutor, pc=None, m=None, solver=None, constraints=None
+        self,
+        executor=None,
+        pc=None,
+        m=None,
+        solver=None,
+        constraints=None,
     ) -> None:
         super().__init__(executor, pc, m, solver, constraints)
         self._last_tid = 0
@@ -48,11 +56,7 @@ class TSEState(BaseState):
         self._exited_threads = {}
         self._mutexes = {}
         self._wait_mutex = {}
-        self.is_bot = False
-        self.data_race: bool = False
         self.trace: Trace = Trace()
-        self.backtrack: set[int] = set()
-        # self.terminal_action = Action()
 
     def _thread_idx(self, thr: Thread) -> int:
         """Return ID of a given thread. Thread's own ID"""
@@ -72,10 +76,10 @@ class TSEState(BaseState):
         new._current_thread = self._current_thread
         new._mutexes = self._mutexes.copy()
         new._wait_mutex = {mtx: W.copy() for mtx, W in self._wait_mutex.items() if W}
-        new._race_alert = self._race_alert
-        new.conflicts = self.conflicts
-        if self.is_bot:
-            new.is_bot = True
+        # new._race_alert = self._race_alert
+        # new.conflicts = self.conflicts
+        # if self.is_bot:
+        #     new.is_bot = True
 
     # def lazy_eval(self, v: Union[Alloc, GlobalVariable]):
     #     value = self.try_eval(v)
@@ -146,6 +150,9 @@ class TSEState(BaseState):
 
     def thread(self, idx=None) -> Thread:
         return self._threads[self._current_thread if idx is None else idx]
+
+    def thread_ids(self):
+        return self._threads.keys()
 
     def thread_id(self, idx=None):
         return self._threads[self._current_thread if idx is None else idx].get_id()
@@ -254,16 +261,16 @@ class TSEState(BaseState):
     def num_threads(self) -> int:
         return len(self._threads)
 
-    def race_condition_possible(self) -> bool:
-        """Sets `race_alert` flag if more than 1 thread is active."""
-        sleeping_threads = [thread.is_paused() for thread in self._threads.values()]
-        if all(sleeping_threads):
-            self.set_error(GenericError("Deadlock detected"))
-            return False
-        self._race_alert = sleeping_threads.count(False) > 1
-        if not self._race_alert:
-            self._tainted_locations = []
-        return self._race_alert
+    # def race_condition_possible(self) -> bool:
+    #     """Sets `race_alert` flag if more than 1 thread is active."""
+    #     sleeping_threads = [thread.is_paused() for thread in self._threads.values()]
+    #     if all(sleeping_threads):
+    #         self.set_error(GenericError("Deadlock detected"))
+    #         return False
+    #     self._race_alert = sleeping_threads.count(False) > 1
+    #     if not self._race_alert:
+    #         self._tainted_locations = []
+    #     return self._race_alert
 
     def threads(self) -> iter:
         return self._threads.values()
@@ -283,6 +290,38 @@ class TSEState(BaseState):
         for it in self._events:
             write(str(it) + "\n")
 
-    def exec(self, thread: int) -> set[Self]:
-        output_states = self.executor.execute_single_thread(self, thread)
+    def exec_thread(self, thread: int) -> set[Self]:
+        output_states = self._executor.execute_single_thread(self, thread)
         return output_states
+
+    def thread_to_action(self, tid: int) -> Action | None:
+        """Convert an active thread pc instruction to an action.
+        Return None if such an action cannot be added (thread paused, etc.)"""
+        if (
+            tid in self.thread_ids()
+            and not self.thread(tid).is_paused()
+            and not self.thread(tid).is_detached()
+        ):
+            assert self.thread(tid).pc, "Thread {tid} PC empty"
+            return Action(tid, self.thread(tid).pc)
+        else:
+            return None
+
+    def exec_trace(self, trace: Trace) -> list[Self]:
+        """ASSUMES NON-TERMINAL PART OF THE TRACE BELONGS TO THE STATE ITSELF"""
+        self.trace = trace
+        return self.exec_thread(trace.terminal_thread())
+
+    def check_data_race(self) -> None:
+        write_locations = set()
+        read_locations = set()
+        for t in self.threads():
+            if not (t.is_paused() or t.is_detached()):
+                if isinstance(t.pc, Store):
+                    write_locations.add(t.pc.pointer_operand())
+                elif isinstance(t.pc, Load):
+                    read_locations.add(t.pc.pointer_operand())
+        if write_locations.intersection(read_locations):
+            err = MemError(MemError.DATA_RACE, "DATA RACE DETECTED")
+            self.set_error(err)
+            sys.exit(1)

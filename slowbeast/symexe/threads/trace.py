@@ -1,51 +1,105 @@
+from __future__ import annotations
+
+from copy import deepcopy
+from slowbeast.ir.instruction import Instruction
+
+
 class Action:
-    def __init__(self, tid: int | None = None, instr: Instruction | None = None):
+    def __init__(self, tid: int | None, instr: Instruction | None):
         self.tid = tid
         self.instr = instr
+        self.occurrence: int | None = None
         self.causes: set(Self) = set()
         self.caused_by: set(Self) = set()
 
 
 class Trace:
     def __init__(self, sequence: list[Action] = []):
-        self.sequence = sequence
-        self.racist = set()  # actions in race with the last action
-        self.backtrack: set(int) = set()
+        self._sequence = sequence
+        self._racist: set[Action] = set()  # actions in race with the last action
+        self._backtrack: list[set[int]] = [set()]
 
-    def append(self, e: Action):
-        self.sequence.append(e)
-        self.update_causality()
+    def append(self, e: Action) -> Self:
+        """RETURNS an appended trace. Doesn't mutate instance."""
+        new_trace = deepcopy(self)
+        new_trace.set_occurrence(e)
+        new_trace._sequence.append(e)
+        new_trace.update_race_and_causality()
+        return new_trace
 
-    def happens_before_i(self, e1: Action, e2: Action) -> bool:
-        assert e1 in self.sequence, "{e1} not in current execution trace"
-        assert e2 in self.sequence, "{e2} not in current execution trace"
-        i1 = self.sequence.index(e1)
-        i2 = self.sequence.index(e2)
-        if e1.tid == e2.tid:
-            return i1 < i2
-        else:
-            # TODO
-            # return lock_check(e1, e2) or data_race_check(e1, e2)
-            pass
+    def set_backtrack(self, bt: set[int]) -> None:
+        """sets backtrack"""
+        self._backtrack[-1] = bt
 
-    def prefix(self, e: Action) -> Self:
-        return Trace(self.sequence[: self.sequence.index(e)])
+    def get_racist_set(self):
+        return self._racist
 
-    def preceding_action(self, e: Action) -> Action:
-        return self.sequence[self.sequence.index(e) - 1]
+    def get_backtrack(self) -> set(int):
+        return self._backtrack[-1]
 
-    def suffix_indep(self, e: Action) -> Self:
-        assert e in self.sequence
+    def set_occurrence(self, act: Action) -> None:  # ✅
+        for e in reversed(self._sequence):
+            if e.tid == act.tid:
+                act.occurrence = e.occurrence + 1
+                break
+        if act.occurrence is None:
+            act.occurrence = 1
 
-    def godfathers(self, prefix: list[Action], w: list[Action]) -> set(Action):
-        assert self.sequence[: len(prefix)] == prefix
+    def add_to_prefix_backtrack(self, action: Action, thread: int) -> None:  # ✅
+        self._backtrack[self._sequence.index(action) - 1].add(thread)
 
-    def reversible_race(self, e1: Action, e2: Action) -> bool:
-        if e1.tid == e2.tid:
+    def independent_suffix_set(self, action: Action) -> set(int):  # ✅
+        """The I_{E'.e}(notdep(e,E).p) for e."""
+        isfset = set()
+        initial_index = self._sequence.index(action) + 1
+        initial_set = set(self._sequence[initial_index:])
+        suffix_set = initial_set.difference(action.causes).add(self._sequence[-1])
+        for e in suffix_set:
+            if not e.caused_by.intersection(suffix_set):
+                isfset.add(e)
+        return isfset
+
+    def update_race_and_causality(self) -> None:  # ✅
+        """Updates causal relation and racist set"""
+        p = self._sequence[-1]
+        for e in reversed(self._sequence[:-1]):
+            if e.tid == p.tid:
+                self.set_happens_before(e, p)
+            elif self.in_data_race(e, p) or self.in_lock_race(e, p):
+                self.set_happens_before(e, p)
+                self._racist.add(e)
+
+    def depends_on_last(self, q: Action) -> bool:
+        p = self._sequence[-1]
+        if p.tid == q.tid:
             return True
         else:
-            return self.happens_before_i(e1, e2)
+            return self.in_data_race(p, q) or self.in_lock_race(p, q)
 
-    def update_causality(self) -> None:
-        """Updates causal relation and racist set"""
-        pass
+    def in_data_race(self, e: Action, p: Action) -> bool:  # ✅
+        instr1 = e.instr
+        instr2 = p.instr
+        if isinstance(instr1, Store) or isinstance(instr2, Store):
+            store_instr, load_instr = (
+                (instr1, instr2) if isinstance(instr1, Store) else (instr2, instr1)
+            )
+            if isinstance(load_instr, Load) or isinstance(load_instr, Store):
+                return load_instr.pointer_operand() == store_instr.pointer_operand()
+        return False
+
+    def in_lock_race(self, e: Action, p: Action) -> bool:  # ✅
+        return (
+            isinstance(e.instr, Call)
+            and isinstance(p.instr, Call)
+            and e.instr.called_function() == "pthread_mutex_lock"
+            and p.instr.called_function() == "pthread_mutex_lock"
+            and e.instr.operand(0) == p.instr.operand(0)
+        )
+
+    def set_happens_before(self, e: Action, p: Action) -> None:  # ✅
+        """Order matters"""
+        e.causes.add(p)
+        p.caused_by.add(e)
+
+    def terminal_thread(self) -> int:
+        return self._sequence[-1].tid

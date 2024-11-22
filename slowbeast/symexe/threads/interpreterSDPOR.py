@@ -8,16 +8,18 @@ from slowbeast.symexe.threads.interpreter import SymbolicInterpreter
 from slowbeast.symexe.threads.state import TSEState
 from slowbeast.interpreter.interpreter import GlobalInit
 
+# from slowbeast.symexe.threads.iexecutor import IExecutor
+
 
 class SPORSymbolicInterpreter(SymbolicInterpreter):
 
     def __init__(self, P, ohandler=None, opts: SEOptions = SEOptions()) -> None:
         print("Initiating the SPOR executor")
-        super().__init__(P, ohandler, opts, None)
+        super().__init__(P, ohandler, opts)
 
     def initial_states(self) -> TSEState:
         mem = self._executor.get_memory_model().create_memory()
-        return TSEState(self.executor, None, mem, self._executor.solver)
+        return TSEState(self._executor, None, mem, self._executor.solver)
 
     def prepare(self) -> None:
         """
@@ -36,11 +38,11 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
         # push call to main to call stack
         entry = self.get_program().entry()
         self.init_state.push_call(None, entry)
-        main_args = self._main_args(s)
+        main_args = self._main_args(self.init_state)
         assert self.init_state.num_threads() == 1
         if main_args:
-            s.memory.get_cs().set_values(main_args)
-        s.sync_pc()
+            self.init_state.memory.get_cs().set_values(main_args)
+        self.init_state.sync_pc()
 
     def run_static(self) -> None:
         """
@@ -61,9 +63,10 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
             for i in G.init():
                 # Hack for concurrent program: FIXME
                 if self.get_options().threads:
-                    ret = self._executor.execute_single_thread(self.init_state, i)
+                    ret = self._executor.exec_legacy(self.init_state, i)
+                    # ret = self._executor.execute(self.init_state, i)
                 else:
-                    ret = self._executor.execute(self.init_state, i)
+                    ret = self._executor.exec_legacy(self.init_state, i)
                 assert len(ret) == 1, "Unhandled initialization"
                 # assert ret[0] is s, "Unhandled initialization instruction"
                 assert ret[
@@ -74,49 +77,55 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
 
     def run(self) -> int:
         self.prepare()
-        self.init_state: TSEState = self.initial_states()
+        # self.init_state: TSEState = self.initial_states()
 
         self.explore(self.init_state, set())
 
     def explore(self, state: TSEState, sleep: set) -> None:
-        """Source - DPOR. We don't evaluate causal relation with actions in pc but we can. TODO"""
-        enabled = get_enabled_threads(state)
-        current_trace = state.trace
-        for thread in enabled.difference(sleep):
-            current_trace.backtrack = set(thread)
-            for ithread in current_trace.backtrack.difference(sleep):
-                extended_trace = current_trace.append(
-                    ithread
-                )  # FIXME convert to action.
-                sample_state = (
-                    newstates.pop()
-                )  # All output states will have the same trace. We just need one.
-                ctrace = sample_state.trace
-                newstates.add(sample_state)
-                for racist_action in ctrace.racist:
-                    godfather = ctrace.godfathers(racist_action)
-                    prefix_event = ctrace.preceding_action(racist_action)
-                    if not godfather.intersection(prefix_event.backtrack):
-                        prefix_event.backtrack.add(godfather.pop())
-                for s in newstates:
-                    s.trace = ctrace
-                    newsleep = set()
-                    for q in sleep:
-                        if not dependent_threads(s, thread, q):
-                            newsleep.add(q)
-                    self.explore(s, newsleep)
-                    sleep.add(thread)
+        """Source - DPOR"""
+        enabled_set = get_enabled_threads(state)
+        usable_threads = enabled_set.difference(sleep)
+        if usable_threads:
+            state.trace.set_backtrack({usable_threads.pop()})
+            while state.trace.get_backtrack().difference(sleep):
+                ithread = state.trace.get_backtrack().difference(sleep).pop()
+                ithread_in_action = state.thread_to_action(ithread)
+                if ithread_in_action is not None:
+                    extended_trace = state.trace.append(
+                        ithread_in_action
+                    )  # This should handle updating causality and race.
+                    for racist_action in extended_trace.get_racist_set():
+                        indep_suffix_set = extended_trace.independent_suffix_set(
+                            racist_action
+                        )
+                        racist_prefix_backtrack = extended_trace.prefix_backtrack(
+                            racist_action
+                        )
+                        if not indep_suffix_set.intersection(racist_prefix_backtrack):
+                            extended_trace.add_to_prefix_backtrack(
+                                racist_action, indep_suffix_set.pop()
+                            )
+                    newstates = state.exec_trace(extended_trace)
+                    for s in newstates:
+                        s.check_data_race()
+                        newsleep = set()
+                        for q in sleep:
+                            if not dependent_threads(s, ithread, q):
+                                newsleep.add(q)
+                        self.explore(s, newsleep)
+                        sleep.add(ithread)
 
 
 def dependent_threads(pstate: TSEState, p: int, q: int) -> bool:
-    """pstate = state with p executed. pqstate wasted. TODO optimise."""
+    """pstate = state with p executed. TODO: very inefficient. You just need to check it with the previous instruction"""
     if p == q:
         return True
     if q not in get_enabled_threads(pstate):
         return False
     else:
-        pqstate = pstate.exec(q)
-        if pqstate.trace[-2] in pqstate.trace[-1].caused_by:
+        q_in_action = pstate.thread_to_action(q)
+        pqtrace = pstate.trace.append(q_in_action)
+        if pqtrace.sequence[-2] in pqtrace.sequence[-1].caused_by:
             return True
         else:
             return False
@@ -124,8 +133,8 @@ def dependent_threads(pstate: TSEState, p: int, q: int) -> bool:
 
 def get_enabled_threads(state: TSEState) -> set[int]:
     enabled = set()
-    for thread in state.threads():
-        if not thread.is_paused():
-            enabled.add(thread)
+    for id in state.thread_ids():
+        if not (state.thread(id).is_paused() or state.thread(id).is_detached()):
+            enabled.add(id)
     # TODO: make sure threads waiting to be joined are not included as well.
     return enabled
