@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from slowbeast.core.errors import GenericError
 from slowbeast.domains.concrete import concrete_value
-from slowbeast.ir.instruction import Alloc, ThreadJoin, Return
+from slowbeast.ir.instruction import Alloc, ThreadJoin, Return, Thread, Call
 from slowbeast.ir.types import get_offset_type
-from slowbeast.symexe.iexecutor import IExecutor as BaseIExecutor
+from slowbeast.ir.function import Function
+from slowbeast.symexe.iexecutor import IExecutor as BaseIExecutor, unsupported_funs
 
 # from slowbeast.symexe.memorymodel import SymbolicMemoryModel
-from slowbeast.symexe.state import Thread
 
 # from slowbeast.symexe.threads.state import TSEState
 from slowbeast.util.debugging import ldbgv, dbgv
@@ -45,15 +45,15 @@ class IExecutor(BaseIExecutor):
     #     #    return IncrementalSEState(self, pc, m)
     #     return TSEState(self, pc, m, self.solver)
 
-    def exec_undef_fun(self, state, instr, fun):
+    def exec_undef_fun(self, state, instr, fun, tid):
         fnname = fun.name()
         if fnname == "__VERIFIER_atomic_begin":
             state.start_atomic()
-            state.pc = state.pc.get_next_inst()
+            state.thread(i).pc = instr.get_next_inst()
             return [state]
         if fnname == "__VERIFIER_atomic_end":
             state.end_atomic()
-            state.pc = state.pc.get_next_inst()
+            state.thread(i).pc = instr.get_next_inst()
             return [state]
         if fnname == "pthread_mutex_init":
             state.mutex_init(state.eval(instr.operand(0)))
@@ -79,7 +79,7 @@ class IExecutor(BaseIExecutor):
                     state.mutex_wait(mtx)
             else:
                 state.mutex_lock(mtx)
-                state.pc = state.pc.get_next_inst()
+                state.thread(i).pc = instr.get_next_inst()
             return [state]
         if fnname == "pthread_mutex_unlock":
             mtx = state.eval(instr.operand(0))
@@ -94,19 +94,71 @@ class IExecutor(BaseIExecutor):
                     state.set_killed("Unlocking un-owned mutex")
                 else:
                     state.mutex_unlock(mtx)
-                    state.pc = state.pc.get_next_inst()
+                    state.thread(i).pc = instr.get_next_inst()
             return [state]
         if fnname.startswith("pthread_"):
             state.set_killed(f"Unsupported pthread_* API: {fnname}")
             return [state]
-        return super().exec_undef_fun(state, instr, fun)
+        state.pc = state.thread(tid).pc
+        state.memory.set_cs(state.thread(tid).get_cs())
+        outputs = super().exec_undef_fun(state, instr, fun)
+        final_result = []
+        for output_state in outputs:
+            output_state.thread(tid).pc = output_state.pc
+            output_state.thread(tid).set_cs(output_state.memory.get_cs())
+            final_result.append(output_state)
+        return final_result
 
-    def call_fun(self, state, instr, fun):
+    def exec_call(self, state: SEState, instr: Call, tid) -> List[SEState]:
+        fun = instr.called_function()
+        if not isinstance(fun, Function):
+            fun = self._resolve_function_pointer(state, fun)
+            if fun is None:
+                state.set_killed(
+                    f"Failed resolving function pointer: {instr.called_function()}"
+                )
+                return [state]
+            assert isinstance(fun, Function)
+
+        if self.is_error_fn(fun):
+            state.set_error(AssertFailError(f"Called '{fun.name()}'"))
+            return [state]
+
+        if fun.is_undefined():
+            name = fun.name()
+            if name == "abort":
+                state.set_terminated("Aborted via an abort() call")
+                return [state]
+            if name in ("exit", "_exit"):
+                state.set_exited(state.eval(instr.operand(0)))
+                return [state]
+            if name in unsupported_funs:
+                state.set_killed(f"Called unsupported function: {name}")
+                return [state]
+            # NOTE: this may be overridden by child classes
+            return self.exec_undef_fun(state, instr, fun, tid)
+
+        if self.calls_forbidden():
+            # FIXME: make this more fine-grained, which calls are forbidden?
+            state.set_killed(f"calling '{fun.name()}', but calls are forbidden")
+            return [state]
+
+        return self.call_fun(state, instr, fun, tid)
+
+    def call_fun(self, state, instr, fun, tid) -> list[TSEState]:
         if fun.name().startswith("__VERIFIER_atomic_"):
-            state.start_atomic()
-        return super().call_fun(state, instr, fun)
+            state.start_atomic(tid)
+        state.pc = state.thread(tid).pc
+        state.memory.set_cs(state.thread(tid).get_cs())
+        outputs = super().call_fun(state, instr, fun)
+        final_result = []
+        for output_state in outputs:
+            output_state.thread(tid).pc = output_state.pc
+            output_state.thread(tid).set_cs(output_state.memory.get_cs())
+            final_result.append(output_state)
+        return final_result
 
-    def exec_thread(self, state, instr) -> list[TSEState]:  # type: ignore
+    def exec_thread(self, state, instr, tid) -> list[TSEState]:  # type: ignore
         fun = instr.called_function()
         ldbgv("-- THREAD {0} --", (fun.name(),))
         if fun.is_undefined():
@@ -127,20 +179,22 @@ class IExecutor(BaseIExecutor):
         }
         t = state.add_thread(fun, fun.bblock(0).instruction(0), mapping or {})
 
-        state.pc = state.pc.get_next_inst()
-        state.set(instr, concrete_value(t.get_id(), get_offset_type()))
+        state.thread(tid).pc = instr.get_next_inst()
+        state.thread(tid).get_cs().set(
+            instr, concrete_value(t.get_id(), get_offset_type())
+        )
         return [state]
 
-    def exec_thread_join(self, state, instr: ThreadJoin) -> list[TSEState]:
+    def exec_thread_join(self, state, instr: ThreadJoin, totid) -> list[TSEState]:
         assert len(instr.operands()) == 1
         tid = state.eval(instr.operand(0))
         if not tid.is_concrete():
             state.set_killed("Symbolic thread values are unsupported yet")
         else:
-            state.join_threads(tid.value())
+            state.join_threads(tid.value(), totid)
         return [state]
 
-    def exec_ret(self, state, instr: Return) -> list[TSEState]:
+    def exec_ret(self, state, instr: Return, tid) -> list[TSEState]:
         # obtain the return value (if any)
         ret = None
         if len(instr.operands()) != 0:  # returns something
@@ -149,18 +203,24 @@ class IExecutor(BaseIExecutor):
                 ret is not None
             ), f"No return value even though there should be: {instr}"
 
-        if state.frame().function.name().startswith("__VERIFIER_atomic_"):
-            state.end_atomic()
+        if (
+            state.thread(tid)
+            .get_cs()
+            .frame()
+            .function.name()
+            .startswith("__VERIFIER_atomic_")
+        ):
+            state.end_atomic(tid)
         # pop the call frame and get the return site
-        rs = state.pop_call()
+        rs = state.thread(tid).get_cs().pop_call()
         if rs is None:  # popped the last frame
-            state.exit_thread(ret)
+            state.exit_thread(ret, tid)
             return [state]
 
         if ret:
-            state.set(rs, ret)
+            state.thread(tid).get_cs().set(rs, ret)
 
-        state.pc = rs.get_next_inst()
+        state.thread(tid).pc = rs.get_next_inst()
         return [state]
 
     def execute(self, state: TSEState) -> list[TSEState]:
@@ -178,24 +238,38 @@ class IExecutor(BaseIExecutor):
                     ns.sync_cs()
         return states
 
+    def wrapper_for_legacy(self, state: TSEState, tid: int) -> list[TSEState]:
+        """Should be made into a decorator or accept calling function as an argument. TODO"""
+        state.pc = state.thread(tid).pc
+        state.memory.set_cs(state.thread(tid).get_cs())
+        outputs = self.exec_legacy(state, state.pc)
+        states = []
+        for legacy_output in outputs:
+            legacy_output.thread(tid).pc = legacy_output.pc
+            legacy_output.thread(tid).set_cs(legacy_output.memory.get_cs())
+            states.append(legacy_output)
+        return states
+
     def execute_single_thread(self, state: TSEState, thread_id: int) -> list[TSEState]:
         s = state.copy()
         instr = s.thread(thread_id).pc
         # action = Action(thread_id, instr)
         # s.trace.append(action)
         if isinstance(instr, Thread):
-            return self.exec_thread(s, instr)
+            return self.exec_thread(s, instr, thread_id)
         if isinstance(instr, ThreadJoin):
-            return self.exec_thread_join(s, instr)
+            return self.exec_thread_join(s, instr, thread_id)
         if isinstance(instr, Return):
-            return self.exec_ret(s, instr)
+            return self.exec_ret(s, instr, thread_id)
+        if isinstance(instr, Call):
+            return self.exec_call(s, instr, thread_id)
         # if self.check_race:
         #     if isinstance(s, Store):
         #         return self.tainted_write(s, instr)
         #     elif isinstance(instr, Load):
         #         return self.tainted_read(s, instr)
 
-        return super().execute(state, instr)
+        return self.wrapper_for_legacy(s, thread_id)
 
     # def tainted_read(self, state: TSEState, instr: Load):
     #     if instr.pointer_operand() in state._tainted_locations:
@@ -215,19 +289,19 @@ class IExecutor(BaseIExecutor):
     #             state._tainted_locations.append(instr.pointer_operand())
     #         return super().execute(state, instr)
 
-    def exec_thread_exit(self, state, instr: ThreadExit):
-        assert isinstance(instr, ThreadExit)
+    # def exec_thread_exit(self, state, instr: ThreadExit):
+    #     assert isinstance(instr, ThreadExit)
 
-        # obtain the return value (if any)
-        ret = None
-        if len(instr.operands()) != 0:  # returns something
-            ret = state.eval(instr.operand(0))
-            assert (
-                ret is not None
-            ), f"No return value even though there should be: {instr}"
+    #     # obtain the return value (if any)
+    #     ret = None
+    #     if len(instr.operands()) != 0:  # returns something
+    #         ret = state.eval(instr.operand(0))
+    #         assert (
+    #             ret is not None
+    #         ), f"No return value even though there should be: {instr}"
 
-        state.exit_thread(ret)
-        return set(state)
+    #     state.exit_thread(ret)
+    #     return set(state)
 
     def exec_legacy(self, state, instr):
         return super().execute(state, instr)

@@ -18,6 +18,7 @@ from .constraints import IncrementalConstraintsSet
 from typing import Optional, TextIO, Union
 from slowbeast.symexe.constraints import ConstraintsSet
 from slowbeast.symexe.memory import Memory
+from slowbeast.core.callstack import CallStack
 
 
 class SEState(ExecutionState):
@@ -283,11 +284,11 @@ class LazySEState(SEState):
 
 
 class Thread:
-    __slots__ = "pc", "cs", "_id", "_paused", "_detached", "_in_atomic", "_exit_val"
+    __slots__ = "pc", "_cs", "_id", "_paused", "_detached", "_in_atomic", "_exit_val"
 
     def __init__(self, tid, pc, callstack) -> None:
         self.pc = pc
-        self.cs = callstack  # callstack
+        self._cs = callstack  # callstack
         self._id = tid  # Thread.ids
         self._paused = False
         self._detached = False
@@ -296,7 +297,7 @@ class Thread:
 
     def copy(self) -> "Thread":
         n = copy(self)  # shallow copy
-        n.cs = self.cs.copy()
+        n._cs = self._cs.copy()
         return n
 
     def get_id(self):
@@ -342,10 +343,17 @@ class Thread:
         return s + ")"
 
     def __repr__(self) -> str:
-        return f"Thread[{self.get_id()}: pc: {self.pc}, cs: {self.cs}]"
+        return f"Thread[{self.get_id()}: pc: {self.pc}, cs: {self._cs}]"
 
     def __eq__(self, value: object) -> bool:
         return self.get_id() == value.get_id()
+
+    def get_cs(self) -> CallStack:
+        return self._cs
+
+    def set_cs(self, cs: CallStack):
+        self._cs = cs
+
 
 def _get_event(pc: Union[Call, Load, Return, Store, ThreadJoin]) -> int:
     if isinstance(pc, Store):

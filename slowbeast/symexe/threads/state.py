@@ -76,10 +76,7 @@ class TSEState(BaseState):
         new._current_thread = self._current_thread
         new._mutexes = self._mutexes.copy()
         new._wait_mutex = {mtx: W.copy() for mtx, W in self._wait_mutex.items() if W}
-        # new._race_alert = self._race_alert
-        # new.conflicts = self.conflicts
-        # if self.is_bot:
-        #     new.is_bot = True
+        new.trace = self.trace
 
     # def lazy_eval(self, v: Union[Alloc, GlobalVariable]):
     #     value = self.try_eval(v)
@@ -111,7 +108,7 @@ class TSEState(BaseState):
     def sync_cs(self) -> None:
         """Synchronise callstack"""
         if self._threads:
-            self.thread().cs = self.memory.get_cs()
+            self.thread().set_cs(self.memory.get_cs())
 
     def add_event(self) -> None:
         self._events.append(Event(self))
@@ -132,7 +129,7 @@ class TSEState(BaseState):
         thr: Thread = self.thread(idx)
         assert thr, self._threads
         self.pc = thr.pc
-        self.memory.set_cs(thr.cs)
+        self.memory.set_cs(thr.get_cs())
         self._current_thread = idx
 
     def add_thread(self, thread_fn, pc, args) -> Thread:
@@ -226,7 +223,7 @@ class TSEState(BaseState):
                 t = self.thread(waitidx)
                 # pass the return value
                 assert isinstance(t.pc, ThreadJoin), t
-                t.cs.set(t.pc, retval)
+                t.get_cs().set(t.pc, retval)
                 t.pc = t.pc.get_next_inst()
 
     def join_threads(self, tid, totid: Thread | None = None) -> None:
@@ -237,11 +234,15 @@ class TSEState(BaseState):
         if tid in self._exited_threads:
             # pass the return value
             retval = self._exited_threads.pop(tid)
-            self.set(self.pc, retval)
-            self.pc = self.pc.get_next_inst()
+            self.thread(totid).get_cs().set(self.thread(totid).pc, retval)
+            self.thread(totid).pc = self.thread(totid).pc.get_next_inst()
             return
 
-        toidx = self._current_thread if totid is None else self._thread_idx(totid)
+        toidx = (
+            self._current_thread
+            if totid is None
+            else self._thread_idx(self.thread(totid))
+        )
         if tid not in self._wait_join:
             self._wait_join[tid] = []
         if toidx not in self._wait_join[tid]:
@@ -252,7 +253,7 @@ class TSEState(BaseState):
         self._threads.pop(self._current_thread if idx is None else idx)
         if self._threads:
             self.pc = self._threads[0].pc
-            self.memory.set_cs(self._threads[0].cs)
+            self.memory.set_cs(self._threads[0].get_cs())
             self._current_thread = 0
 
         if self.num_threads() == 0:

@@ -8,6 +8,9 @@ from slowbeast.symexe.threads.interpreter import SymbolicInterpreter
 from slowbeast.symexe.threads.state import TSEState
 from slowbeast.interpreter.interpreter import GlobalInit
 
+# For debugger:
+from slowbeast.ir.instruction import Call  # noqa:F401
+
 # from slowbeast.symexe.threads.iexecutor import IExecutor
 
 
@@ -107,13 +110,15 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                             )
                     newstates = state.exec_trace(extended_trace)
                     for s in newstates:
+                        self.handle_new_state(s)
                         s.check_data_race()
                         newsleep = set()
                         for q in sleep:
                             if not dependent_threads(s, ithread, q):
                                 newsleep.add(q)
-                        self.explore(s, newsleep)
-                        sleep.add(ithread)
+                        if s.is_ready():
+                            self.explore(s, newsleep)
+                            sleep.add(ithread)
 
 
 def dependent_threads(pstate: TSEState, p: int, q: int) -> bool:
