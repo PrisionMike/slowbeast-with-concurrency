@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from slowbeast.ir.instruction import Instruction
+from slowbeast.ir.instruction import Store, Load, Call
 
 
 class Action:
@@ -34,8 +35,13 @@ class Trace:
     def get_racist_set(self):
         return self._racist
 
-    def get_backtrack(self) -> set(int):
-        return self._backtrack[-1]
+    def get_backtrack(self, action: Action | None = None) -> set(int):
+        """Returns backtrack for the last action
+        (= current trace) or backtrack of the PREFIX
+        of the requested action"""
+        if action is None:
+            return self._backtrack[-1]
+        return self._backtrack[index(action) - 1]
 
     def set_occurrence(self, act: Action) -> None:  # ✅
         for e in reversed(self._sequence):
@@ -53,7 +59,8 @@ class Trace:
         isfset = set()
         initial_index = self._sequence.index(action) + 1
         initial_set = set(self._sequence[initial_index:])
-        suffix_set = initial_set.difference(action.causes).add(self._sequence[-1])
+        suffix_set = initial_set.difference(action.causes)
+        suffix_set.add(self._sequence[-1])
         for e in suffix_set:
             if not e.caused_by.intersection(suffix_set):
                 isfset.add(e)

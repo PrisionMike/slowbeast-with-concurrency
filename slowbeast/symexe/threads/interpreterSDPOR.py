@@ -101,7 +101,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                         indep_suffix_set = extended_trace.independent_suffix_set(
                             racist_action
                         )
-                        racist_prefix_backtrack = extended_trace.prefix_backtrack(
+                        racist_prefix_backtrack = extended_trace.get_backtrack(
                             racist_action
                         )
                         if not indep_suffix_set.intersection(racist_prefix_backtrack):
