@@ -310,19 +310,28 @@ class TSEState(BaseState):
 
     def exec_trace(self, trace: Trace) -> list[Self]:
         """ASSUMES NON-TERMINAL PART OF THE TRACE BELONGS TO THE STATE ITSELF"""
-        self.trace = trace
-        return self.exec_thread(trace.terminal_thread())
+        output_states = self.exec_thread(trace.terminal_thread())
+        for state in output_states:
+            state.trace = trace
+        return output_states
 
     def check_data_race(self) -> None:
         write_locations = set()
         read_locations = set()
-        for t in self.threads():
-            if not (t.is_paused() or t.is_detached()):
-                if isinstance(t.pc, Store):
-                    write_locations.add(t.pc.pointer_operand())
-                elif isinstance(t.pc, Load):
-                    read_locations.add(t.pc.pointer_operand())
-        if write_locations.intersection(read_locations):
+        data_race = False
+        if len(self.threads()) >= 2:
+            for t in self.threads():
+                if not (t.is_paused() or t.is_detached()):
+                    if isinstance(t.pc, Store):
+                        if t.pc.pointer_operand() in write_locations:
+                            data_race = True
+                            break
+                        else:
+                            write_locations.add(t.pc.pointer_operand())
+                    if isinstance(t.pc, Load):
+                        read_locations.add(t.pc.pointer_operand())
+        data_race = data_race and bool(write_locations.intersection(read_locations))
+        if data_race:
             err = MemError(MemError.DATA_RACE, "DATA RACE DETECTED")
             self.set_error(err)
             sys.exit(1)
