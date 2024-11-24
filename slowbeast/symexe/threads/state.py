@@ -310,6 +310,11 @@ class TSEState(BaseState):
             state.trace = trace
         return output_states
 
+    def exec_trace_preset(self) -> list[Self]:
+        """Executes the trace already set in state."""
+        output_states = self.exec_thread(self.trace.terminal_thread())
+        return output_states
+
     def check_data_race(self) -> None:
         write_locations = set()
         read_locations = set()

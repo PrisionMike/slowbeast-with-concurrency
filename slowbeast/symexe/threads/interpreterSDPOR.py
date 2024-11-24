@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+# from copy import deepcopy
+
 # from typing import Set
 from slowbeast.symexe.options import SEOptions
 
@@ -98,21 +100,39 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                 ithread = state.trace.get_backtrack().difference(sleep).pop()
                 ithread_in_action = state.thread_to_action(ithread)
                 if ithread_in_action is not None:
-                    extended_trace = state.trace.append(
+                    # extended_trace = state.trace.append(
+                    #     ithread_in_action
+                    # )  # This should handle updating causality and race.
+                    # for racist_action in extended_trace.get_racist_set():
+                    #     indep_suffix_set = extended_trace.independent_suffix_set(
+                    #         racist_action
+                    #     )
+                    #     racist_prefix_backtrack = extended_trace.get_backtrack(
+                    #         racist_action
+                    #     )
+                    #     if not indep_suffix_set.intersection(racist_prefix_backtrack):
+                    #         extended_trace.add_to_prefix_backtrack(
+                    #           # XXX Problematic. Doesn't update prefix for unextended trace.
+                    #             racist_action, indep_suffix_set.pop()
+                    #         )
+                    # newstates = state.exec_trace(extended_trace)
+
+                    # unextended_trace = deepcopy(state.trace)
+                    state.trace.append_in_place(
                         ithread_in_action
                     )  # This should handle updating causality and race.
-                    for racist_action in extended_trace.get_racist_set():
-                        indep_suffix_set = extended_trace.independent_suffix_set(
+                    for racist_action in state.trace.get_racist_set():
+                        indep_suffix_set = state.trace.independent_suffix_set(
                             racist_action
                         )
-                        racist_prefix_backtrack = extended_trace.get_backtrack(
+                        racist_prefix_backtrack = state.trace.get_backtrack(
                             racist_action
                         )
                         if not indep_suffix_set.intersection(racist_prefix_backtrack):
-                            extended_trace.add_to_prefix_backtrack(
+                            state.trace.add_to_prefix_backtrack(
                                 racist_action, indep_suffix_set.pop()
                             )
-                    newstates = state.exec_trace(extended_trace)
+                    newstates = state.exec_trace_preset()
                     for s in newstates:
                         s.check_data_race()
                         self.handle_new_state(s)
@@ -121,6 +141,8 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                             if not dependent_threads(s, ithread, q):
                                 newsleep.add(q)
                         self.explore(s, newsleep)
+                        # state.trace = unextended_trace  # Restore original trace (E)
+                        state.trace.trim()  # Restore original trace (E)
                         sleep.add(ithread)
 
 

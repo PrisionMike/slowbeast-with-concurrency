@@ -17,7 +17,10 @@ class Action:
 class Trace:
     def __init__(self, sequence: list[Action] = []):
         self._sequence = sequence
-        self._racist: set[Action] = set()  # actions in race with the last action
+        self._racist: list[set[Action] | None] = [
+            set()
+        ]  # actions in race with the last action
+        # self._penultimate_racist: set[Action] = set() # Used for trimming the trace.
         self._backtrack: list[set[int] | None] = [set()]
 
     def append(self, e: Action) -> Self:
@@ -29,12 +32,33 @@ class Trace:
         new_trace.update_race_and_causality()
         return new_trace
 
+    def append_in_place(self, e: Action) -> None:
+        """RETURNS an appended trace. Doesn't mutate instance."""
+        # new_trace = deepcopy(self)
+        self.set_occurrence(e)
+        self._sequence.append(e)
+        self._backtrack.append(None)
+        # self._penultimate_racist = deepcopy(self._racist)
+        self.update_race_and_causality()
+        # return new_trace
+
+    # def safe_trim(self):
+    #     old_bt = self._
+
+    def trim(self) -> None:
+        """Trims last event out of the trace. Preserves backtrack updates."""
+        for e in self._sequence[-1].caused_by:
+            e.causes.remove(self._sequence[-1])
+        self._racist = self._racist[:-1]
+        self._sequence = self._sequence[:-1]
+        self._backtrack = self._backtrack[:-1]
+
     def set_backtrack(self, bt: set[int]) -> None:
         """sets backtrack"""
         self._backtrack[-1] = bt
 
     def get_racist_set(self):
-        return self._racist
+        return self._racist[-1]
 
     def get_backtrack(self, action: Action | None = None) -> set(int):
         """Returns backtrack for the last action
@@ -53,7 +77,10 @@ class Trace:
             act.occurrence = 1
 
     def add_to_prefix_backtrack(self, action: Action, thread: int) -> None:  # ✅
-        self._backtrack[self._sequence.index(action) - 1].add(thread)
+        try:
+            self._backtrack[self._sequence.index(action) - 1].add(thread)
+        except ValueError:
+            self._backtrack[self.index(action) - 1].add(thread)
 
     def independent_suffix_set(self, action: Action) -> set(int):  # ✅
         """The I_{E'.e}(notdep(e,E).p) for e."""
@@ -75,7 +102,7 @@ class Trace:
                 self.set_happens_before(e, p)
             elif self.in_data_race(e, p) or self.in_lock_race(e, p):
                 self.set_happens_before(e, p)
-                self._racist.add(e)
+                self._racist[-1].add(e)
 
     def depends_on_last(self, q: Action) -> bool:
         p = self._sequence[-1]
@@ -111,3 +138,15 @@ class Trace:
 
     def terminal_thread(self) -> int:
         return self._sequence[-1].tid
+
+    def __len__(self):
+        return len(self._sequence)
+
+    def index(self, action: Action) -> int | None:
+        ind = 0
+        for e in self._sequence:
+            if e.tid == action.tid and e.occurrence == action.occurrence:
+                return ind
+            else:
+                ind += 1
+        return None
