@@ -81,15 +81,19 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
     def run(self) -> int:
         self.prepare()
         # self.init_state: TSEState = self.initial_states()
-
+        # self.trace = self.init_state.trace  # Empty trace
         self.explore(self.init_state, set())
 
     def explore(self, state: TSEState, sleep: set) -> None:
         """Source - DPOR"""
-        enabled_set = get_enabled_threads(state)
+        enabled_set = get_enabled_threads(
+            state
+        )  # TODO: Make sure the correct state is being sent. It should match the self.current_trace?
         usable_threads = enabled_set.difference(sleep)
         if usable_threads:
-            state.trace.set_backtrack({usable_threads.pop()})
+            state.trace.set_backtrack(
+                {usable_threads.pop()}
+            )  # Isolate trace from state execution TODO: remove all trace references from the state.
             while state.trace.get_backtrack().difference(sleep):
                 ithread = state.trace.get_backtrack().difference(sleep).pop()
                 ithread_in_action = state.thread_to_action(ithread)
@@ -110,15 +114,14 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                             )
                     newstates = state.exec_trace(extended_trace)
                     for s in newstates:
-                        self.handle_new_state(s)
                         s.check_data_race()
+                        self.handle_new_state(s)
                         newsleep = set()
                         for q in sleep:
                             if not dependent_threads(s, ithread, q):
                                 newsleep.add(q)
-                        if s.is_ready():
-                            self.explore(s, newsleep)
-                            sleep.add(ithread)
+                        self.explore(s, newsleep)
+                        sleep.add(ithread)
 
 
 def dependent_threads(pstate: TSEState, p: int, q: int) -> bool:
