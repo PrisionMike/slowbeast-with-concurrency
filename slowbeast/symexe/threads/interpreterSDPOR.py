@@ -145,7 +145,8 @@ def dependent_threads(pstate: TSEState, p: int, q: int) -> bool:
         return False
     else:
         q_in_action = pstate.thread_to_action(q)
-        pqtrace = pstate.trace.append(q_in_action)
+        pqtrace = deepcopy(pstate.trace)
+        pqtrace.append_in_place(q_in_action)
         if pqtrace.sequence[-2] in pqtrace.sequence[-1].caused_by:
             return True
         else:

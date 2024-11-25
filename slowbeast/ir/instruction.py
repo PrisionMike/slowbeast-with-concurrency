@@ -422,6 +422,7 @@ class Return(Instruction):
 class Thread(Call):
     def __init__(self, wht, operands, optypes) -> None:
         super().__init__(wht, get_offset_type(), operands, optypes)
+        self._operand_tid: int | None = None
 
     def called_function(self):
         return self._function
@@ -442,6 +443,7 @@ class Thread(Call):
 class ThreadJoin(ValueTypedInstruction):
     def __init__(self, ty, ops, optypes) -> None:
         super().__init__(ty, ops, optypes)
+        self._operand_tid: int | None = None
 
     def __str__(self) -> str:
         if len(self.operands()) == 0:

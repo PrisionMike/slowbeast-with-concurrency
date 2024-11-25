@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from slowbeast.ir.instruction import Instruction
-from slowbeast.ir.instruction import Store, Load, Call
+from slowbeast.ir.instruction import Store, Load, Call, Thread, ThreadJoin, Return
 
 
 class Action:
@@ -95,7 +95,7 @@ class Trace:
         return isfset
 
     def update_race_and_causality(self) -> None:  # ✅
-        """Updates causal relation and racist set"""
+        """Updates causal relation (redundantly) and racist set"""
         p = self._sequence[-1]
         for e in reversed(self._sequence[:-1]):
             if e.tid == p.tid:
@@ -103,13 +103,44 @@ class Trace:
             elif self.in_data_race(e, p) or self.in_lock_race(e, p):
                 self.set_happens_before(e, p)
                 self._racist[-1].add(e)
+            elif self.other_causality(e, p):
+                self.set_happens_before(e, p)
 
-    def depends_on_last(self, q: Action) -> bool:
-        p = self._sequence[-1]
-        if p.tid == q.tid:
-            return True
-        else:
-            return self.in_data_race(p, q) or self.in_lock_race(p, q)
+    def other_causality(self, e: Action, p: Action) -> bool:
+        """Order sensitive"""
+        return (
+            self.unlock_causality(e, p)
+            or self.fork_causality(e, p)
+            or self.join_causality(e, p)
+        )
+
+    def unlock_causality(self, e: Action, p: Action) -> bool:
+        return (
+            isinstance(e.instr, Call)
+            and isinstance(p.instr, Call)
+            and e.instr.called_function() == "pthread_mutex_unlock"
+            and p.instr.called_function() == "pthread_mutex_lock"
+            and e.instr.operand(0) == p.instr.operand(0)
+        )
+
+    def fork_causality(self, e: Action, p: Action) -> bool:
+        if isinstance(e.instr, Thread):
+            if e.instr._operand_tid == p.tid and p.occurrence == 1:
+                return True
+        return False
+
+    def join_causality(self, e: Action, p: Action) -> bool:
+        if isinstance(e.instr, Return):
+            for j in reversed(self._sequence[:-1]):
+                if (
+                    j.tid == p.tid
+                    and j.occurrence == p.occurrence - 1
+                    and isinstance(j.instr, ThreadJoin)
+                    and j.instr._operand_tid == e.tid
+                ):
+                    return True
+                    break
+        return False
 
     def in_data_race(self, e: Action, p: Action) -> bool:  # ✅
         instr1 = e.instr

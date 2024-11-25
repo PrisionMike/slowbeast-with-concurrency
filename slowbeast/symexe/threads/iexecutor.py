@@ -179,6 +179,8 @@ class IExecutor(BaseIExecutor):
         }
         t = state.add_thread(fun, fun.bblock(0).instruction(0), mapping or {})
 
+        instr._operand_tid = t.get_id()
+
         state.thread(tid).pc = instr.get_next_inst()
         state.thread(tid).get_cs().set(
             instr, concrete_value(t.get_id(), get_offset_type())
@@ -188,6 +190,7 @@ class IExecutor(BaseIExecutor):
     def exec_thread_join(self, state, instr: ThreadJoin, totid) -> list[TSEState]:
         assert len(instr.operands()) == 1
         tid = state.eval(instr.operand(0))
+        instr._operand_tid = tid.value()
         if not tid.is_concrete():
             state.set_killed("Symbolic thread values are unsupported yet")
         else:
@@ -263,31 +266,8 @@ class IExecutor(BaseIExecutor):
             return self.exec_ret(s, instr, thread_id)
         if isinstance(instr, Call):
             return self.exec_call(s, instr, thread_id)
-        # if self.check_race:
-        #     if isinstance(s, Store):
-        #         return self.tainted_write(s, instr)
-        #     elif isinstance(instr, Load):
-        #         return self.tainted_read(s, instr)
 
         return self.wrapper_for_legacy(s, thread_id)
-
-    # def tainted_read(self, state: TSEState, instr: Load):
-    #     if instr.pointer_operand() in state._tainted_locations:
-    #         err = MemError(MemError.DATA_RACE, " DATA RACE DETECTED: " + str(instr.pointer_operand()))
-    #         state.set_error(err)
-    #         return state
-    #     else:
-    #         return super().execute(state, instr)
-
-    # def tainted_write(self, state: TSEState, instr: Store):
-    #     if instr.pointer_operand() in state._tainted_locations:
-    #         err = MemError(MemError.DATA_RACE, " DATA RACE DETECTED: " + str(instr.pointer_operand()))
-    #         state.set_error(err)
-    #         return state
-    #     else:
-    #         if may_be_glob_mem(state, instr.pointer_operand()):
-    #             state._tainted_locations.append(instr.pointer_operand())
-    #         return super().execute(state, instr)
 
     # def exec_thread_exit(self, state, instr: ThreadExit):
     #     assert isinstance(instr, ThreadExit)
