@@ -88,36 +88,26 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
 
     def explore(self, state: TSEState, sleep: set) -> None:
         """Source - DPOR"""
-        enabled_set = get_enabled_threads(
-            state
-        )  # TODO: Make sure the correct state is being sent. It should match the self.current_trace?
+        print("Explore")
+        enabled_set = get_enabled_threads(state)
         usable_threads = enabled_set.difference(sleep)
         if usable_threads:
-            state.trace.set_backtrack(
-                {usable_threads.pop()}
-            )  # Isolate trace from state execution TODO: remove all trace references from the state.
+            state.trace.set_backtrack({usable_threads.pop()})
+            print("usable_threads:", usable_threads)
+            print("enabled set:", enabled_set)
             while state.trace.get_backtrack().difference(sleep):
-                ithread = state.trace.get_backtrack().difference(sleep).pop()
-                ithread_in_action = state.thread_to_action(ithread)
-                if ithread_in_action is not None:
-                    # extended_trace = state.trace.append(
-                    #     ithread_in_action
-                    # )  # This should handle updating causality and race.
-                    # for racist_action in extended_trace.get_racist_set():
-                    #     indep_suffix_set = extended_trace.independent_suffix_set(
-                    #         racist_action
-                    #     )
-                    #     racist_prefix_backtrack = extended_trace.get_backtrack(
-                    #         racist_action
-                    #     )
-                    #     if not indep_suffix_set.intersection(racist_prefix_backtrack):
-                    #         extended_trace.add_to_prefix_backtrack(
-                    #           # XXX Problematic. Doesn't update prefix for unextended trace.
-                    #             racist_action, indep_suffix_set.pop()
-                    #         )
-                    # newstates = state.exec_trace(extended_trace)
+                print("state_trace_bt:", state.trace.get_backtrack())
 
-                    # unextended_trace = deepcopy(state.trace)
+                backtrack_minus_sleep = state.trace.get_backtrack().difference(sleep)
+                iia = None
+                for ithread in backtrack_minus_sleep:
+                    iia = state.thread_to_action(ithread)
+                    if iia is not None:
+                        ithread_in_action = iia
+                        break
+                if iia is None:
+                    break  # No thread in enabled and backtrack but not in sleep.
+                else:
                     state.trace.append_in_place(
                         ithread_in_action
                     )  # This should handle updating causality and race.
@@ -144,6 +134,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                         # state.trace = unextended_trace  # Restore original trace (E)
                         state.trace.trim()  # Restore original trace (E)
                         sleep.add(ithread)
+                        print("Sleepies")
 
 
 def dependent_threads(pstate: TSEState, p: int, q: int) -> bool:
