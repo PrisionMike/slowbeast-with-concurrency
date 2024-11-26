@@ -318,19 +318,21 @@ class TSEState(BaseState):
     def check_data_race(self) -> None:
         write_locations = set()
         read_locations = set()
-        data_race = False
+        write_data_race = False
         if len(self.threads()) >= 2:
             for t in self.threads():
                 if not (t.is_paused() or t.is_detached()):
                     if isinstance(t.pc, Store):
                         if t.pc.pointer_operand() in write_locations:
-                            data_race = True
+                            write_data_race = True
                             break
                         else:
                             write_locations.add(t.pc.pointer_operand())
                     if isinstance(t.pc, Load):
                         read_locations.add(t.pc.pointer_operand())
-        data_race = data_race and bool(write_locations.intersection(read_locations))
+        data_race = write_data_race or bool(
+            write_locations.intersection(read_locations)
+        )
         if data_race:
             err = MemError(MemError.DATA_RACE, "DATA RACE DETECTED")
             self.set_error(err)

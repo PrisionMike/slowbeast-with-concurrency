@@ -38,7 +38,7 @@ class Trace:
         self.set_occurrence(e)
         self._sequence.append(e)
         self._backtrack.append(None)
-        # self._penultimate_racist = deepcopy(self._racist)
+        self._racist.append(set())
         self.update_race_and_causality()
         # return new_trace
 
@@ -87,18 +87,45 @@ class Trace:
         isfset = set()
         initial_index = self._sequence.index(action) + 1
         initial_set = set(self._sequence[initial_index:])
-        suffix_set = initial_set.difference(action.causes)
+        e_causes = self.get_causes(action)
+        e_caused_by = self.get_caused_by(action)
+        suffix_set = initial_set.difference(e_causes)
         suffix_set.add(self._sequence[-1])
         for e in suffix_set:
-            if not e.caused_by.intersection(suffix_set):
+            if not e_caused_by.intersection(suffix_set):
                 isfset.add(e.tid)
         return isfset
 
+    def get_causes(self, e: Action):
+        """Returns transivitively closed set of causal successors"""
+        successors = set()
+
+        def dfs(current):
+            for succ in current.causes:
+                successors.add(succ)
+                dfs(succ)
+
+        dfs(e)
+        return successors
+
+    def get_caused_by(self, e: Action):
+        """Returns transivitively closed set of causal predecessors"""
+        predecessors = set()
+
+        def dfs(current):
+            for pred in current.caused_by:
+                predecessors.add(pred)
+                dfs(pred)
+
+        dfs(e)
+        return predecessors
+
     def update_race_and_causality(self) -> None:  # ✅
-        """Updates causal relation (redundantly) and racist set"""
+        """Updates causal relation (redundantly) and racist set
+        TODO: Optimise"""
         p = self._sequence[-1]
         for e in reversed(self._sequence[:-1]):
-            if e.tid == p.tid:
+            if e.tid == p.tid and e.occurrence + 1 == p.occurrence:
                 self.set_happens_before(e, p)
             elif self.in_data_race(e, p) or self.in_lock_race(e, p):
                 self.set_happens_before(e, p)
@@ -118,8 +145,8 @@ class Trace:
         return (
             isinstance(e.instr, Call)
             and isinstance(p.instr, Call)
-            and e.instr.called_function() == "pthread_mutex_unlock"
-            and p.instr.called_function() == "pthread_mutex_lock"
+            and e.instr.called_function().name() == "pthread_mutex_unlock"
+            and p.instr.called_function().name() == "pthread_mutex_lock"
             and e.instr.operand(0) == p.instr.operand(0)
         )
 
@@ -157,8 +184,8 @@ class Trace:
         return (
             isinstance(e.instr, Call)
             and isinstance(p.instr, Call)
-            and e.instr.called_function() == "pthread_mutex_lock"
-            and p.instr.called_function() == "pthread_mutex_lock"
+            and e.instr.called_function().name() == "pthread_mutex_lock"
+            and p.instr.called_function().name() == "pthread_mutex_lock"
             and e.instr.operand(0) == p.instr.operand(0)
         )
 
