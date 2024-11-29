@@ -1,5 +1,5 @@
 from __future__ import annotations
-from sys import stdout
+from sys import stdout, exit
 from typing import TextIO, Self
 
 from slowbeast.core.callstack import CallStack
