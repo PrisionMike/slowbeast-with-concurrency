@@ -84,63 +84,103 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
         self.prepare()
         # self.init_state: TSEState = self.initial_states()
         # self.trace = self.init_state.trace  # Empty trace
+
+        self.log_trace = []
         self.explore(self.init_state, set())
+        print(self.log_trace)
 
     def explore(self, state: TSEState, sleep: set) -> None:
         """Source - DPOR"""
         print("Explore")
         enabled_set = get_enabled_threads(state)
         usable_threads = enabled_set.difference(sleep)
+
+        if enabled_set and not usable_threads:
+            self.log_trace.append((enabled_set.copy(), "💤🫷", sleep))
+
         if usable_threads:
             state.trace.set_backtrack({usable_threads.pop()})
-            print("usable_threads:", usable_threads)
-            print("enabled set:", enabled_set)
+            # print("usable_threads:", usable_threads)
+            # print("enabled set:", enabled_set)
             while state.trace.get_backtrack().difference(sleep):
-                print("state_trace_bt:", state.trace.get_backtrack())
+                # print("state_trace_bt:", state.trace.get_backtrack())
                 ithread = state.trace.get_backtrack().difference(sleep).pop()
                 ithread_in_action = state.thread_to_action(ithread)
                 assert ithread_in_action is not None, "AHHHHHH!!!!!"
                 state.trace.append_in_place(
                     ithread_in_action
                 )  # This should handle updating causality and race.
+
+                # self.log_trace.append("👇")
+
+                self.log_trace.append(
+                    (
+                        (ithread_in_action.tid, ithread_in_action.occurrence),
+                        state.trace._backtrack[-2],
+                        sleep.copy(),
+                        ithread_in_action.instr,
+                    )
+                )
+
                 for racist_action in state.trace.get_racist_set():
                     indep_suffix_set = state.trace.independent_suffix_set(racist_action)
                     racist_prefix_backtrack = state.trace.get_backtrack(racist_action)
+                    missing_thread_in_backtrack = None
                     if not indep_suffix_set.intersection(racist_prefix_backtrack):
+                        missing_thread_in_backtrack = indep_suffix_set.pop()
                         state.trace.add_to_prefix_backtrack(
-                            racist_action, indep_suffix_set.pop()
+                            racist_action, missing_thread_in_backtrack
                         )
+                if state.trace.get_racist_set():
+                    self.log_trace.append(
+                        (
+                            "🏁⤴️",
+                            [
+                                (x.tid, x.occurrence)
+                                for x in state.trace.get_racist_set()
+                            ],
+                            (
+                                missing_thread_in_backtrack
+                                if missing_thread_in_backtrack
+                                else "💩"
+                            ),
+                        )
+                    )
                 newstates = state.exec_trace_preset()
                 for s in newstates:
                     s.check_data_race()
                     self.handle_new_state(s)
                     newsleep = set()
                     for q in sleep:
-                        if not dependent_threads(s, ithread, q):
+                        if not self.dependent_threads(s, ithread, q):
                             newsleep.add(q)
+                    if newsleep:
+                        self.log_trace.append("💤 : " + str(newsleep.copy()))
                     self.explore(s, newsleep)
                     # state.trace = unextended_trace  # Restore original trace (E)
                     state.trace.trim()  # Restore original trace (E)
+
+                    self.log_trace.append(("☝️", ithread))
+
                     sleep.add(ithread)
                     print("Sleepies")
 
-
-def dependent_threads(pstate: TSEState, p: int, q: int) -> bool:
-    """pstate = state with p executed.
-    TODO: very inefficient. You just need
-    to check it with the previous instruction"""
-    if p == q:
-        return True
-    if q not in get_enabled_threads(pstate):
-        return False
-    else:
-        q_in_action = pstate.thread_to_action(q)
-        pqtrace = deepcopy(pstate.trace)
-        pqtrace.append_in_place(q_in_action)
-        if pqtrace._sequence[-2] in pqtrace._sequence[-1].caused_by:
+    def dependent_threads(self, pstate: TSEState, p: int, q: int) -> bool:
+        """pstate = state with p executed.
+        TODO: INCREDIBLY inefficient. You just need
+        to check it with the previous instruction"""
+        if p == q:
             return True
-        else:
+        if q not in get_enabled_threads(pstate):
             return False
+        else:
+            q_in_action = pstate.thread_to_action(q)
+            pqtrace = deepcopy(pstate.trace)
+            pqtrace.append_in_place(q_in_action)
+            if pqtrace._sequence[-2] in pqtrace._sequence[-1].caused_by:
+                return True
+            else:
+                return False
 
 
 def get_enabled_threads(state: TSEState) -> set[int]:

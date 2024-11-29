@@ -66,7 +66,7 @@ class Trace:
         of the requested action"""
         if action is None:
             return self._backtrack[-1]
-        return self._backtrack[self._sequence.index(action) - 1]
+        return self._backtrack[self._sequence.index(action)]
 
     def set_occurrence(self, act: Action) -> None:  # ✅
         for e in reversed(self._sequence):
@@ -78,9 +78,9 @@ class Trace:
 
     def add_to_prefix_backtrack(self, action: Action, thread: int) -> None:  # ✅
         try:
-            self._backtrack[self._sequence.index(action) - 1].add(thread)
+            self._backtrack[self._sequence.index(action)].add(thread)
         except ValueError:
-            self._backtrack[self.index(action) - 1].add(thread)
+            self._backtrack[self.index(action)].add(thread)
 
     def independent_suffix_set(self, action: Action) -> set(int):  # ✅
         """The I_{E'.e}(notdep(e,E).p) for e."""
@@ -100,24 +100,42 @@ class Trace:
         """Returns transivitively closed set of causal successors"""
         successors = set()
 
-        def dfs(current):
+        stack = [e]
+        while stack:
+            current = stack.pop()
             for succ in current.causes:
-                successors.add(succ)
-                dfs(succ)
+                if succ not in successors:
+                    successors.add(succ)
+                    stack.append(succ)
 
-        dfs(e)
+        # XXX Reducing recursion depth. Moving to iterative.
+        # def dfs(current):
+        #     for succ in current.causes:
+        #         successors.add(succ)
+        #         dfs(succ)
+
+        # dfs(e)
         return successors
 
     def get_caused_by(self, e: Action):
         """Returns transivitively closed set of causal predecessors"""
         predecessors = set()
 
-        def dfs(current):
-            for pred in current.caused_by:
-                predecessors.add(pred)
-                dfs(pred)
+        # def dfs(current):
+        #     for pred in current.caused_by:
+        #         predecessors.add(pred)
+        #         dfs(pred)
 
-        dfs(e)
+        # dfs(e)
+
+        stack = [e]
+        while stack:
+            current = stack.pop()
+            for pred in current.causes:
+                if pred not in predecessors:
+                    predecessors.add(pred)
+                    stack.append(pred)
+
         return predecessors
 
     def update_race_and_causality(self) -> None:  # ✅
@@ -125,8 +143,9 @@ class Trace:
         TODO: Optimise"""
         p = self._sequence[-1]
         for e in reversed(self._sequence[:-1]):
-            if e.tid == p.tid and e.occurrence + 1 == p.occurrence:
-                self.set_happens_before(e, p)
+            if e.tid == p.tid:
+                if e.occurrence + 1 == p.occurrence:
+                    self.set_happens_before(e, p)
             elif self.in_data_race(e, p) or self.in_lock_race(e, p):
                 self.set_happens_before(e, p)
                 self._racist[-1].add(e)

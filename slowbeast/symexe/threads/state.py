@@ -1,8 +1,9 @@
 from __future__ import annotations
-from sys import stdout
+from sys import stdout, exit
 from typing import TextIO, Self
 
 from slowbeast.core.callstack import CallStack
+from slowbeast.core.errors import MemError
 
 # from slowbeast.core.errors import GenericError
 from slowbeast.ir.instruction import ThreadJoin, Store, Load
@@ -283,7 +284,7 @@ class TSEState(BaseState):
         write(f" -- Mutexes (locked by): {self._mutexes}\n")
         write(f" -- Threads waiting for mutexes: {self._wait_mutex}\n")
         write(" -- Events --\n")
-        for it in self._events:
+        for it in self.trace._sequence:
             write(str(it) + "\n")
 
     def exec_thread(self, thread: int) -> set[Self]:
@@ -336,4 +337,4 @@ class TSEState(BaseState):
         if data_race:
             err = MemError(MemError.DATA_RACE, "DATA RACE DETECTED")
             self.set_error(err)
-            sys.exit(1)
+            # exit(1)

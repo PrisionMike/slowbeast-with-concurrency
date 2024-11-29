@@ -8,6 +8,8 @@ tests/threads
 sb-out
 llvmlite
 slowbeast_test_bkp
+dryes
+drno
 
 *.bc
 

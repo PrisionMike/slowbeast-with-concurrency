@@ -113,6 +113,8 @@ class MemError(Error):
             detail = "invalid object"
         elif err == MemError.UNSUPPORTED:
             detail = "unsupported operation"
+        elif err == MemError.DATA_RACE:
+            detail = "Data Race detected"
         else:
             raise RuntimeError("Invalid memory error type")
 
