@@ -1,19 +1,12 @@
 from __future__ import annotations
 
-from copy import deepcopy
+# from copy import deepcopy
+from sys import setrecursionlimit
 
-# from typing import Set
 from slowbeast.symexe.options import SEOptions
-
-# from slowbeast.symexe.threads.configuration import Configuration
 from slowbeast.symexe.threads.interpreter import SymbolicInterpreter
 from slowbeast.symexe.threads.state import TSEState
 from slowbeast.interpreter.interpreter import GlobalInit
-
-# For debugger:
-from slowbeast.ir.instruction import Call  # noqa:F401
-
-# from slowbeast.symexe.threads.iexecutor import IExecutor
 
 
 class SPORSymbolicInterpreter(SymbolicInterpreter):
@@ -86,12 +79,26 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
         # self.trace = self.init_state.trace  # Empty trace
 
         self.log_trace = []
-        self.explore(self.init_state, set())
+        self.states.append(
+            self.init_state
+        )  # To populate self.states to halt exploration
+        setrecursionlimit(10**4)
+        try:
+            self.explore(self.init_state, set())
+        except RecursionError:
+            print(
+                "Exploration too deep. Consider making it iterative or increasing recursion depth."
+            )
         print(self.log_trace)
 
     def explore(self, state: TSEState, sleep: set) -> None:
         """Source - DPOR"""
-        print("Explore")
+
+        if not self.states:
+            # Halt. state not ready and has errors.
+            self.log_trace.append("⛔")
+            return
+
         enabled_set = get_enabled_threads(state)
         usable_threads = enabled_set.difference(sleep)
 
@@ -100,10 +107,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
 
         if usable_threads:
             state.trace.set_backtrack({usable_threads.pop()})
-            # print("usable_threads:", usable_threads)
-            # print("enabled set:", enabled_set)
             while state.trace.get_backtrack().difference(sleep):
-                # print("state_trace_bt:", state.trace.get_backtrack())
                 ithread = state.trace.get_backtrack().difference(sleep).pop()
                 ithread_in_action = state.thread_to_action(ithread)
                 assert ithread_in_action is not None, "AHHHHHH!!!!!"
@@ -157,13 +161,11 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                     if newsleep:
                         self.log_trace.append("💤 : " + str(newsleep.copy()))
                     self.explore(s, newsleep)
-                    # state.trace = unextended_trace  # Restore original trace (E)
                     state.trace.trim()  # Restore original trace (E)
 
                     self.log_trace.append(("☝️", ithread))
 
                     sleep.add(ithread)
-                    print("Sleepies")
 
     def dependent_threads(self, pstate: TSEState, p: int, q: int) -> bool:
         """pstate = state with p executed.
@@ -175,17 +177,22 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
             return False
         else:
             q_in_action = pstate.thread_to_action(q)
-            pqtrace = deepcopy(pstate.trace)
-            pqtrace.append_in_place(q_in_action)
-            if pqtrace._sequence[-2] in pqtrace._sequence[-1].caused_by:
-                return True
-            else:
-                return False
+            return pstate.trace.depends_on_last(q_in_action)
+            # q_in_action = pstate.thread_to_action(q)
+            # pqtrace = deepcopy(pstate.trace)
+            # pqtrace.append_in_place(q_in_action)
+            # if pqtrace._sequence[-2] in pqtrace._sequence[-1].caused_by:
+            #     return True
+            # else:
+            #     return False
 
 
 def get_enabled_threads(state: TSEState) -> set[int]:
-    enabled = set()
-    for id in state.thread_ids():
-        if not (state.thread(id).is_paused() or state.thread(id).is_detached()):
-            enabled.add(id)
-    return enabled
+    if state.is_ready():
+        enabled = set()
+        for id in state.thread_ids():
+            if not (state.thread(id).is_paused() or state.thread(id).is_detached()):
+                enabled.add(id)
+        return enabled
+    else:
+        return set()

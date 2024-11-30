@@ -42,9 +42,6 @@ class Trace:
         self.update_race_and_causality()
         # return new_trace
 
-    # def safe_trim(self):
-    #     old_bt = self._
-
     def trim(self) -> None:
         """Trims last event out of the trace. Preserves backtrack updates."""
         for e in self._sequence[-1].caused_by:
@@ -93,6 +90,7 @@ class Trace:
         suffix_set.add(self._sequence[-1])
         for e in suffix_set:
             if not e_caused_by.intersection(suffix_set):
+                # print(e)
                 isfset.add(e.tid)
         return isfset
 
@@ -115,6 +113,7 @@ class Trace:
         #         dfs(succ)
 
         # dfs(e)
+
         return successors
 
     def get_caused_by(self, e: Action):
@@ -131,7 +130,7 @@ class Trace:
         stack = [e]
         while stack:
             current = stack.pop()
-            for pred in current.causes:
+            for pred in current.caused_by:
                 if pred not in predecessors:
                     predecessors.add(pred)
                     stack.append(pred)
@@ -139,21 +138,26 @@ class Trace:
         return predecessors
 
     def update_race_and_causality(self) -> None:  # ✅
-        """Updates causal relation (redundantly) and racist set
-        TODO: Optimise"""
+        """Updates immediate causal relation and racist set"""
         p = self._sequence[-1]
         for e in reversed(self._sequence[:-1]):
             if e.tid == p.tid:
                 if e.occurrence + 1 == p.occurrence:
                     self.set_happens_before(e, p)
             elif self.in_data_race(e, p) or self.in_lock_race(e, p):
+                self.update_race(e, p)
                 self.set_happens_before(e, p)
-                self._racist[-1].add(e)
-            elif self.other_causality(e, p):
+            elif self.non_reversible_causality(e, p):
                 self.set_happens_before(e, p)
 
-    def other_causality(self, e: Action, p: Action) -> bool:
-        """Order sensitive"""
+    def update_race(self, e: Action, p: Action) -> None:
+        e_causes = self.get_causes(e)
+        if p not in e_causes:
+            self._racist[-1].add(e)
+
+    def non_reversible_causality(self, e: Action, p: Action) -> bool:
+        """Order sensitive.
+        Won't be added in race as reversed action sequence not possible."""
         return (
             self.unlock_causality(e, p)
             or self.fork_causality(e, p)
@@ -227,3 +231,14 @@ class Trace:
             else:
                 ind += 1
         return None
+
+    def depends_on_last(self, e: Action) -> bool:
+        p = self._sequence[-1]
+        assert p.tid != e.tid, "Actions from the same thread."
+        return (
+            self.in_data_race(e, p)
+            or self.in_lock_race(e, p)
+            or self.unlock_causality(e, p)
+            or self.fork_causality(e, p)
+            or self.join_causality(e, p)
+        )

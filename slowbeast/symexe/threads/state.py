@@ -1,5 +1,5 @@
 from __future__ import annotations
-from sys import stdout, exit
+from sys import stdout
 from typing import TextIO, Self
 
 from slowbeast.core.callstack import CallStack
@@ -29,7 +29,6 @@ class TSEState(BaseState):
         "data_race",
         "trace",
         "bakctrack",
-        # "terminal_action",
     )
 
     def __init__(
@@ -337,4 +336,5 @@ class TSEState(BaseState):
         if data_race:
             err = MemError(MemError.DATA_RACE, "DATA RACE DETECTED")
             self.set_error(err)
+            # self.halt_exec = True
             # exit(1)

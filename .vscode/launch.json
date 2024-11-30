@@ -44,7 +44,8 @@
                 "-check",
                 "no-data-race",
                 "-out-dir",
-                "${workspaceFolder}/drno"
+                "${workspaceFolder}/drno",
+                "-threads-dpor"
             ],
         },
         {
