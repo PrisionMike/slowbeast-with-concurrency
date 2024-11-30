@@ -18,14 +18,13 @@ class Trace:
     def __init__(self, sequence: list[Action] = []):
         self._sequence = sequence
         self._racist: set[Action] = set()  # actions in race with the last action
-        self._backtrack: list[set[int] | None] = [set()]
+        self._backtrack: list[set[int]] = [set()]
 
     def append(self, e: Action) -> Self:
         """RETURNS an appended trace. Doesn't mutate instance."""
         new_trace = deepcopy(self)
         new_trace.set_occurrence(e)
         new_trace._sequence.append(e)
-        new_trace._backtrack.append(None)
         new_trace.update_race_and_causality()
         return new_trace
 
@@ -42,7 +41,7 @@ class Trace:
         of the requested action"""
         if action is None:
             return self._backtrack[-1]
-        return self._backtrack[self._sequence.index(action) - 1]
+        return self._backtrack[index(action) - 1]
 
     def set_occurrence(self, act: Action) -> None:  # ✅
         for e in reversed(self._sequence):
@@ -64,7 +63,7 @@ class Trace:
         suffix_set.add(self._sequence[-1])
         for e in suffix_set:
             if not e.caused_by.intersection(suffix_set):
-                isfset.add(e.tid)
+                isfset.add(e)
         return isfset
 
     def update_race_and_causality(self) -> None:  # ✅
