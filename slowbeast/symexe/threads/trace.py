@@ -148,13 +148,27 @@ class Trace:
         )
 
     def unlock_causality(self, e: Action, p: Action) -> bool:
-        return (
+        """NOTE: Unlock happens before the next instruction after Lock.
+        Lock instructions are enabled regardless of lock being acquired.
+        Instructions ahead are paused untill lock is acquired, ergo they
+        relate to the unlock event."""
+
+        if (
             isinstance(e.instr, Call)
-            and isinstance(p.instr, Call)
             and e.instr.called_function().name() == "pthread_mutex_unlock"
-            and p.instr.called_function().name() == "pthread_mutex_lock"
-            and e.instr.operand(0) == p.instr.operand(0)
-        )
+        ):
+            for j in reversed(self._sequence):
+                if (
+                    j.tid == p.tid
+                    and j.occurrence + 1 == p.occurrence
+                    and isinstance(j.instr, Call)
+                    and j.instr.called_function().name() == "pthread_mutex_lock"
+                    and e.instr.operand(0) == j.instr.operand(0)
+                ):
+                    return True
+                if j.tid == p.tid and j.occurrence < p.occurrence - 1:
+                    break
+        return False
 
     def fork_causality(self, e: Action, p: Action) -> bool:
         if isinstance(e.instr, Thread):
@@ -164,7 +178,7 @@ class Trace:
 
     def join_causality(self, e: Action, p: Action) -> bool:
         if isinstance(e.instr, Return):
-            for j in reversed(self._sequence[:-1]):
+            for j in reversed(self._sequence):
                 if (
                     j.tid == p.tid
                     and j.occurrence == p.occurrence - 1
