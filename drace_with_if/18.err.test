@@ -1,0 +1,70 @@
+ERROR
+Read of uninitialized byte
+
+Nondeterministic values:
+  x50 = <__thread_create_succeeded:32b> -> 0u (0)
+  x54 = <__thread_create_succeeded#2:32b> -> 0u (0)
+  x59 = <__join_succeeded:32b> -> 0u (0)
+
+---- State ----
+status: ERROR
+ -- program counter --
+x26: 32b = load (*)c1
+-- Memory:
+-- Global objects:
+mo1 ('v', alloc'd by g1), global, size: 1:32b
+  0 -> 0:8b
+-- Global bindings:
+g1 -> ptr(1:32b, 0:32b)
+-- Objects:
+mo2 ('<unnamed>', alloc'd by x45), size: 4:32b
+  0 -> 0:32b
+mo3 ('<unnamed>', alloc'd by t1), size: 4:32b
+  0 -> 1:32b
+mo4 ('<unnamed>', alloc'd by t2), size: 4:32b
+  0 -> 2:32b
+mo5 ('<unnamed>', alloc'd by arg), size: 4:32b
+  0 -> ptr(0:32b, 0:32b)
+mo6 ('<unnamed>', alloc'd by c1), size: 4:32b
+  0 -> None
+  1 -> None
+  2 -> None
+  3 -> None
+-- Call stack:
+ -- 0: thread1 --
+a3 -> ptr(0:32b, 0:32b)
+arg -> ptr(5:32b, 0:32b)
+c1 -> ptr(6:32b, 0:32b)
+scoped objects: mo5, mo6
+ -- nondets --
+x50 = <__thread_create_succeeded:32b>
+x54 = <__thread_create_succeeded#2:32b>
+x59 = <__join_succeeded:32b>
+ -- constraints --
+[]
+ -- Threads --
+  0: 0
+  1: 1
+  2: 2
+ -- Exited threads waiting for join: {}
+ -- Threads waiting in join: {1: [0]}
+ -- Mutexes (locked by): {}
+ -- Threads waiting for mutexes: {}
+ -- Events --
+<slowbeast.symexe.threads.trace.Action object at 0x7943840bad50>
+<slowbeast.symexe.threads.trace.Action object at 0x794384d8acc0>
+<slowbeast.symexe.threads.trace.Action object at 0x7943831b40e0>
+<slowbeast.symexe.threads.trace.Action object at 0x79437b18d9a0>
+<slowbeast.symexe.threads.trace.Action object at 0x79437998d310>
+<slowbeast.symexe.threads.trace.Action object at 0x79437998d490>
+<slowbeast.symexe.threads.trace.Action object at 0x79437998d2e0>
+<slowbeast.symexe.threads.trace.Action object at 0x79437998d760>
+<slowbeast.symexe.threads.trace.Action object at 0x79437bfe1f40>
+<slowbeast.symexe.threads.trace.Action object at 0x79438314a4e0>
+<slowbeast.symexe.threads.trace.Action object at 0x79438314ac30>
+<slowbeast.symexe.threads.trace.Action object at 0x79437b18c7a0>
+<slowbeast.symexe.threads.trace.Action object at 0x79438314a510>
+<slowbeast.symexe.threads.trace.Action object at 0x79437998dca0>
+<slowbeast.symexe.threads.trace.Action object at 0x794383148170>
+<slowbeast.symexe.threads.trace.Action object at 0x794381d9b980>
+<slowbeast.symexe.threads.trace.Action object at 0x79437998e030>

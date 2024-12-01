@@ -10,6 +10,7 @@ llvmlite
 slowbeast_test_bkp
 dryes
 drno
+drace_withif
 
 *.bc
 

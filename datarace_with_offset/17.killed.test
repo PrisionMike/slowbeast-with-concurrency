@@ -1,0 +1,56 @@
+KILLED
+
+---- State ----
+status: KILLED
+ -- program counter --
+store (8b)49:8b to (*)x22
+-- Memory:
+-- Global objects:
+mo1 ('v', alloc'd by g1), global, zeroed, size: 2:32b
+-- Global bindings:
+g1 -> ptr(1:32b, 0:32b)
+-- Objects:
+mo2 ('<unnamed>', alloc'd by x32), size: 4:32b
+  0 -> 0:32b
+mo3 ('<unnamed>', alloc'd by t1), size: 4:32b
+  0 -> 1:32b
+mo4 ('<unnamed>', alloc'd by t2), size: 4:32b
+  0 -> 2:32b
+mo5 ('<unnamed>', alloc'd by arg), size: 4:32b
+  0 -> ptr(0:32b, 0:32b)
+-- Call stack:
+ -- 0: thread1 --
+a2 -> ptr(0:32b, 0:32b)
+arg -> ptr(5:32b, 0:32b)
+scoped objects: mo5
+ -- nondets --
+x37 = <__thread_create_succeeded:32b>
+x41 = <__thread_create_succeeded#2:32b>
+x46 = <__join_succeeded:32b>
+ -- constraints --
+[]
+ -- Threads --
+  0: 0
+  1: 1
+  2: 2
+ -- Exited threads waiting for join: {}
+ -- Threads waiting in join: {1: [0]}
+ -- Mutexes (locked by): {}
+ -- Threads waiting for mutexes: {}
+ -- Events --
+<slowbeast.symexe.threads.trace.Action object at 0x73d06cf3e720>
+<slowbeast.symexe.threads.trace.Action object at 0x73d067fe1340>
+<slowbeast.symexe.threads.trace.Action object at 0x73d06eb9ddf0>
+<slowbeast.symexe.threads.trace.Action object at 0x73d0669dca40>
+<slowbeast.symexe.threads.trace.Action object at 0x73d06ff2c7a0>
+<slowbeast.symexe.threads.trace.Action object at 0x73d06601d850>
+<slowbeast.symexe.threads.trace.Action object at 0x73d0740d2240>
+<slowbeast.symexe.threads.trace.Action object at 0x73d0669dd430>
+<slowbeast.symexe.threads.trace.Action object at 0x73d06601d970>
+<slowbeast.symexe.threads.trace.Action object at 0x73d06601d790>
+<slowbeast.symexe.threads.trace.Action object at 0x73d06601db20>
+<slowbeast.symexe.threads.trace.Action object at 0x73d06601dca0>
+<slowbeast.symexe.threads.trace.Action object at 0x73d066994d40>
+<slowbeast.symexe.threads.trace.Action object at 0x73d066994680>
+<slowbeast.symexe.threads.trace.Action object at 0x73d0661ab9e0>
+<slowbeast.symexe.threads.trace.Action object at 0x73d06ebd9e50>
