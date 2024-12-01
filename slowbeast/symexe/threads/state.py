@@ -53,7 +53,8 @@ class TSEState(BaseState):
         self.trace: Trace = Trace()
 
     def _thread_idx(self, thr: Thread) -> int:
-        """Return ID of a given thread. Thread's own ID"""
+        """Return ID of a given thread. Thread's own ID
+        FIXME likely an unnecessary inflexion."""
         for idx in self._threads:
             if self._threads[idx] == thr:
                 return idx
@@ -151,22 +152,26 @@ class TSEState(BaseState):
         return mtx in self._mutexes
 
     def mutex_lock(self, mtx, idx=None) -> None:
-        tid = self.thread(self._current_thread if idx is None else idx).get_id()
+        # tid = self.thread(self._current_thread if idx is None else idx).get_id()
+        tid = self._current_thread if idx is None else idx
         assert self.mutex_locked_by(mtx) is None, "Locking locked mutex"
         self._mutexes[mtx] = tid
 
     def mutex_unlock(self, mtx, idx=None) -> None:
         assert (
-            self.mutex_locked_by(mtx)
-            == self.thread(self._current_thread if idx is None else idx).get_id()
+            self.mutex_locked_by(mtx) == self._current_thread
+            if idx is None
+            else idx
+            # == self.thread(self._current_thread if idx is None else idx).get_id()
         ), "Unlocking wrong mutex"
         self._mutexes[mtx] = None
-        tidx = self._thread_idx
-        unpause = self.unpause_thread
+        # tidx = self._thread_idx
+        # unpause = self.unpause_thread
         W = self._wait_mutex.get(mtx)
         if W is not None:
             for tid in W:
-                unpause(tidx(tid))
+                # unpause(tidx(tid))
+                self.unpause_thread(tid)
             self._wait_mutex[mtx] = set()
 
     def mutex_wait(self, mtx, idx=None) -> None:

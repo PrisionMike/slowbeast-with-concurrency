@@ -64,12 +64,13 @@ class IExecutor(BaseIExecutor):
             # mchalupa TODO: This does not work with mutexes initialized via assignment...
             lckd = state.mutex_locked_by(mtx)
             if lckd is not None:
-                if lckd == state.thread().get_id():
+                # if lckd == state.thread().get_id():
+                if lckd == tid:
                     state.set_killed("Double lock")
                 else:
-                    state.mutex_wait(mtx)
+                    state.mutex_wait(mtx, tid)
             else:
-                state.mutex_lock(mtx)
+                state.mutex_lock(mtx, tid)
                 state.thread(tid).pc = instr.get_next_inst()
             return [state]
         elif fnname == "pthread_mutex_unlock":
@@ -81,10 +82,11 @@ class IExecutor(BaseIExecutor):
             if lckd is None:
                 state.set_killed("Unlocking unlocked lock")
             else:
-                if lckd != state.thread().get_id():
+                # if lckd != state.thread().get_id():
+                if lckd != tid:
                     state.set_killed("Unlocking un-owned mutex")
                 else:
-                    state.mutex_unlock(mtx)
+                    state.mutex_unlock(mtx, tid)
                     state.thread(tid).pc = instr.get_next_inst()
             return [state]
         elif fnname.startswith("pthread_"):
