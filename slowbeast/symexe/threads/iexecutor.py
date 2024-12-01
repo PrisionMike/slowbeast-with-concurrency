@@ -7,9 +7,6 @@ from slowbeast.ir.types import get_offset_type
 from slowbeast.ir.function import Function
 from slowbeast.symexe.iexecutor import IExecutor as BaseIExecutor, unsupported_funs
 
-# from slowbeast.symexe.memorymodel import SymbolicMemoryModel
-
-# from slowbeast.symexe.threads.state import TSEState
 from slowbeast.util.debugging import ldbgv, dbgv
 
 
@@ -36,14 +33,6 @@ class IExecutor(BaseIExecutor):
         memorymodel: SymbolicMemoryModel | None = None,  # noqa:F821
     ) -> None:
         super().__init__(program, solver, opts, memorymodel)
-        # self.check_race = False
-
-    # def create_state(self, pc=None, m=None) -> TSEState:
-    #     if m is None:
-    #         m = self.get_memory_model().create_memory()
-    #     # if self.get_options().incremental_solving:
-    #     #    return IncrementalSEState(self, pc, m)
-    #     return TSEState(self, pc, m, self.solver)
 
     def exec_undef_fun(self, state, instr, fun, tid):
         fnname = fun.name()
@@ -72,10 +61,7 @@ class IExecutor(BaseIExecutor):
             outputs = super().exec_undef_fun(state, instr, fun)
         elif fnname == "pthread_mutex_lock":
             mtx = state.eval(instr.operand(0))
-            # TODO: This does not work with mutexes initialized via assignment...
-            # if not state.has_mutex(mtx):
-            #    state.set_killed("Locking unknown mutex")
-            #    return [state]
+            # mchalupa TODO: This does not work with mutexes initialized via assignment...
             lckd = state.mutex_locked_by(mtx)
             if lckd is not None:
                 if lckd == state.thread().get_id():
@@ -104,6 +90,8 @@ class IExecutor(BaseIExecutor):
         elif fnname.startswith("pthread_"):
             state.set_killed(f"Unsupported pthread_* API: {fnname}")
             return [state]
+        else:
+            outputs = super().exec_undef_fun(state, instr, fun)
 
         for output_state in outputs:
             output_state.thread(tid).pc = output_state.pc
@@ -137,11 +125,10 @@ class IExecutor(BaseIExecutor):
             if name in unsupported_funs:
                 state.set_killed(f"Called unsupported function: {name}")
                 return [state]
-            # NOTE: this may be overridden by child classes
             return self.exec_undef_fun(state, instr, fun, tid)
 
         if self.calls_forbidden():
-            # FIXME: make this more fine-grained, which calls are forbidden?
+            # mchalupa: TODO: make this more fine-grained, which calls are forbidden?
             state.set_killed(f"calling '{fun.name()}', but calls are forbidden")
             return [state]
 
@@ -168,9 +155,6 @@ class IExecutor(BaseIExecutor):
                 GenericError(f"Spawning thread with undefined function: {fun.name()}")
             )
             return [state]
-        # map values to arguments
-        # TODO: do we want to allow this? Less actual parameters than formal parameters?
-        # assert len(instr.operands()) == len(fun.arguments())
         if len(instr.operands()) > len(fun.arguments()):
             dbgv(
                 "Thread created with less actual arguments than with formal arguments..."
@@ -236,7 +220,6 @@ class IExecutor(BaseIExecutor):
 
         for t in state._threads:
             if not state.thread(t).is_paused():
-                # self.check_race = self.check_race and not t.in_atomic()
                 states.append(self.execute_single_thread(state, t))
                 for ns in states:
                     ns.sync_pc()
@@ -258,8 +241,6 @@ class IExecutor(BaseIExecutor):
     def execute_single_thread(self, state: TSEState, thread_id: int) -> list[TSEState]:
         s = state.copy()
         instr = s.thread(thread_id).pc
-        # action = Action(thread_id, instr)
-        # s.trace.append(action)
         if isinstance(instr, Thread):
             return self.exec_thread(s, instr, thread_id)
         if isinstance(instr, ThreadJoin):
@@ -270,20 +251,6 @@ class IExecutor(BaseIExecutor):
             return self.exec_call(s, instr, thread_id)
 
         return self.wrapper_for_legacy(s, thread_id)
-
-    # def exec_thread_exit(self, state, instr: ThreadExit):
-    #     assert isinstance(instr, ThreadExit)
-
-    #     # obtain the return value (if any)
-    #     ret = None
-    #     if len(instr.operands()) != 0:  # returns something
-    #         ret = state.eval(instr.operand(0))
-    #         assert (
-    #             ret is not None
-    #         ), f"No return value even though there should be: {instr}"
-
-    #     state.exit_thread(ret)
-    #     return set(state)
 
     def exec_legacy(self, state, instr):
         return super().execute(state, instr)

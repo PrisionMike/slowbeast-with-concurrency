@@ -34,13 +34,11 @@ class Trace:
 
     def append_in_place(self, e: Action) -> None:
         """RETURNS an appended trace. Doesn't mutate instance."""
-        # new_trace = deepcopy(self)
         self.set_occurrence(e)
         self._sequence.append(e)
         self._backtrack.append(None)
         self._racist.append(set())
         self.update_race_and_causality()
-        # return new_trace
 
     def trim(self) -> None:
         """Trims last event out of the trace. Preserves backtrack updates."""
@@ -106,26 +104,11 @@ class Trace:
                     successors.add(succ)
                     stack.append(succ)
 
-        # XXX Reducing recursion depth. Moving to iterative.
-        # def dfs(current):
-        #     for succ in current.causes:
-        #         successors.add(succ)
-        #         dfs(succ)
-
-        # dfs(e)
-
         return successors
 
     def get_caused_by(self, e: Action):
         """Returns transivitively closed set of causal predecessors"""
         predecessors = set()
-
-        # def dfs(current):
-        #     for pred in current.caused_by:
-        #         predecessors.add(pred)
-        #         dfs(pred)
-
-        # dfs(e)
 
         stack = [e]
         while stack:

@@ -22,13 +22,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
     def prepare(self) -> None:
         """
         DUPLICATED FROM PREDECESSOR
-        Initial state no longer a list.
-        TODO: Move such changes upstream.
-        Prepare the interpreter for execution.
-        I.e. initialize static memory and push the call to
-        the main function to call stack.
-        Result is a set of states before starting executing
-        the entry function.
+        SS TODO: Move such changes upstream.
         """
         self.init_state = self.initial_states()
         self.run_static()
@@ -47,26 +41,18 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
         DUPLICATED to resolve initial states being a list.
         Run static actors (e.g. initialize globals)
         """
-        # fake the program counter for the executor
         ginit = GlobalInit()
         self.init_state.pc = ginit
 
         globs = self._program.globals()
         for G in globs:
-            # bind the global to the state
             self.init_state.memory.allocate_global(G, zeroed=G.is_zeroed())
 
             if not G.has_init():
                 continue
             for i in G.init():
-                # Hack for concurrent program: FIXME
-                if self.get_options().threads:
-                    ret = self._executor.exec_legacy(self.init_state, i)
-                    # ret = self._executor.execute(self.init_state, i)
-                else:
-                    ret = self._executor.exec_legacy(self.init_state, i)
+                ret = self._executor.exec_legacy(self.init_state, i)
                 assert len(ret) == 1, "Unhandled initialization"
-                # assert ret[0] is s, "Unhandled initialization instruction"
                 assert ret[
                     0
                 ].is_ready(), (
@@ -75,8 +61,6 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
 
     def run(self) -> int:
         self.prepare()
-        # self.init_state: TSEState = self.initial_states()
-        # self.trace = self.init_state.trace  # Empty trace
 
         self.log_trace = []
         self.states.append(
@@ -95,7 +79,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
         """Source - DPOR"""
 
         if not self.states:
-            # Halt. state not ready and has errors.
+            # Halt. Data race found.
             self.log_trace.append("⛔")
             return
 
@@ -114,8 +98,6 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                 state.trace.append_in_place(
                     ithread_in_action
                 )  # This should handle updating causality and race.
-
-                # self.log_trace.append("👇")
 
                 self.log_trace.append(
                     (
@@ -176,13 +158,6 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
         else:
             q_in_action = pstate.thread_to_action(q)
             return pstate.trace.depends_on_last(q_in_action)
-            # q_in_action = pstate.thread_to_action(q)
-            # pqtrace = deepcopy(pstate.trace)
-            # pqtrace.append_in_place(q_in_action)
-            # if pqtrace._sequence[-2] in pqtrace._sequence[-1].caused_by:
-            #     return True
-            # else:
-            #     return False
 
 
 def get_enabled_threads(state: TSEState) -> set[int]:

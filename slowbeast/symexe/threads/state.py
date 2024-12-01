@@ -42,7 +42,6 @@ class TSEState(BaseState):
         super().__init__(executor, pc, m, solver, constraints)
         self._last_tid = 0
         self._current_thread = 0
-        # [Thread(0, pc, self.memory.get_cs() if m else None)]
         if m:
             self._threads = {0: Thread(0, pc, self.memory.get_cs())}
         else:
@@ -62,7 +61,6 @@ class TSEState(BaseState):
             return None
 
     def _copy_to(self, new: Self) -> None:
-        # assert not self.is_bot, "Don't copy the bottom state"
         super()._copy_to(new)
         new._threads = {id: thr.copy() for id, thr in self._threads.items()}
         new._wait_join = self._wait_join.copy()
@@ -72,29 +70,6 @@ class TSEState(BaseState):
         new._mutexes = self._mutexes.copy()
         new._wait_mutex = {mtx: W.copy() for mtx, W in self._wait_mutex.items() if W}
         new.trace = self.trace
-
-    # def lazy_eval(self, v: Union[Alloc, GlobalVariable]):
-    #     value = self.try_eval(v)
-    #     if value is None:
-    #         vtype = v.type()
-    #         if vtype.is_pointer():
-    #             if isinstance(
-    #                 v, (Alloc, GlobalVariable)
-    #             ):  # FIXME: this is hack, do it generally for pointers
-    #                 self.executor().memorymodel.lazy_allocate(self, v)
-    #                 return self.try_eval(v)
-    #             name = f"unknown_ptr_{v.as_value()}"
-    #         else:
-    #             name = f"unknown_{v.as_value()}"
-    #         value = self.solver().symbolic_value(name, v.type())
-    #         ldbgv(
-    #             "Created new nondet value {0} = {1}",
-    #             (v.as_value(), value),
-    #             color="dark_blue",
-    #         )
-    #         self.set(v, value)
-    #         self.create_nondet(v, value)
-    #     return value
 
     def sync_pc(self) -> None:
         if self._threads:
@@ -120,7 +95,6 @@ class TSEState(BaseState):
         if self._current_thread == idx:
             return
 
-        # schedule new thread
         thr: Thread = self.thread(idx)
         assert thr, self._threads
         self.pc = thr.pc
@@ -134,7 +108,6 @@ class TSEState(BaseState):
         t = Thread(self._last_tid, pc, cs)
         assert not t.is_paused()
         self._threads[self._last_tid] = t
-        # self._trace.append(f"add thread {t.get_id()}")
         return t
 
     def current_thread(self) -> int:
@@ -325,5 +298,3 @@ class TSEState(BaseState):
         if data_race:
             err = MemError(MemError.DATA_RACE, "DATA RACE DETECTED")
             self.set_error(err)
-            # self.halt_exec = True
-            # exit(1)
