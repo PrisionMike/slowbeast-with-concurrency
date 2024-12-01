@@ -49,6 +49,28 @@
             ],
         },
         {
+            "name": "drrace_with_locks",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/sb",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "args": [
+                "${workspaceFolder}/drace_with_locks.c",
+                "-svcomp-witness",
+                "-entry",
+                "main",
+                "-pointer-bitwidth",
+                "32",
+                "-exit-on-error",
+                "-check",
+                "no-data-race",
+                "-out-dir",
+                "${workspaceFolder}/drrace_with_locks",
+                "-threads-dpor"
+            ],
+        },
+        {
             "name": "yes-data-race",
             "type": "debugpy",
             "request": "launch",

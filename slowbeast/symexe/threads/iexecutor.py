@@ -47,25 +47,30 @@ class IExecutor(BaseIExecutor):
 
     def exec_undef_fun(self, state, instr, fun, tid):
         fnname = fun.name()
+        state.pc = state.thread(tid).pc
+        state.memory.set_cs(state.thread(tid).get_cs())
+        outputs = []
+        final_result = []
+
         if fnname == "__VERIFIER_atomic_begin":
             state.start_atomic()
-            state.thread(i).pc = instr.get_next_inst()
+            state.thread(tid).pc = instr.get_next_inst()
             return [state]
-        if fnname == "__VERIFIER_atomic_end":
+        elif fnname == "__VERIFIER_atomic_end":
             state.end_atomic()
-            state.thread(i).pc = instr.get_next_inst()
+            state.thread(tid).pc = instr.get_next_inst()
             return [state]
-        if fnname == "pthread_mutex_init":
-            state.mutex_init(state.eval(instr.operand(0)))
+        elif fnname == "pthread_mutex_init":
             # return non-det value for the init
-            # TODO: we should connect the returned value with the
+            # mchalupa: TODO: we should connect the returned value with the
             # effect of init...
-            return super().exec_undef_fun(state, instr, fun)
-        if fnname == "pthread_mutex_destroy":
+            state.mutex_init(state.eval(instr.operand(0)))
+            outputs = super().exec_undef_fun(state, instr, fun)
+        elif fnname == "pthread_mutex_destroy":
+            # mchalupa: the same as for init...
             state.mutex_destroy(state.eval(instr.operand(0)))
-            # the same as for init...
-            return super().exec_undef_fun(state, instr, fun)
-        if fnname == "pthread_mutex_lock":
+            outputs = super().exec_undef_fun(state, instr, fun)
+        elif fnname == "pthread_mutex_lock":
             mtx = state.eval(instr.operand(0))
             # TODO: This does not work with mutexes initialized via assignment...
             # if not state.has_mutex(mtx):
@@ -79,9 +84,9 @@ class IExecutor(BaseIExecutor):
                     state.mutex_wait(mtx)
             else:
                 state.mutex_lock(mtx)
-                state.thread(i).pc = instr.get_next_inst()
+                state.thread(tid).pc = instr.get_next_inst()
             return [state]
-        if fnname == "pthread_mutex_unlock":
+        elif fnname == "pthread_mutex_unlock":
             mtx = state.eval(instr.operand(0))
             if not state.has_mutex(mtx):
                 state.set_killed("Unlocking unknown mutex")
@@ -94,15 +99,12 @@ class IExecutor(BaseIExecutor):
                     state.set_killed("Unlocking un-owned mutex")
                 else:
                     state.mutex_unlock(mtx)
-                    state.thread(i).pc = instr.get_next_inst()
+                    state.thread(tid).pc = instr.get_next_inst()
             return [state]
-        if fnname.startswith("pthread_"):
+        elif fnname.startswith("pthread_"):
             state.set_killed(f"Unsupported pthread_* API: {fnname}")
             return [state]
-        state.pc = state.thread(tid).pc
-        state.memory.set_cs(state.thread(tid).get_cs())
-        outputs = super().exec_undef_fun(state, instr, fun)
-        final_result = []
+
         for output_state in outputs:
             output_state.thread(tid).pc = output_state.pc
             output_state.thread(tid).set_cs(output_state.memory.get_cs())

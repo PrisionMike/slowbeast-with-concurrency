@@ -168,9 +168,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                     sleep.add(ithread)
 
     def dependent_threads(self, pstate: TSEState, p: int, q: int) -> bool:
-        """pstate = state with p executed.
-        TODO: INCREDIBLY inefficient. You just need
-        to check it with the previous instruction"""
+        """pstate = state with p executed"""
         if p == q:
             return True
         if q not in get_enabled_threads(pstate):

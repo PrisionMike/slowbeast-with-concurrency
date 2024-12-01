@@ -257,17 +257,6 @@ class TSEState(BaseState):
     def num_threads(self) -> int:
         return len(self._threads)
 
-    # def race_condition_possible(self) -> bool:
-    #     """Sets `race_alert` flag if more than 1 thread is active."""
-    #     sleeping_threads = [thread.is_paused() for thread in self._threads.values()]
-    #     if all(sleeping_threads):
-    #         self.set_error(GenericError("Deadlock detected"))
-    #         return False
-    #     self._race_alert = sleeping_threads.count(False) > 1
-    #     if not self._race_alert:
-    #         self._tainted_locations = []
-    #     return self._race_alert
-
     def threads(self) -> iter:
         return self._threads.values()
 
