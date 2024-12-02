@@ -103,6 +103,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                     ithread_in_action
                 )  # This should handle updating causality and race.
                 if state.trace.data_race:
+                    self.log_trace.append("⛔")
                     state.set_data_race()
                     self.handle_new_state(state)
                     self.data_race = True

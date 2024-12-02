@@ -79,7 +79,6 @@
             "console": "integratedTerminal",
             "args": [
                 "${workspaceFolder}/drace_withif.c",
-                "-svcomp-witness",
                 "-entry",
                 "main",
                 "-pointer-bitwidth",
