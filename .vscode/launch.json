@@ -90,7 +90,6 @@
                 "-out-dir",
                 "${workspaceFolder}/drace_with_if",
                 "-threads-dpor",
-                "-uninitialized-nondet"
             ],
         },
         {

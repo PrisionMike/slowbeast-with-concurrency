@@ -22,6 +22,7 @@ class Trace:
         ]  # actions in race with the last action
         # self._penultimate_racist: set[Action] = set() # Used for trimming the trace.
         self._backtrack: list[set[int] | None] = [set()]
+        self.data_race = False
 
     def append(self, e: Action) -> Self:
         """RETURNS an appended trace. Doesn't mutate instance."""
@@ -33,7 +34,7 @@ class Trace:
         return new_trace
 
     def append_in_place(self, e: Action) -> None:
-        """RETURNS an appended trace. Doesn't mutate instance."""
+        """Appends the trace along with updating races and causality"""
         self.set_occurrence(e)
         self._sequence.append(e)
         self._backtrack.append(None)
@@ -127,16 +128,25 @@ class Trace:
             if e.tid == p.tid:
                 if e.occurrence + 1 == p.occurrence:
                     self.set_happens_before(e, p)
-            elif self.in_data_race(e, p) or self.in_lock_race(e, p):
+            elif self.in_data_race(e, p):
+                if self.update_race(e, p):
+                    self.data_race = True
+                    break  # Should not break if data race detection is not the only goal.
+                self.set_happens_before(e, p)
+            elif self.in_lock_race(e, p):
                 self.update_race(e, p)
                 self.set_happens_before(e, p)
             elif self.non_reversible_causality(e, p):
                 self.set_happens_before(e, p)
 
-    def update_race(self, e: Action, p: Action) -> None:
+    def update_race(self, e: Action, p: Action) -> bool:
+        """Returns True if race is updated"""
         e_causes = self.get_causes(e)
         if p not in e_causes:
             self._racist[-1].add(e)
+            return True
+        else:
+            return False
 
     def non_reversible_causality(self, e: Action, p: Action) -> bool:
         """Order sensitive.

@@ -283,6 +283,7 @@ class TSEState(BaseState):
         return output_states
 
     def check_data_race(self) -> None:
+        """TODO: Not required. data race in trace => data race in some possible state"""
         write_locations = set()
         read_locations = set()
         write_data_race = False
@@ -301,5 +302,9 @@ class TSEState(BaseState):
             write_locations.intersection(read_locations)
         )
         if data_race:
-            err = MemError(MemError.DATA_RACE, "DATA RACE DETECTED")
-            self.set_error(err)
+            self.set_data_race()
+
+    def set_data_race(self):
+        # self.data_race = True
+        err = MemError(MemError.DATA_RACE, "DATA RACE DETECTED")
+        self.set_error(err)

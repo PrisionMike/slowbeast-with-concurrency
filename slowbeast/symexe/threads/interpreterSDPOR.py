@@ -14,6 +14,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
     def __init__(self, P, ohandler=None, opts: SEOptions = SEOptions()) -> None:
         print("Initiating the SPOR executor")
         super().__init__(P, ohandler, opts)
+        self.data_race = False
 
     def initial_states(self) -> TSEState:
         mem = self._executor.get_memory_model().create_memory()
@@ -101,7 +102,11 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                 state.trace.append_in_place(
                     ithread_in_action
                 )  # This should handle updating causality and race.
-
+                if state.trace.data_race:
+                    state.set_data_race()
+                    self.handle_new_state(state)
+                    self.data_race = True
+                    break
                 self.log_trace.append(
                     (
                         (ithread_in_action.tid, ithread_in_action.occurrence),
@@ -137,7 +142,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                     )
                 newstates = state.exec_trace_preset()
                 for s in newstates:
-                    s.check_data_race()
+                    # s.check_data_race()
                     self.handle_new_state(s)
                     newsleep = set()
                     for q in sleep:
@@ -146,6 +151,10 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                     if newsleep:
                         self.log_trace.append("💤 : " + str(newsleep.copy()))
                     self.explore(s, newsleep)
+
+                    if self.data_race:
+                        return
+
                     state.trace.trim()  # Restore original trace (E)
 
                     self.log_trace.append(("☝️", ithread))
