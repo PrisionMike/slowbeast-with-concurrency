@@ -11,7 +11,7 @@ void *thread1(void *arg) {
 }
 
 void *thread2(void *arg) {
-    if (cond <= 5) {  // Conditional race
+    if (cond > 5) {  // Conditional race
         v = '2';
     }
     return 0;

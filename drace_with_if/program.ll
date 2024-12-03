@@ -56,9 +56,9 @@ fun thread2(a11)
    ; llvm :   %4 = sext i8 %3 to i32, !dbg !25
    ; dbgloc : ('drace_withif.c', 14, 9)
   x41: 32b = extend signed (8b)x40 to 32 bits 
-   ; llvm :   %5 = icmp sle i32 %4, 5, !dbg !27
+   ; llvm :   %5 = icmp sgt i32 %4, 5, !dbg !27
    ; dbgloc : ('drace_withif.c', 14, 14)
-  x42: bool = cmp (32b)x41 <= (32b)5:32b 
+  x42: bool = cmp (32b)x41 > (32b)5:32b 
    ; llvm :   br i1 %5, label %6, label %7, !dbg !28
    ; dbgloc : ('drace_withif.c', 14, 9)
   branch x42 ? bblock 36 : bblock 37 

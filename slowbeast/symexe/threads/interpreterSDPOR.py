@@ -8,6 +8,8 @@ from slowbeast.symexe.threads.interpreter import SymbolicInterpreter
 from slowbeast.symexe.threads.state import TSEState
 from slowbeast.interpreter.interpreter import GlobalInit
 
+# from slowbeast.ir.instruction import Branch
+
 
 class SPORSymbolicInterpreter(SymbolicInterpreter):
 
@@ -80,7 +82,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
         """Source - DPOR"""
 
         if not self.states:
-            # Halt. Data race found.
+            # Halt. Error found.
             self.log_trace.append("⛔")
             return
 
@@ -114,6 +116,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                         state.trace._backtrack[-2],
                         sleep.copy(),
                         ithread_in_action.instr,
+                        [(x.tid, x.occurrence) for x in ithread_in_action.caused_by],
                     )
                 )
 
@@ -142,6 +145,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                         )
                     )
                 newstates = state.exec_trace_preset()
+                # state.trace.trim()
                 for s in newstates:
                     # s.check_data_race()
                     self.handle_new_state(s)
@@ -151,16 +155,17 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                             newsleep.add(q)
                     if newsleep:
                         self.log_trace.append("💤 : " + str(newsleep.copy()))
+
                     self.explore(s, newsleep)
 
-                    if self.data_race:
-                        return
+                if self.data_race:
+                    return
 
-                    state.trace.trim()  # Restore original trace (E)
+                state.trace.trim()
 
-                    self.log_trace.append(("☝️", ithread))
+                self.log_trace.append(("☝️", ithread))
 
-                    sleep.add(ithread)
+                sleep.add(ithread)
 
     def dependent_threads(self, pstate: TSEState, p: int, q: int) -> bool:
         """pstate = state with p executed"""

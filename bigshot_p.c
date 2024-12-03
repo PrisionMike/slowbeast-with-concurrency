@@ -12,26 +12,21 @@ void reach_error() { assert(0); }
 
 #include <stdlib.h>
 #include <pthread.h>
+#include <string.h>
 
 void __VERIFIER_assert(int expression) { if (!expression) { ERROR: {reach_error();abort();}}; return; }
-
-char *_strcpy(char *dest, const char *src) {
-    char *save = dest;
-    while ((*dest++ = *src++));
-    return save;
-}
 
 char *v;
 
 void *thread1(void * arg)
 {
-  v = calloc(8, sizeof(char));
+  v = malloc(sizeof(char) * 8);
   return 0;
 }
 
 void *thread2(void *arg)
 {
-  if (v) _strcpy(v, "Bigshot");
+  if (v) strcpy(v, "Bigshot");
   return 0;
 }
 
@@ -41,8 +36,9 @@ int main()
   pthread_t t1, t2;
 
   pthread_create(&t1, 0, thread1, 0);
-  pthread_create(&t2, 0, thread2, 0);
   pthread_join(t1, 0);
+
+  pthread_create(&t2, 0, thread2, 0);
   pthread_join(t2, 0);
 
   __VERIFIER_assert(!v || v[0] == 'B');
