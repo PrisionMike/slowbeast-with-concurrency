@@ -99,8 +99,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                 ithread_in_action = state.thread_to_action(ithread)
                 assert (
                     ithread_in_action is not None
-                ), "Backtracked instruction not in sleep and not enabled. \
-                Likely an error in drawing causality or determining race at least."
+                ), "Backtracked instruction not in sleep and not enabled"
                 state.trace.append_in_place(
                     ithread_in_action
                 )  # This should handle updating causality and race.
