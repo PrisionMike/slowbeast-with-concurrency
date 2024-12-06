@@ -81,9 +81,8 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
     def explore(self, state: TSEState, sleep: set) -> None:
         """Source - DPOR"""
 
-        if not self.states:
-            # Halt. Error found.
-            self.log_trace.append("⛔")
+        if self.data_race:
+            self.log_trace.append("🚩")
             return
 
         enabled_set = get_enabled_threads(state)
