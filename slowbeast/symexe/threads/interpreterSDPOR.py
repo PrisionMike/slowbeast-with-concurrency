@@ -76,7 +76,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
             print(
                 "Exploration too deep. Consider making it iterative or increasing recursion depth."
             )
-        # print(self.log_trace)
+        print(self.log_trace)
 
     def explore(self, state: TSEState, sleep: set) -> None:
         """Source - DPOR"""

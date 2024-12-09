@@ -224,10 +224,10 @@ class TSEState(BaseState):
 
     def remove_thread(self, idx=None) -> None:
         self._threads.pop(self._current_thread if idx is None else idx)
-        if self._threads:
-            self.pc = self._threads[0].pc
-            self.memory.set_cs(self._threads[0].get_cs())
-            self._current_thread = 0
+        # if self._threads:
+        #     self.pc = self._threads[0].pc
+        #     self.memory.set_cs(self._threads[0].get_cs())
+        #     self._current_thread = 0
 
         if self.num_threads() == 0:
             self.set_exited(0)
@@ -279,7 +279,8 @@ class TSEState(BaseState):
 
     def exec_trace_preset(self) -> list[Self]:
         """Executes the trace already set in state."""
-        output_states = self.exec_thread(self.trace.terminal_thread())
+        self._current_thread = self.trace.terminal_thread()
+        output_states = self.exec_thread(self._current_thread)
         return output_states
 
     def check_data_race(self) -> None:

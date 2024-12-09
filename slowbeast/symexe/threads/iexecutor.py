@@ -42,11 +42,11 @@ class IExecutor(BaseIExecutor):
         final_result = []
 
         if fnname == "__VERIFIER_atomic_begin":
-            state.start_atomic()
+            state.start_atomic(tid)
             state.thread(tid).pc = instr.get_next_inst()
             return [state]
         elif fnname == "__VERIFIER_atomic_end":
-            state.end_atomic()
+            state.end_atomic(tid)
             state.thread(tid).pc = instr.get_next_inst()
             return [state]
         elif fnname == "pthread_mutex_init":

@@ -12,7 +12,7 @@
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "args": [
-                "${workspaceFolder}/bigshot_p.c",
+                "${workspaceFolder}/bigshot_p.i",
                 "-entry",
                 "main",
                 "-pointer-bitwidth",
