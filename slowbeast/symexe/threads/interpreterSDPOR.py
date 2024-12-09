@@ -14,7 +14,7 @@ from slowbeast.interpreter.interpreter import GlobalInit
 class SPORSymbolicInterpreter(SymbolicInterpreter):
 
     def __init__(self, P, ohandler=None, opts: SEOptions = SEOptions()) -> None:
-        print("Initiating the SPOR executor")
+        # print("Initiating the SPOR executor")
         super().__init__(P, ohandler, opts)
         self.data_race = False
 
@@ -76,7 +76,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
             print(
                 "Exploration too deep. Consider making it iterative or increasing recursion depth."
             )
-        print(self.log_trace)
+        # print(self.log_trace)
 
     def explore(self, state: TSEState, sleep: set) -> None:
         """Source - DPOR"""
@@ -174,6 +174,20 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
         else:
             q_in_action = pstate.thread_to_action(q)
             return pstate.trace.depends_on_last(q_in_action)
+
+    def handle_new_state(self, state: TSEState) -> None:
+        """Only works for data race"""
+        if state.has_error():
+            if state.get_error().is_data_race_error():
+                self.stats.errors += 1
+                self.stats.paths += 1
+                self.states = []
+            else:  # Any other error: kill it.
+                state.set_killed("Non - data race error.")
+                self.states = []
+                super().handle_new_state(state)
+        else:
+            super().handle_new_state(state)
 
 
 def get_enabled_threads(state: TSEState) -> set[int]:
