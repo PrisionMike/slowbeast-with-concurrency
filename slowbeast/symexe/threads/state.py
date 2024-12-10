@@ -312,6 +312,17 @@ class TSEState(BaseState):
 
     def exec_thread_and_update_trace(self, tid: int) -> tuple[list[Self], Action]:
         # TODO Refactor correctly.
-        self._current_thread = tid
-        output_states, finished_instr = self.exec_thread(self._current_thread)
-        state.trace.append_in_place(Action(tid, finished_instr))
+
+        if (
+            tid in self.thread_ids()
+            and not self.thread(tid).is_paused()
+            and not self.thread(tid).is_detached()
+        ):
+            assert self.thread(tid).pc, "Thread {tid} PC empty"
+            self._current_thread = tid
+            output_states, finished_instr = self.exec_thread(self._current_thread)
+            thread_in_action = Action(tid, finished_instr)
+            self.trace.append_in_place(thread_in_action)
+            return output_states, thread_in_action
+        else:
+            return [], None
