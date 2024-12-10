@@ -28,7 +28,6 @@ class TSEState(BaseState):
         "immediate_conflicts",
         "data_race",
         "trace",
-        "bakctrack",
     )
 
     def __init__(
@@ -259,7 +258,8 @@ class TSEState(BaseState):
 
     def thread_to_action(self, tid: int) -> Action | None:
         """Convert an active thread pc instruction to an action.
-        Return None if such an action cannot be added (thread paused, etc.)"""
+        Return None if such an action cannot be added (thread paused, etc.)
+        TODO: Update occurrence as well."""
         if (
             tid in self.thread_ids()
             and not self.thread(tid).is_paused()
@@ -309,3 +309,9 @@ class TSEState(BaseState):
         # self.data_race = True
         err = MemError(MemError.DATA_RACE, "DATA RACE DETECTED")
         self.set_error(err)
+
+    def exec_thread_and_update_trace(self, tid: int) -> tuple[list[Self], Action]:
+        # TODO Refactor correctly.
+        self._current_thread = tid
+        output_states, finished_instr = self.exec_thread(self._current_thread)
+        state.trace.append_in_place(Action(tid, finished_instr))

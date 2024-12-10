@@ -380,6 +380,7 @@ class Call(ValueTypedInstruction):
     def __init__(self, wht, ty, operands, optypes) -> None:
         super().__init__(ty, operands, optypes)
         self._function = wht
+        self.succ = False  # Added for succ mutex lock acquire
 
     def called_function(self):
         return self._function

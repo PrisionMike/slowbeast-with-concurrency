@@ -8,6 +8,8 @@ from slowbeast.symexe.threads.interpreter import SymbolicInterpreter
 from slowbeast.symexe.threads.state import TSEState
 from slowbeast.interpreter.interpreter import GlobalInit
 
+from slowbeast.core.errors import MemError
+
 # from slowbeast.ir.instruction import Branch
 
 
@@ -76,7 +78,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
             print(
                 "Exploration too deep. Consider making it iterative or increasing recursion depth."
             )
-        print(self.log_trace)
+        # print(self.log_trace)
 
     def explore(self, state: TSEState, sleep: set) -> None:
         """Source - DPOR"""
@@ -95,13 +97,16 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
             state.trace.set_backtrack({usable_threads.pop()})
             while state.trace.get_backtrack().difference(sleep):
                 ithread = state.trace.get_backtrack().difference(sleep).pop()
-                ithread_in_action = state.thread_to_action(ithread)
+                newstates, ithread_in_action = state.exec_thread_and_update_trace(
+                    ithread
+                )
+                # ithread_in_action = state.thread_to_action(ithread)
                 assert (
                     ithread_in_action is not None
                 ), "Backtracked instruction not in sleep and not enabled"
-                state.trace.append_in_place(
-                    ithread_in_action
-                )  # This should handle updating causality and race.
+                # state.trace.append_in_place(
+                #     ithread_in_action
+                # )  # This should handle updating causality and race.
                 if state.trace.data_race:
                     self.log_trace.append("⛔")
                     state.set_data_race()
@@ -142,17 +147,21 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                             ),
                         )
                     )
-                newstates = state.exec_trace_preset()
+                # newstates = state.exec_trace_preset()
                 # state.trace.trim()
                 for s in newstates:
                     # s.check_data_race()
                     self.handle_new_state(s)
                     newsleep = set()
-                    for q in sleep:
-                        if not self.dependent_threads(s, ithread, q):
-                            newsleep.add(q)
+                    if s.is_killed() or s.is_terminated():
+                        newsleep.update(s._threads.keys())
+                        self.log_trace.append("SSBeing 🚩🚩🚩")
+                    else:
+                        for q in sleep:
+                            if not self.dependent_threads(s, ithread, q):
+                                newsleep.add(q)
                     if newsleep:
-                        self.log_trace.append("💤 : " + str(newsleep.copy()))
+                        self.log_trace.append(str(newsleep.copy()) + " added to 💤")
 
                     self.explore(s, newsleep)
 
@@ -166,7 +175,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
                 sleep.add(ithread)
 
     def dependent_threads(self, pstate: TSEState, p: int, q: int) -> bool:
-        """pstate = state with p executed"""
+        """pstate = state with p executed TODO: move to TSEState"""
         if p == q:
             return True
         if q not in get_enabled_threads(pstate):
@@ -178,13 +187,16 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
     def handle_new_state(self, state: TSEState) -> None:
         """Only works for data race"""
         if state.has_error():
-            if state.get_error().is_data_race_error():
-                self.stats.errors += 1
-                self.stats.paths += 1
-                self.states = []
-            else:  # Any other error: kill it.
-                state.set_killed("Non - data race error.")
-                self.states = []
+            if isinstance(state.get_error(), MemError):
+                if state.get_error().is_data_race_error():
+                    self.stats.errors += 1
+                    self.stats.paths += 1
+                    self.states = []
+                else:  # Any other error: kill it.
+                    state.set_killed("Non - data race mem error.")
+                    self.states = []
+                    super().handle_new_state(state)
+            else:
                 super().handle_new_state(state)
         else:
             super().handle_new_state(state)

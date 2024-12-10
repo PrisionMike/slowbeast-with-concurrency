@@ -18,7 +18,7 @@ from .specialfunctions import (
 from .utils import *
 
 concrete_value = ConcreteDomain.get_value
-#sym_value = SymbolicDomain.get_value
+# sym_value = SymbolicDomain.get_value
 
 
 def _get_llvm_module(path: str) -> ModuleRef:
@@ -28,6 +28,7 @@ def _get_llvm_module(path: str) -> ModuleRef:
     else:
         with open(path, "rb") as f:
             return llvm.parse_bitcode(f.read())
+
 
 def parse_special_fcmp(inst, op1, op2, optypes):
     seq = []
@@ -182,6 +183,8 @@ unsupported_funs = [
     "pthread_cond_broadcast",
     "pthread_cond_wait",
     "pthread_cond_timedwait",
+    "__VERIFIER_atomic_begin",
+    "__VERIFIER_atomic_end",
 ]
 thread_funs = ["pthread_create", "pthread_join", "pthread_exit"]
 
@@ -1223,12 +1226,16 @@ class Parser:
         # because they may be operands of calls
         for f in m.functions:
             assert f.type.is_pointer, "Function pointer type is not a pointer"
-            succ, retty = parse_fun_ret_ty(self.llvmmodule, f.type.element_type) # retty has wrong bitwidth too. FIXME.
+            succ, retty = parse_fun_ret_ty(
+                self.llvmmodule, f.type.element_type
+            )  # retty has wrong bitwidth too. FIXME.
             if not succ:
                 raise NotImplementedError(
                     f"Cannot parse function return type: {f.type.element_type} of fun: {f.name}"
                 )
-            args = [Argument(get_sb_type(self.llvmmodule, a.type)) for a in f.arguments] # gets the bitwidth wrong. FIXME.
+            args = [
+                Argument(get_sb_type(self.llvmmodule, a.type)) for a in f.arguments
+            ]  # gets the bitwidth wrong. FIXME.
             fun = Function(f.name, args, retty)
             self.program.add_fun(fun)
             self._funs[f] = fun

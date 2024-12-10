@@ -158,10 +158,11 @@ class Trace:
         )
 
     def unlock_causality(self, e: Action, p: Action) -> bool:
-        """NOTE: Unlock happens before the next instruction after Lock.
+        """NOTE: Unlock "happens before" the next instruction after Lock.
         Lock instructions are enabled regardless of lock being acquired.
         Instructions ahead are paused untill lock is acquired, ergo they
-        relate to the unlock event."""
+        relate to the unlock event.
+        CHECK LOCK SUCCESS."""
 
         if (
             isinstance(e.instr, Call)
@@ -173,6 +174,7 @@ class Trace:
                     and j.occurrence + 1 == p.occurrence
                     and isinstance(j.instr, Call)
                     and j.instr.called_function().name() == "pthread_mutex_lock"
+                    and j.instr.succ
                     and e.instr.operand(0) == j.instr.operand(0)
                 ):
                     return True
@@ -217,6 +219,8 @@ class Trace:
             and e.instr.called_function().name() == "pthread_mutex_lock"
             and p.instr.called_function().name() == "pthread_mutex_lock"
             and e.instr.operand(0) == p.instr.operand(0)
+            and e.instr.succ  # LOCK ACQUIRED SUCCESSFULLY.
+            and p.instr.succ  # LOCK ACQUIRED SUCCESSFULLY.
         )
 
     def set_happens_before(self, e: Action, p: Action) -> None:  # ✅
@@ -241,6 +245,7 @@ class Trace:
 
     def depends_on_last(self, e: Action) -> bool:
         p = self._sequence[-1]
+        # self.set_occurrence(e)
         assert p.tid != e.tid, "Actions from the same thread."
         return (
             self.in_data_race(e, p)

@@ -17,7 +17,7 @@
                 "main",
                 "-pointer-bitwidth",
                 "32",
-                "-exit-on-error",
+                // "-exit-on-error",
                 "-check",
                 "no-data-race",
                 "-out-dir",

@@ -44,11 +44,11 @@ class IExecutor(BaseIExecutor):
         if fnname == "__VERIFIER_atomic_begin":
             state.start_atomic(tid)
             state.thread(tid).pc = instr.get_next_inst()
-            return [state]
+            return [state], instr
         elif fnname == "__VERIFIER_atomic_end":
             state.end_atomic(tid)
             state.thread(tid).pc = instr.get_next_inst()
-            return [state]
+            return [state], instr
         elif fnname == "pthread_mutex_init":
             # return non-det value for the init
             # mchalupa: TODO: we should connect the returned value with the
@@ -72,12 +72,13 @@ class IExecutor(BaseIExecutor):
             else:
                 state.mutex_lock(mtx, tid)
                 state.thread(tid).pc = instr.get_next_inst()
-            return [state]
+                instr.succ = True
+            return [state], instr  # XXX
         elif fnname == "pthread_mutex_unlock":
             mtx = state.eval(instr.operand(0))
             if not state.has_mutex(mtx):
                 state.set_killed("Unlocking unknown mutex")
-                return [state]
+                return [state], instr
             lckd = state.mutex_locked_by(mtx)
             if lckd is None:
                 state.set_killed("Unlocking unlocked lock")
@@ -88,10 +89,10 @@ class IExecutor(BaseIExecutor):
                 else:
                     state.mutex_unlock(mtx, tid)
                     state.thread(tid).pc = instr.get_next_inst()
-            return [state]
+            return [state], instr
         elif fnname.startswith("pthread_"):
             state.set_killed(f"Unsupported pthread_* API: {fnname}")
-            return [state]
+            return [state], instr
         else:
             outputs = super().exec_undef_fun(state, instr, fun)
 
@@ -99,9 +100,11 @@ class IExecutor(BaseIExecutor):
             output_state.thread(tid).pc = output_state.pc
             output_state.thread(tid).set_cs(output_state.memory.get_cs())
             final_result.append(output_state)
-        return final_result
+        return final_result, instr
 
-    def exec_call(self, state: SEState, instr: Call, tid) -> List[SEState]:
+    def exec_call(
+        self, state: SEState, instr: Call, tid
+    ) -> tuple[List[SEState], Instruction]:
         fun = instr.called_function()
         if not isinstance(fun, Function):
             fun = self._resolve_function_pointer(state, fun)
@@ -109,24 +112,24 @@ class IExecutor(BaseIExecutor):
                 state.set_killed(
                     f"Failed resolving function pointer: {instr.called_function()}"
                 )
-                return [state]
+                return [state], instr
             assert isinstance(fun, Function)
 
         if self.is_error_fn(fun):
             state.set_error(AssertFailError(f"Called '{fun.name()}'"))
-            return [state]
+            return [state], instr
 
         if fun.is_undefined():
             name = fun.name()
             if name == "abort":
                 state.set_terminated("Aborted via an abort() call")
-                return [state]
+                return [state], instr
             if name in ("exit", "_exit"):
                 state.set_exited(state.eval(instr.operand(0)))
-                return [state]
+                return [state], instr
             if name in unsupported_funs:
                 state.set_killed(f"Called unsupported function: {name}")
-                return [state]
+                return [state], instr
             return self.exec_undef_fun(state, instr, fun, tid)
 
         if self.calls_forbidden():
@@ -240,19 +243,21 @@ class IExecutor(BaseIExecutor):
             states.append(legacy_output)
         return states
 
-    def execute_single_thread(self, state: TSEState, thread_id: int) -> list[TSEState]:
+    def execute_single_thread(
+        self, state: TSEState, thread_id: int
+    ) -> tuple[list[TSEState], Instruction]:
         s = state.copy()
         instr = s.thread(thread_id).pc
         if isinstance(instr, Thread):
-            return self.exec_thread(s, instr, thread_id)
+            return self.exec_thread(s, instr, thread_id), instr
         if isinstance(instr, ThreadJoin):
-            return self.exec_thread_join(s, instr, thread_id)
+            return self.exec_thread_join(s, instr, thread_id), instr
         if isinstance(instr, Return):
-            return self.exec_ret(s, instr, thread_id)
+            return self.exec_ret(s, instr, thread_id), instr
         if isinstance(instr, Call):
             return self.exec_call(s, instr, thread_id)
 
-        return self.wrapper_for_legacy(s, thread_id)
+        return self.wrapper_for_legacy(s, thread_id), instr
 
     def exec_legacy(self, state, instr):
         return super().execute(state, instr)

@@ -355,6 +355,7 @@ def parse_arguments():
 def print_stats(engine):
     if hasattr(engine, "executor"):
         executor = engine.executor()
+        print_stdout(f"Data Race Found: {engine.data_race} ", color="CYAN")
         print_stdout(
             f"Executed steps till branch: {executor.get_exec_step_num()}",
             color="CYAN",
