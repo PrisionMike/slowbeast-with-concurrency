@@ -9,6 +9,8 @@ from slowbeast.symexe.iexecutor import IExecutor as BaseIExecutor, unsupported_f
 
 from slowbeast.util.debugging import ldbgv, dbgv
 
+from copy import deepcopy
+
 
 def may_be_glob_mem(state, mem: Alloc) -> bool:
     ptr = state.try_eval(mem)
@@ -60,6 +62,7 @@ class IExecutor(BaseIExecutor):
             state.mutex_destroy(state.eval(instr.operand(0)))
             outputs = super().exec_undef_fun(state, instr, fun)
         elif fnname == "pthread_mutex_lock":
+            newinstr = deepcopy(instr)
             mtx = state.eval(instr.operand(0))
             # mchalupa TODO: This does not work with mutexes initialized via assignment...
             lckd = state.mutex_locked_by(mtx)
@@ -69,11 +72,12 @@ class IExecutor(BaseIExecutor):
                     state.set_killed("Double lock")
                 else:
                     state.mutex_wait(mtx, tid)
+                    newinstr.succ = False
             else:
                 state.mutex_lock(mtx, tid)
-                state.thread(tid).pc = instr.get_next_inst()
-                instr.succ = True
-            return [state], instr  # XXX
+                state.thread(tid).pc = newinstr.get_next_inst()
+                newinstr.succ = True
+            return [state], newinstr  # XXX
         elif fnname == "pthread_mutex_unlock":
             mtx = state.eval(instr.operand(0))
             if not state.has_mutex(mtx):
