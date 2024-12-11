@@ -154,7 +154,7 @@ class IExecutor(BaseIExecutor):
             output_state.thread(tid).pc = output_state.pc
             output_state.thread(tid).set_cs(output_state.memory.get_cs())
             final_result.append(output_state)
-        return final_result
+        return final_result, instr
 
     def exec_thread(self, state, instr, tid) -> list[TSEState]:  # type: ignore
         fun = instr.called_function()

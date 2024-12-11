@@ -252,9 +252,9 @@ class TSEState(BaseState):
         for it in self.trace._sequence:
             write(str(it) + "\n")
 
-    def exec_thread(self, thread: int) -> set[Self]:
-        output_states = self._executor.execute_single_thread(self, thread)
-        return output_states
+    def exec_thread(self, thread: int) -> tuple[list[Self], Instruction]:
+        output_states, instr = self._executor.execute_single_thread(self, thread)
+        return output_states, instr
 
     def thread_to_action(self, tid: int) -> Action | None:
         """Convert an active thread pc instruction to an action.

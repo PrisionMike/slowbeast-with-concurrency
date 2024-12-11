@@ -719,7 +719,7 @@ void *thread3(void *arg)
 {
   pthread_mutex_lock(&mutex);
   if (data >= 3){
-//     ERROR: {reach_error();abort();}
+    ERROR: {reach_error();abort();}
     ;
   }
   pthread_mutex_unlock(&mutex);
