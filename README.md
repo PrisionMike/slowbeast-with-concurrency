@@ -1,8 +1,7 @@
 # Slowbeast
 
-Playground for symbolic execution. Originally created by Marek Chalupa, this fork allows for handling multi-threaded C programs. It's a work in progress, focussing on data race detection for now. But other tasks like reach safety and overflow detection should come for free with it. To be tested.
-
-Best way to use it is to build via docker and then run the files inside. Ensure reproducibility.
+Playground for symbolic execution. Originally created by Marek Chalupa, in FORMELA, Faculty of Informatics, Masaryk University. This fork allows for handling multi-threaded C programs. It's a work in progress, focussing on data race detection for now. But other tasks like reach safety and overflow detection should come for free with it. Soon ;)
+Best way to use it is to build via docker and then run the files inside. This aids in quick deployment.
 
 # How to build (Dev)
 
