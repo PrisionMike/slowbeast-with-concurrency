@@ -1,17 +1,29 @@
 # Slowbeast
 
-Playground for symbolic execution.
+Playground for symbolic execution. Originally created by Marek Chalupa, this fork allows for handling multi-threaded C programs. It's a work in progress, focussing on data race detection for now. But other tasks like reach safety and overflow detection should come for free with it. To be tested.
 
-## Requirements
+Best way to use it is to build via docker and then run the files inside. Ensure reproducibility.
 
-Slowbeast needs python3 and Z3 accesible from python (z3-solver).
-Alternatively, slowbeast can use PySMT solver layer (experimental).
+# How to build (Dev)
 
-To use the LLVM front-end, you need llvmlite. For many LLVM programs, the
-official package is good to go. However, our LLVM parser relies on some
-modifications that we did to the package. Our version of llvmlite can be
-downloaded from https://github.com/mchalupa/llvmlite.
+Clone https://github.com/mchalupa/llvmlite
+Run by mounting the pwd in the docker container.
 
-For running tests:
-For running tests, you need LLVM `lit` (`pip install lit`) and `make`.
-Further, `lit` requires `python-setuptools`.
+# Container In Progress
+
+apt install make
+apt install build-essential
+Just install llvm
+for llvm-config command
+so far I have also installed llvm
+
+setuptools > requirements.txt
+
+apt install -y llvm-14 llvm-14-dev < done so far. 
+
+also install llvmlite locally cloned.
+
+## TODO
+
+- Setup unit tests.
+- Add safe cloning of llvmlite instead of copying from host.

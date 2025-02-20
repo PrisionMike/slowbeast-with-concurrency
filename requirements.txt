@@ -1,0 +1,5 @@
+# Python libraries required for slowbeast
+numpy
+z3-solver
+# Required to build llvmlite locally.
+setuptools

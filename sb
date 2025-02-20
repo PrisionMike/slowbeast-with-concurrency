@@ -1,5 +1,3 @@
-#!/var/tmp/suyash/slowbeast/.sb-venv/bin/python3
-
 import argparse
 from logging import warning
 from os import mkdir
