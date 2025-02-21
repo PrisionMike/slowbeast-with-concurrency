@@ -1,5 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
+set -e
+
+# Ouptut directory.
+mkdir -p sb-out
+
+# Clone and llvmlite if required.
 if [ ! -d "/app/llvmlite" ]; then
     echo "llvmlite not found, cloning..."
     git clone https://github.com/mchalupa/llvmlite /app/llvmlite
@@ -8,11 +14,7 @@ else
 fi
 
 echo "Attempting installation..."
-python /app/llvmlite/setup.py build
+python ./llvmlite/setup.py build
 
-while [ ! -f /app/sb ]; do
-    echo "Waiting for /app/sb..."
-    sleep 1
-done
-
-exec python sb "$@"
+echo "Testing llvm installation.."
+python ./test-z3-installation.py

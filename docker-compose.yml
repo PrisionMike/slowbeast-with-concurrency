@@ -2,5 +2,6 @@ services:
   slowbeast:
     image: slowbeastnodatarace:latest
     volumes:
-      - . :/app
-    # command: ["/app/install-llvmlite.sh"]
+      - ./:/app
+    command: ["./install-llvmlite.sh"]
+    tty: true

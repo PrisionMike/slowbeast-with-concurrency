@@ -1,28 +1,22 @@
 # Slowbeast
 
-Playground for symbolic execution. Originally created by Marek Chalupa, in FORMELA, Faculty of Informatics, Masaryk University. This fork allows for handling multi-threaded C programs. It's a work in progress, focussing on data race detection for now. But other tasks like reach safety and overflow detection should come for free with it. Soon ;)
-Best way to use it is to build via docker and then run the files inside. This aids in quick deployment.
+Playground for symbolic execution. Originally created by Marek Chalupa, in FORMELA, Faculty of Informatics, Masaryk University. This fork allows for handling multi-threaded C programs. It's a work in progress, focussing on data race detection for now. But other tasks like reach safety and overflow detection should come for free with it. Soon ;)  
 
-# How to build (Dev)
-
-Clone https://github.com/mchalupa/llvmlite
-Run by mounting the pwd in the docker container.
-
-# Container In Progress
-
-apt install make
-apt install build-essential
-Just install llvm
-for llvm-config command
-so far I have also installed llvm
-
-setuptools > requirements.txt
-
-apt install -y llvm-14 llvm-14-dev < done so far. 
-
-also install llvmlite locally cloned.
+It is intended to be developed further. thus the dockerisation (intends to) start the application as a development environment. Not as a ready to use container.
 
 ## TODO
 
-- Setup unit tests.
-- Add safe cloning of llvmlite instead of copying from host.
+- Make `-threads-dpor` default.
+- Make history available inside docker. 
+
+## How to build (Dev)
+
+Run by mounting the pwd in the docker container.  
+
+## Docker debug commands
+
+`docker run --rm -it -v "$PWD":/app -w /app slowbeastnodatarace:latest bash`
+
+`docker compose exec slowbeast /bin/bash`
+
+`docker compose run --service-ports --rm slowbeast /bin/bash`
