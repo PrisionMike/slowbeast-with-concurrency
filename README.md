@@ -8,6 +8,7 @@ It is intended to be developed further. thus the dockerisation (intends to) star
 
 - Make `-threads-dpor` default.
 - Make history available inside docker. 
+- setup unit tests.
 
 ## How to build (Dev)
 
