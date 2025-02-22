@@ -8,11 +8,16 @@ It is intended to be developed further. thus the dockerisation (intends to) star
 
 - Make `-threads-dpor` default.
 - Make history available inside docker. 
-- setup unit tests.
+- Setup unit tests.
 
-## How to build (Dev)
+## Get Started
 
-Run by mounting the pwd in the docker container.  
+Run the `./get-started.sh` script. It builds the docker container and runs a container with the current directory mounted.
+
+## Requirements
+
+- While docker is not mandatory, it is advised for quick and easy deployment, even for development etc.
+- Refer the Docker image file and the `install-llvmlite.sh` script for replicating a local build. The latter is the script run as soon as the image is built and the current drive is mounted.
 
 ## Docker debug commands
 

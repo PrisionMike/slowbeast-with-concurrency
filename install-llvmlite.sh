@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Just used by docker inside the container
+
+
 set -e
 
 # Ouptut directory.
