@@ -1,0 +1,10 @@
+__pycache__
+*.pyc
+*.bc
+sb-out
+unit-tests/result-files/*
+llvmlite
+docs/
+.dockerignore
+.vscode
+.command-history-docker
