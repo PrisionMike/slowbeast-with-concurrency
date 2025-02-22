@@ -3,7 +3,7 @@ __pycache__
 *.bc
 .*
 sb-out
-unit-tests/result-files
+unit-tests/result-files/*
 llvmlite
 docs/
 .dockerignore
