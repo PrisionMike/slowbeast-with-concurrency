@@ -24,7 +24,7 @@ def get_verdict(input_file, out_dir):
         prop_file = drr.get("property_file")
         assert prop_file == '../properties/no-data-race.prp'
         expected_verdict = drr.get("expected_verdict")
-    out_dir_target = out_dir + target_file
+    out_dir_target = out_dir + target_file.split(".")[0]
 
     return target_file, expected_verdict, out_dir_target
 
@@ -39,8 +39,8 @@ def run_sb(target_file, out_dir_target, base_dir):
     return output
 
 
-def write_output_log(target_file, out_dir_target, output):
-    with open(out_dir_target + target_file + ".log", 'w') as g:
+def write_output_log(out_dir_target, output):
+    with open(out_dir_target + "/output.log", 'w') as g:
         g.write("****** STDOUT *******\n")
         g.write(output.stdout)
         g.write("********************\n")

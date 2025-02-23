@@ -21,7 +21,7 @@ def test_all_units(input_file):
     
     output = run_sb(target_file, out_dir_target, IN_DIR)
     
-    write_output_log(target_file, out_dir_target, output)
+    write_output_log(out_dir_target, output)
     
     evaluate_result(expected_verdict, output)
 
