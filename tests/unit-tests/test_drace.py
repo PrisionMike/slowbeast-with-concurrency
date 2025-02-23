@@ -13,7 +13,7 @@ def get_input_files():
     return glob.glob(pattern)
 
 def file_id(filename):
-    return filename
+    return os.path.basename(str(filename).split('.')[0])
 
 @pytest.mark.parametrize("input_file", get_input_files(), ids=file_id)
 def test_all_units(input_file):
@@ -24,15 +24,3 @@ def test_all_units(input_file):
     write_output_log(out_dir_target, output)
     
     evaluate_result(expected_verdict, output)
-
-
-# @pytest.mark.skip(reason="Redundant")
-# def test_drace():
-#     input_file = IN_DIR + 'drace.yml'
-#     target_file, expected_verdict, out_dir_target = get_verdict(input_file, OUT_DIR)
-
-#     output = run_sb(target_file, out_dir_target, IN_DIR)
-
-#     write_output_log(target_file, out_dir_target, output)
-
-#     evaluate_result(expected_verdict, output)

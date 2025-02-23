@@ -1,4 +1,4 @@
-Run `pytest tests/` from `/app` (default) for testing. Use `-s` for enabling output
+Run `pytest -v tests/` from `/app` (default) for testing. Use `-s` for enabling output.
 
 [SV-Comp](https://gitlab.com/sosy-lab/benchmarking/sv-benchmarks/-/tree/main/c/goblint-regression?ref_type=heads) style `.yml` file and place. Just make sure they have the property and are placed in the same directory as the target file.
 

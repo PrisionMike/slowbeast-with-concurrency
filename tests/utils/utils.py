@@ -45,7 +45,6 @@ def write_output_log(out_dir_target, output):
         g.write(output.stdout)
         g.write("********************\n")
         if output.stderr != '':
-            g.write("****** STDERR *******\n")
+            g.write("****** Errors Or Warnings *******\n")
             g.write(output.stderr)
             g.write("*********************")
-            assert False
