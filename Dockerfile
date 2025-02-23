@@ -3,6 +3,7 @@ FROM python:3-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV HISTFILE=/app/.command-history-docker
+ENV PATH="/app:${PATH}"
 
 WORKDIR /app
 

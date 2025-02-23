@@ -1,3 +1,5 @@
+#!/usr/local/bin/python
+
 import argparse
 from logging import warning
 from os import mkdir
@@ -269,8 +271,8 @@ def create_arg_parser():
     parser.add_argument(
         "-threads-dpor",
         action="store_true",
-        default=False,
-        help="Enable DPOR when handling threads (default=false)",
+        default=True,
+        help="Enable DPOR when handling threads (default=true)",
     )
     parser.add_argument(
         "-ai",

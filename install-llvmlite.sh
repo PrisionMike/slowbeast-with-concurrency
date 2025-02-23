@@ -20,4 +20,4 @@ echo "Attempting installation..."
 python ./llvmlite/setup.py build
 
 echo "Testing llvm installation.."
-python ./test-z3-installation.py
+python ./tests/test-z3-installation.py
