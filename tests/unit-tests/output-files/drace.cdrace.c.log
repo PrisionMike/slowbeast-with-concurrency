@@ -1,4 +1,5 @@
-****** STDOUT *******The output dir exists, overwriting it
+****** STDOUT *******
+The output dir exists, overwriting it
 Data Race Found: True 
 Executed steps till branch: 0
 Executed instructions: 15
@@ -10,5 +11,5 @@ Paths that reached exit: 0
 Paths that abnormally terminated: 0
 Killed paths: 0
 Found errors: 1
-wall-time: 0.005453824996948242, cpu-time: 0.00545365199999992
+wall-time: 0.011971473693847656, cpu-time: 0.011970835000000069
 ********************

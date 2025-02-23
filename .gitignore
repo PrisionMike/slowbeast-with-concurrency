@@ -2,8 +2,8 @@ __pycache__
 *.pyc
 *.bc
 sb-out
-tests/*.ll
-tests/*.log
+tests/unit-tests/output-files/*
+tests/tdd/output-files/*
 llvmlite
 .dockerignore
 .command-history-docker
