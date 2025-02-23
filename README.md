@@ -9,7 +9,7 @@ Run the `./get-started.sh` script. It builds the docker container and runs a con
 ## How to use:
 
 - Running the `./get-started.sh` creates a bash terminal inside the docker container (tagged: `slowbeastnodatarace:latest`). This is considered the default mode of operation. Files created outside the container can be edited from inside **but vice versa is not true**. Only create files from outside the container, which is also the more convenient option. The only files the container should create are the `program.ll` files which are the translation of the input program into llvm, that is then used for analysis.
-- The `sb-main` is the main entrypoint of all the analysis. Simple `sb-main input-file.c` should default to using the right parameters. The line `Data Race Found: False` is the main value to be read. It will be printed regardless of the completion of analysis so the final result is only valid if there are no KILLED paths. (TODO: clearly indicate unknown result when that is the case)
+- The `sb-main` is the main entrypoint of all the analysis. Simple `sb-main <input-file>` should default to using the right parameters. The line `Data Race Found: False` is the main value to be read. It will be printed regardless of the completion of analysis so the final result is only valid if there are no KILLED paths. (TODO: clearly indicate unknown result when that is the case)
 - `benchexec-dir\slowbeast.py` is the main file that will evaluate the output of the `sb-main <input file>` command when running [benchexec](https://github.com/sosy-lab/benchexec). 
 
 
