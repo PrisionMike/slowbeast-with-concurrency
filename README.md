@@ -12,6 +12,7 @@ Tool used to detect data race in C programs. Uses symbolic execution and SDPOR a
 - Get going atomic.
 - Add reference to thesis.
 - Mark the specific files and classes to be used for understanding the work.
+- Setup GitHub actions for docker build. Unit tests.
 
 ## Get Started
 
