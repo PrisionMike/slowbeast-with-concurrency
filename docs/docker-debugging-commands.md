@@ -1,4 +1,3 @@
-
 ## Docker debug commands
 
 `docker run --rm -it -v "$PWD":/app -w /app slowbeastnodatarace:latest bash`
