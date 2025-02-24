@@ -27,6 +27,4 @@ Run the `./get-started.sh` script. It builds the docker container and runs a con
 - Refactor for comprehension.
 - Add an explainer doc for SDPOR, understanding trace, etc.
 - Get going atomic.
-- Add reference to thesis.
-- Mark the specific files and classes to be used for understanding the work.
 - Setup GitHub actions for docker build and unit tests.

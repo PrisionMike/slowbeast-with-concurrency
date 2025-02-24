@@ -6,7 +6,7 @@ from slowbeast.ir.instruction import ThreadJoin, Return, Thread, Alloc
 from slowbeast.ir.types import get_offset_type
 from slowbeast.symexe.iexecutor import IExecutor as BaseIExecutor
 from slowbeast.symexe.memorymodel import SymbolicMemoryModel
-from slowbeast.symexe.threads.state_backup import TSEState
+from slowbeast.symexe.threads.vestigial.state_backup import TSEState
 from slowbeast.util.debugging import ldbgv, dbgv
 
 

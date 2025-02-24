@@ -1,6 +1,18 @@
-Run `pytest -v tests/` from `/app` (default) for testing. Use `-s` for enabling output.
+## TDD Friendly
 
-[SV-Comp](https://gitlab.com/sosy-lab/benchmarking/sv-benchmarks/-/tree/main/c/goblint-regression?ref_type=heads) style `.yml` file and place. Just make sure they have the property and are placed in the same directory as the target file.
+The project is meant to be developed obeying the Test Driven Development principles. Simply put, we write the exact test of the required feature **before** developing it. Run and fail the test, and simply drive the development by eliminating the errors thrown until the test passes. At which point it can be transfered to `unit-tests` to strengthen testing.  
+
+Run the specific (or all) tests in `tests/tdd/<target feature>` to develop or to measure the extent to which a feature has been extended.
+
+## How To Test
+
+Run `pytest -v tests/` from `/app` (default) for testing. Use `-s` for enabling output. Pytest uses method and class names to identify tests so make sure those are not altered. Ref: [Pytest test discovery](https://docs.pytest.org/en/7.1.x/explanation/goodpractices.html#conventions-for-python-test-discovery).  
+
+The `input-file` within each test group should be treated as an [SV-Comp](https://gitlab.com/sosy-lab/benchmarking/sv-benchmarks/-/tree/main/c/goblint-regression?ref_type=heads) benchmark folder with `.yml` result files and target programs. This ensures drop testing. Simply dump the yaml result and source file in a directory and run the test after updating the respective directories.  
+
+Following is a pytest cheat sheet for future reference.  
+
+---
 
 ### **1. Skip a Test (Always)**
 Use `@pytest.mark.skip` to completely disable a test:

@@ -1,3 +1,5 @@
+# TODO: Remove. Most functions already copied to the main interpreter: interpreterSDPOR
+
 from typing import List, Optional, Union
 from slowbeast.ir.function import Function
 from slowbeast.ir.instruction import Alloc, Call, Load, Store, ThreadJoin, Thread
