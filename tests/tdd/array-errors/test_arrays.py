@@ -31,9 +31,9 @@ def _evaluate_result(expected_verdict, output):
         print(line)
         if line == 'Data Race Found: True':
             print("SS: 1", line)
-            assert expected_verdict == "false"
+            assert expected_verdict is False
             break
         elif line == 'Data Race Found: False':
             print("SS: 2", line)
-            assert expected_verdict == "true"
+            assert expected_verdict is True
             break
