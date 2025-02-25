@@ -21,14 +21,3 @@ Run the `./get-started.sh` script. It builds the docker container and runs a con
 
 - While docker is not mandatory, it is recommended for convenience.
 - Refer the Docker image file (Dockerfile) and the `install-llvmlite.sh` script for replicating a local build. The latter is the script run as soon as the image is built and the current drive is mounted.
-
-## TODO
-
-- Fix incorrect results.
-- Identify atomic instructions
-- Refactor for comprehension.
-- Add an explainer doc for SDPOR, understanding trace, etc.
-- Get going atomic.
-- Setup GitHub actions for docker build and unit tests.
-- Setup linters et al.
-- Switch to dev containers.
