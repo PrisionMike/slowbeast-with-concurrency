@@ -1,0 +1,15 @@
+****** STDOUT *******
+The output dir exists, overwriting it
+Data Race Found: False 
+Executed steps till branch: 0
+Executed instructions: 21
+Executed branch instructions: 0
+Number of forks on branches: 0 (forked on 0% of branches)
+Number of all forks: 0 (from 0 calls (0%) to fork())
+Executed paths: 1
+Paths that reached exit: 1
+Paths that abnormally terminated: 0
+Killed paths: 0
+Found errors: 0
+wall-time: 0.006417036056518555, cpu-time: 0.006417644000000111
+********************
