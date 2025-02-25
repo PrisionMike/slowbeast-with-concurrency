@@ -209,8 +209,21 @@ class Trace:
                 (instr1, instr2) if isinstance(instr1, Store) else (instr2, instr1)
             )
             if isinstance(load_instr, Load) or isinstance(load_instr, Store):
-                return load_instr.pointer_operand() == store_instr.pointer_operand()
+                return self.points_to_same_location(store_instr, load_instr)
         return False
+
+    def points_to_same_location(self, store_instr, load_instr):
+        load_pointer_operand = load_instr.pointer_operand()
+        store_pointer_operand = store_instr.pointer_operand()
+        load_metadata = load_instr._metadata
+        store_metadata = store_instr._metadata
+        print("load metadata", load_metadata)
+        print("store metadata", store_metadata)
+        print("load pointer operand type", type(load_pointer_operand))
+        print("store pointer operand type", type(store_pointer_operand))
+
+        return load_pointer_operand == store_pointer_operand
+
 
     def in_lock_race(self, e: Action, p: Action) -> bool:  # ✅
         return (

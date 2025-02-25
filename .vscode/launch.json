@@ -7,11 +7,5 @@
         
     ],
     "inputs": [
-        {
-            "id": "fileName",
-            "type": "promptString",
-            "description": "Enter File name. It should be in current workspace",
-            "default": "_strcpy.c"
-        }
     ]
 }

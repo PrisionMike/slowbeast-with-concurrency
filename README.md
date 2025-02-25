@@ -2,11 +2,13 @@
 
 Tool used to detect data race in C programs. Uses symbolic execution and SDPOR algorithm for concurent analysis. [Mgr. thesis project by Suyash Shandilya.](https://is.muni.cz/th/n9ib3/)
 
- [Originally](https://gitlab.com/mchalupa/slowbeast) created by Marek Chalupa, in FORMELA, Faculty of Informatics, Masaryk University as a playground for symbolic execution. This fork allows for handling multi-threaded C programs. It's a work in progress, focussing on data race detection for now. But other tasks like reach safety and overflow detection should come for free with it. Soon :)
+ [Originally](https://gitlab.com/mchalupa/slowbeast) created by Marek Chalupa, in FORMELA, Faculty of Informatics, Masaryk University as a playground for symbolic execution. This fork allows for handling multi-threaded C programs. It's a work in progress, focussing on data race detection for now. But other tasks like reach safety and overflow detection should come for free with it. Soon :)  
 
 ## Get Started
 
 Run the `./get-started.sh` script. It builds the docker container and runs a container with the current directory mounted.
+
+**Logical entry point: ./sb-main**
 
 ## How to use:
 
@@ -28,3 +30,5 @@ Run the `./get-started.sh` script. It builds the docker container and runs a con
 - Add an explainer doc for SDPOR, understanding trace, etc.
 - Get going atomic.
 - Setup GitHub actions for docker build and unit tests.
+- Setup linters et al.
+- Switch to dev containers.

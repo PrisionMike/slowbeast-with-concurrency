@@ -1,9 +1,10 @@
 __pycache__
 *.pyc
 *.bc
+*.i
 sb-out
 tests/unit-tests/output-files/*
-tests/tdd/output-files/*
+tests/tdd/other-arrays/output-files/*
 tests/tdd/array-errors/output-files/*
 llvmlite
 .dockerignore

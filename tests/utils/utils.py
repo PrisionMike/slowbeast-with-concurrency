@@ -2,15 +2,12 @@ import yaml
 import subprocess
 
 def evaluate_result(expected_verdict, output):
-    # print("evaluating result")
     for line in output.stdout.splitlines():
         line = line.strip()
         if line == 'Data Race Found: True':
-            print("SS EV:", expected_verdict)
             assert expected_verdict is False
             break
         elif line == 'Data Race Found: False':
-            print("SS EV:", expected_verdict)
             assert expected_verdict is True
             break
 
