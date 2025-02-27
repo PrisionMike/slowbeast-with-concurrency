@@ -2,14 +2,18 @@ import yaml
 import subprocess
 
 def evaluate_result(expected_verdict, output):
+    noresult = True
     for line in output.stdout.splitlines():
         line = line.strip()
         if line == 'Data Race Found: True':
+            noresult = False
             assert expected_verdict is False
             break
         elif line == 'Data Race Found: False':
+            noresult = False
             assert expected_verdict is True
             break
+    assert not noresult
 
 
 def get_verdict(input_file, out_dir):
@@ -21,7 +25,6 @@ def get_verdict(input_file, out_dir):
         prop_file = drr.get("property_file")
         assert prop_file == '../properties/no-data-race.prp'
         expected_verdict = drr.get("expected_verdict")
-        print("SS EV type:", type(expected_verdict))
     out_dir_target = out_dir + target_file.split(".")[0]
 
     return target_file, expected_verdict, out_dir_target

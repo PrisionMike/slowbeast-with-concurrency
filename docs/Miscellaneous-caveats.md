@@ -1,0 +1,1 @@
+- Files created outside the container can be edited from inside **but vice versa is not true**. Only create files from outside the container, which is also the more convenient option. The only files the container should create are the `program.ll` files which are the translation of the input program into llvm, that is then used for analysis.

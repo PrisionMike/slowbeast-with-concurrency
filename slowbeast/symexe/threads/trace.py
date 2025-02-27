@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from pprint import pprint
 from slowbeast.ir.instruction import Instruction
 from slowbeast.ir.instruction import Store, Load, Call, Thread, ThreadJoin, Return
 
@@ -217,13 +218,37 @@ class Trace:
         store_pointer_operand = store_instr.pointer_operand()
         load_metadata = load_instr._metadata
         store_metadata = store_instr._metadata
-        print("load metadata", load_metadata)
-        print("store metadata", store_metadata)
-        print("load pointer operand type", type(load_pointer_operand))
-        print("store pointer operand type", type(store_pointer_operand))
+        lline = self.get_line_no_from_metadata(load_metadata)
+        sline = self.get_line_no_from_metadata(store_metadata)
+        if (sline, lline) == (990,997) or (lline,sline) == (990,997):
+            print("load metadata", load_metadata)
+            print("store metadata", store_metadata)
+            print("load pointer operand type", type(load_pointer_operand))
+            pprint(vars(load_pointer_operand))
+            print("store pointer operand type", type(store_pointer_operand))
+            pprint(vars(store_pointer_operand))
 
         return load_pointer_operand == store_pointer_operand
 
+    def dump_instance(self, obj, indent=0):
+        """Recursively print all attributes of an object line by line."""
+        padding = " " * indent
+        if hasattr(obj, "__dict__"):  # Check if the object has attributes
+            for key, value in vars(obj).items():
+                if hasattr(value, "__dict__"):  # If the attribute is another object, recurse
+                    print(f"{padding}{key}:")
+                    self.dump_instance(value, indent + 4)
+                else:
+                    print(f"{padding}{key}: {value}")
+        else:
+            print(f"{padding}{obj}")  # Print for non-object types
+
+    def get_line_no_from_metadata(self, metadata: list):
+        try:
+            result = metadata[-1][-1][1]
+        except IndexError:
+            result = metadata
+        return result
 
     def in_lock_race(self, e: Action, p: Action) -> bool:  # ✅
         return (
