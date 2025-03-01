@@ -4,6 +4,7 @@ from copy import deepcopy
 from pprint import pprint
 from slowbeast.ir.instruction import Instruction
 from slowbeast.ir.instruction import Store, Load, Call, Thread, ThreadJoin, Return
+from slowbeast.ir.types import PointerType
 
 
 class Action:
@@ -216,32 +217,36 @@ class Trace:
     def points_to_same_location(self, store_instr, load_instr):
         load_pointer_operand = load_instr.pointer_operand()
         store_pointer_operand = store_instr.pointer_operand()
-        load_metadata = load_instr._metadata
-        store_metadata = store_instr._metadata
-        lline = self.get_line_no_from_metadata(load_metadata)
-        sline = self.get_line_no_from_metadata(store_metadata)
-        if (sline, lline) == (990,997) or (lline,sline) == (990,997):
-            print("load metadata", load_metadata)
-            print("store metadata", store_metadata)
-            print("load pointer operand type", type(load_pointer_operand))
-            pprint(vars(load_pointer_operand))
-            print("store pointer operand type", type(store_pointer_operand))
-            pprint(vars(store_pointer_operand))
 
-        return load_pointer_operand == store_pointer_operand
+        load_location = self.resolve_multi_pointers(load_pointer_operand)
+        store_location = self.resolve_multi_pointers(store_pointer_operand)
 
-    def dump_instance(self, obj, indent=0):
-        """Recursively print all attributes of an object line by line."""
-        padding = " " * indent
-        if hasattr(obj, "__dict__"):  # Check if the object has attributes
-            for key, value in vars(obj).items():
-                if hasattr(value, "__dict__"):  # If the attribute is another object, recurse
-                    print(f"{padding}{key}:")
-                    self.dump_instance(value, indent + 4)
-                else:
-                    print(f"{padding}{key}: {value}")
-        else:
-            print(f"{padding}{obj}")  # Print for non-object types
+        return load_location == store_location
+        # load_metadata = load_instr._metadata
+        # store_metadata = store_instr._metadata
+        # lline = self.get_line_no_from_metadata(load_metadata)
+        # sline = self.get_line_no_from_metadata(store_metadata)
+        # if (sline, lline) == (990,997) or (lline,sline) == (990,997):
+        #     print("load metadata", load_metadata)
+        #     print("store metadata", store_metadata)
+        #     print("load pointer operand type", type(load_pointer_operand))
+        #     pprint(vars(load_pointer_operand))
+        #     # print(dir(load_pointer_operand))
+        #     if isinstance(load_pointer_operand, Load):
+        #         print("load pointer was a pointer")
+        #         pprint(vars(load_pointer_operand.pointer_operand()))
+        #     print("store pointer operand type", type(store_pointer_operand))
+        #     pprint(vars(store_pointer_operand))
+        #     if isinstance(store_pointer_operand, Load):
+        #         print("store pointer was a pointer")
+        #         pprint(vars(store_pointer_operand.pointer_operand()))
+
+    def resolve_multi_pointers(self, pointer_op):
+        """Resolves double (or more) pointers"""
+        return_op = pointer_op
+        while isinstance(return_op, Load):
+            return_op = return_op.pointer_operand()
+        return return_op
 
     def get_line_no_from_metadata(self, metadata: list):
         try:
