@@ -221,25 +221,36 @@ class Trace:
         load_location = self.resolve_multi_pointers(load_pointer_operand)
         store_location = self.resolve_multi_pointers(store_pointer_operand)
 
+        load_metadata = load_instr._metadata
+        store_metadata = store_instr._metadata
+        lline = self.get_line_no_from_metadata(load_metadata)
+        sline = self.get_line_no_from_metadata(store_metadata)
+        if (sline, lline) == (685,694) or (lline,sline) == (685,694):
+            print("load metadata", load_metadata)
+            print("store metadata", store_metadata)
+            print("load pointer operand type", type(load_pointer_operand))
+            pprint(vars(load_pointer_operand))
+
+            print("load location", load_location)
+            pprint(vars(load_location))
+
+            # if isinstance(load_pointer_operand, Load):
+            #     print("load pointer was a pointer")
+            #     print(type(load_pointer_operand.pointer_operand()))
+            #     pprint(vars(load_pointer_operand.pointer_operand()))
+            
+            print("store pointer operand type", type(store_pointer_operand))
+            pprint(vars(store_pointer_operand))
+
+            print("store location", store_location)
+            pprint(vars(store_location))
+            
+            # if isinstance(store_pointer_operand, Load):
+            #     print("store pointer was a pointer")
+            #     print(type(store_pointer_operand.pointer_operand()))
+            #     pprint(vars(store_pointer_operand.pointer_operand()))
+        
         return load_location == store_location
-        # load_metadata = load_instr._metadata
-        # store_metadata = store_instr._metadata
-        # lline = self.get_line_no_from_metadata(load_metadata)
-        # sline = self.get_line_no_from_metadata(store_metadata)
-        # if (sline, lline) == (990,997) or (lline,sline) == (990,997):
-        #     print("load metadata", load_metadata)
-        #     print("store metadata", store_metadata)
-        #     print("load pointer operand type", type(load_pointer_operand))
-        #     pprint(vars(load_pointer_operand))
-        #     # print(dir(load_pointer_operand))
-        #     if isinstance(load_pointer_operand, Load):
-        #         print("load pointer was a pointer")
-        #         pprint(vars(load_pointer_operand.pointer_operand()))
-        #     print("store pointer operand type", type(store_pointer_operand))
-        #     pprint(vars(store_pointer_operand))
-        #     if isinstance(store_pointer_operand, Load):
-        #         print("store pointer was a pointer")
-        #         pprint(vars(store_pointer_operand.pointer_operand()))
 
     def resolve_multi_pointers(self, pointer_op):
         """Resolves double (or more) pointers"""
