@@ -18,7 +18,7 @@ def file_id(filename):
 @pytest.mark.parametrize("input_file", get_input_files(), ids=file_id)
 def test_all_units(input_file):
     target_file, expected_verdict, out_dir_target = get_verdict(input_file, OUT_DIR)
-    
+    print(os.getcwd())
     output = run_sb(target_file, out_dir_target, IN_DIR)
     
     write_output_log(out_dir_target, output)

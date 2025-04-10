@@ -32,7 +32,7 @@ def get_verdict(input_file, out_dir):
 
 def run_sb(target_file, out_dir_target, base_dir):
     output = subprocess.run(
-            ["sb-main", base_dir + target_file, "-out-dir", out_dir_target],
+            ["./sb-main", base_dir + target_file, "-out-dir", out_dir_target],
             capture_output=True,
             text=True
         )

@@ -26,7 +26,7 @@
 	// "forwardPorts": [3000],
 
 	// Explore onCreate in future. Refactor this by using the docker file.
-	"postCreateCommand": "/bin/bash -c \"apt update && apt install -y --no-install-recommends llvm llvm-14 llvm-14-dev make build-essential clang-14 && echo 'prerequisites installed' && rm -rf /var/lib/apt/lists/* && pip3 install --user -r requirements.txt && echo 'python packages installed' && ./install-llvmlite.sh\"",
+	"postCreateCommand": "./setup.sh",
 
 
 	// "onCreateCommand": "../install-llvmlite.sh",
