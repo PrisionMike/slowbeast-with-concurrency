@@ -4,8 +4,8 @@ import glob
 
 from tests.utils.utils import *
 
-IN_DIR = os.path.abspath("/app/tests/unit-tests/input-files") + os.sep
-OUT_DIR = os.path.abspath("/app/tests/unit-tests/output-files") + os.sep
+IN_DIR = os.path.abspath("/workspaces/slowbeast-no-data-race/tests/unit-tests/input-files") + os.sep
+OUT_DIR = os.path.abspath("/workspaces/slowbeast-no-data-race/tests/unit-tests/output-files") + os.sep
 
 def get_input_files():
     """Returns file ids for indexing tests"""

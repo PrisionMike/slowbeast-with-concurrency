@@ -2,11 +2,11 @@ FROM python:3-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV HISTFILE=/app/.command-history-docker
-ENV PATH="/app:${PATH}"
-ENV PYTHONPATH='/app'
+ENV HISTFILE=./.command-history-docker
+# ENV PATH="/app:${PATH}"
+ENV PYTHONPATH='./'
 
-WORKDIR /app
+# WORKDIR /app
 
 # Install apt packages. Mostly to get llvmlite running
 RUN apt update && apt install -y --no-install-recommends \
@@ -19,5 +19,5 @@ RUN apt update && apt install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install python modules
-COPY requirements.txt /app/requirements.txt
+# COPY requirements.txt /app/requirements.txt
 RUN python -m pip install -r requirements.txt

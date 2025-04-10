@@ -2,7 +2,7 @@
 touch .command-history-docker
 
 # Build container image
-echo "Buidling docker image.."
+echo "Building docker image.."
 docker build --pull=false -t slowbeastnodatarace:latest -f Dockerfile .
 
 # docker compose run (mounts pwd and enters into docker shell)

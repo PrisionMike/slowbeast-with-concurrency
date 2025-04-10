@@ -1,0 +1,54 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/python
+{
+	"name": "sb-ndr-dev",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+
+	"image": "python:3-slim",
+	"containerEnv": {
+		"PYTHONUNBUFFERED": "1",
+		"PYTHONIOENCODING": "utf-8",
+		"PYTHONDONTWRITEBYTECODE": "1",
+		"PYTHONPATH": "/workspaces/:/workspaces/slowbeast-no-data-race"
+		,"HISTFILE": "/workspaces/.devcontainer/.command-history-docker"
+		// ,"PATH": "/root/.local/lib/python3.13/site-packages"
+	},
+
+	// "build": {
+	// 	"dockerfile": "../Dockerfile",
+	// 	"context": ".."
+	// },
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [3000],
+
+	// Explore onCreate in future. Refactor this by using the docker file.
+	"postCreateCommand": "/bin/bash -c \"apt update && apt install -y --no-install-recommends llvm llvm-14 llvm-14-dev make build-essential clang-14 && echo 'prerequisites installed' && rm -rf /var/lib/apt/lists/* && pip3 install --user -r requirements.txt && echo 'python packages installed' && ./install-llvmlite.sh\"",
+
+
+	// "onCreateCommand": "../install-llvmlite.sh",
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.debugpy",
+				"ms-python.vscode-pylance"
+			],
+
+			"settings": {
+				"python.languageServer": "Pylance",
+				"terminal.integrated.shell.linux": "/bin/bash"
+			}
+		}
+	},
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	"remoteUser": "root"
+
+	
+}
