@@ -2,10 +2,14 @@
 
 - Python SAST checker to detect possible data races in multi-threaded C programs.Uses [Partial order reduction](https://www.researchgate.net/publication/262352623_Optimal_Dynamic_Partial_Order_Reduction) in Symbolic execution. [Mgr. thesis project by Suyash Shandilya.](https://is.muni.cz/th/n9ib3/)
 
-- [Originally](https://gitlab.com/mchalupa/slowbeast) created by Marek Chalupa at FORMELA, Faculty of Informatics, Masaryk University, as a playground for symbolic execution, this fork extends support for multi-threaded C programs. Currently a work in progress, it focuses on **data race detection**, with additional properties like **reachability analysis** and **overflow detection** expected to follow soon. 🙂
-  
+- [Originally](https://gitlab.com/mchalupa/slowbeast) created by Marek Chalupa at FORMELA, Faculty of Informatics, Masaryk University, as a playground for symbolic execution, this fork extends support for multi-threaded C programs. Currently a work in progress, it focuses on **data race detection**, with additional properties like **reachability analysis** and **overflow detection** expected to follow soon. 🙂  
 
-## Get Started
+Recently moved to devcontainer. To get started it should just be to clone and open a devcontainer in vscode. Don't follow the steps below. the get-started.sh script is likely moot now.
+
+---
+
+## Get Started (UNUPDATED DON'T FOLLOW)
+
 
 - Run the `./get-started.sh` script. It builds the docker container and runs a container with the current directory mounted.
 
