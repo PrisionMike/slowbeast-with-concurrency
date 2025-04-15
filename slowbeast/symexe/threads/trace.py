@@ -160,7 +160,7 @@ class Trace:
         )
 
     def unlock_causality(self, e: Action, p: Action) -> bool:
-        """NOTE: Unlock "happens before" the next instruction after Lock.
+        """NOTE: Unlock "happens before" the NEXT instruction after Lock.
         Lock instructions are enabled regardless of lock being acquired.
         Instructions ahead are paused untill lock is acquired, ergo they
         relate to the unlock event.
@@ -203,7 +203,7 @@ class Trace:
                     break
         return False
 
-    def in_data_race(self, e: Action, p: Action) -> bool:  # ✅
+    def in_data_race(self, e: Action, p: Action) -> bool:
         instr1 = e.instr
         instr2 = p.instr
         if isinstance(instr1, Store) or isinstance(instr2, Store):
@@ -225,31 +225,6 @@ class Trace:
         store_metadata = store_instr._metadata
         lline = self.get_line_no_from_metadata(load_metadata)
         sline = self.get_line_no_from_metadata(store_metadata)
-        if (sline, lline) == (685,694) or (lline,sline) == (685,694):
-            print("load metadata", load_metadata)
-            print("store metadata", store_metadata)
-            print("load pointer operand type", type(load_pointer_operand))
-            pprint(vars(load_pointer_operand))
-
-            print("load location", load_location)
-            pprint(vars(load_location))
-
-            # if isinstance(load_pointer_operand, Load):
-            #     print("load pointer was a pointer")
-            #     print(type(load_pointer_operand.pointer_operand()))
-            #     pprint(vars(load_pointer_operand.pointer_operand()))
-            
-            print("store pointer operand type", type(store_pointer_operand))
-            pprint(vars(store_pointer_operand))
-
-            print("store location", store_location)
-            pprint(vars(store_location))
-            
-            # if isinstance(store_pointer_operand, Load):
-            #     print("store pointer was a pointer")
-            #     print(type(store_pointer_operand.pointer_operand()))
-            #     pprint(vars(store_pointer_operand.pointer_operand()))
-        
         return load_location == store_location
 
     def resolve_multi_pointers(self, pointer_op):
