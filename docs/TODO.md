@@ -1,4 +1,6 @@
 
+Use trello instead: https://trello.com/b/E5n2Butp/slowbeast-weekly
+
 ### TODO
 
 - UPDATE README.
