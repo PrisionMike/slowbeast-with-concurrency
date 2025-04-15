@@ -10,26 +10,13 @@
 		"PYTHONIOENCODING": "utf-8",
 		"PYTHONDONTWRITEBYTECODE": "1",
 		"PYTHONPATH": "/workspaces/:/workspaces/slowbeast-no-data-race"
-		,"HISTFILE": "/workspaces/.devcontainer/.command-history-docker"
+		,"HISTFILE": "/workspaces/:/workspaces/slowbeast-no-data-race/.devcontainer/.command-history-docker"
+		,"PS1": "root@devcontainer# "
 		// ,"PATH": "/root/.local/lib/python3.13/site-packages"
 	},
 
-	// "build": {
-	// 	"dockerfile": "../Dockerfile",
-	// 	"context": ".."
-	// },
-
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [3000],
-
 	// Explore onCreate in future. Refactor this by using the docker file.
-	"postCreateCommand": "./setup.sh",
-
-
-	// "onCreateCommand": "../install-llvmlite.sh",
+	"postCreateCommand": "pwd && ./setup.sh",
 
 	// Configure tool-specific properties.
 	"customizations": {
@@ -47,8 +34,6 @@
 		}
 	},
 
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	"remoteUser": "root"
 
-	
 }
