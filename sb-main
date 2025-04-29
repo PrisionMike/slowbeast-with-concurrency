@@ -497,12 +497,13 @@ def main():
         print("Entry function not found: {0}".format(args.entry))
         sys_exit(1)
 
-    has_threads = not args.forbid_threads and parser.created_thread_fun()
-    assert (
-        not has_threads
-        or P.fun("pthread_create") is not None
-        or P.fun("thrd_create") is not None
-    )
+    # has_threads = not args.forbid_threads and parser.created_thread_fun()
+    has_threads = True #FIXME: Only for concurrency development. To force SDPOR interpreter.
+    # assert (
+    #     not has_threads
+    #     or P.fun("pthread_create") is not None
+    #     or P.fun("thrd_create") is not None
+    # )
     testgen = None
     if not args.no_output:
         try:

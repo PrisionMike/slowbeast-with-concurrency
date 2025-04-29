@@ -17,6 +17,7 @@ Recently moved to devcontainer. To get started it should just be to clone and op
 
 - Running the `./get-started.sh` creates a bash terminal inside the docker container (tagged: `slowbeastnodatarace:latest`). This is considered the default mode of operation. 
 - The `sb-main` is the main entrypoint of all the analysis. Simple `sb-main <input-file>` should default to using the right parameters. The line `Data Race Found: False` is the main value to be read. It will be printed regardless of the completion of analysis so the final result is only valid if there are no KILLED paths.
+    - Line 500/501 `has_threads` variable set to `True` to force the interpreter to be the current intended one.
 - TDD Friendly project. Refer to the [testing doc](docs/Testing.md) to get started.
 <!-- - `benchexec-dir\slowbeast.py` is the main file that will evaluate the output of the `sb-main <input file>` command when running [benchexec](https://github.com/sosy-lab/benchexec).  -->
 

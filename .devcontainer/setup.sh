@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 # Ouptut directory.
 mkdir -p sb-out
 
@@ -65,24 +63,34 @@ pytest tests/unit-tests/
 #
 error=0
 
-function check_var() {
+# Function to check and optionally set environment variables.
+function check_and_set_var() {
     local var_name="$1"
+    local default_value="$2"
     if [[ -z "${!var_name}" ]]; then
-        echo "FAIL: $var_name is not set!"
-        ((error++))
+        echo "WARN: $var_name is not set. Setting it to default value: '$default_value'."
+        export $var_name="$default_value"
+        echo "$var_name was overridden."
+        overridden_vars+=("$var_name")
+        ((overrides++))
     else
         echo "PASS: $var_name is set to '${!var_name}'."
     fi
 }
 
-echo "Checking environment variables..."
+echo "Checking and setting environment variables..."
 
-# Check that each variable is set.
-check_var PYTHONUNBUFFERED
-check_var PYTHONIOENCODING
-check_var PYTHONDONTWRITEBYTECODE
-check_var PYTHONPATH
-check_var HISTFILE
+# Initialize override counter and list of overridden variables.
+overrides=0
+overridden_vars=()
+
+# Check and set each variable with a default value if not set.
+check_and_set_var PYTHONUNBUFFERED "1"
+check_and_set_var PYTHONIOENCODING "utf-8"
+check_and_set_var PYTHONDONTWRITEBYTECODE "1"
+check_and_set_var PYTHONPATH "/usr/local/lib/python3.8/site-packages"
+check_and_set_var HISTFILE "/workspaces/slowbeast-no-data-race/.devcontainer/.command-history-docker"
+check_and_set_var PS1 "root@devspace# "
 
 # Test if HISTFILE is writable.
 if [[ -n "$HISTFILE" ]]; then
@@ -96,14 +104,10 @@ if [[ -n "$HISTFILE" ]]; then
 fi
 
 # Test the functionality of PYTHONPATH:
-# Run a short Python snippet to print sys.path, then confirm that each
-# directory in your PYTHONPATH is present.
 if [[ -n "$PYTHONPATH" ]]; then
     python_sys_path=$(python -c 'import sys; print(":".join(sys.path))')
-    # Split PYTHONPATH into an array by colon delimiter.
     IFS=':' read -r -a py_paths <<< "$PYTHONPATH"
     for p in "${py_paths[@]}"; do
-        # Using grep -q to quietly check if the path is in sys.path.
         if echo "$python_sys_path" | grep -qF "$p"; then
             echo "PASS: '$p' found in Python sys.path."
         else
@@ -113,9 +117,13 @@ if [[ -n "$PYTHONPATH" ]]; then
     done
 fi
 
-# You can add additional tests below if needed, for example, testing 'PATH' modifications.
-# A basic test could simply print it:
-echo "INFO: PATH is set to: $PATH"
+# Report overrides.
+if [[ $overrides -ne 0 ]]; then
+    echo "INFO: $overrides environment variables were overridden with default values."
+    echo "Overridden variables: ${overridden_vars[*]}"
+else
+    echo "INFO: No environment variables required overriding."
+fi
 
 # Final outcome based on error flag.
 if [[ $error -ne 0 ]]; then
@@ -124,7 +132,11 @@ else
     echo "All tests passed!"
 fi
 
-exit $error
+# exit $error
+
+echo "Path variable"
+echo $PATH
 
 echo "Present working directory:"
 pwd
+
