@@ -44,23 +44,6 @@ export PATH=/root/.local/bin:$PATH
 echo "Running Unit tests..."
 pytest tests/unit-tests/
 
-# echo "Verify PATH please..."
-# echo $PATH
-
-# ---------
-
-# This script tests if specific environment variables in your devcontainer
-# are set correctly and, where applicable, function as expected.
-#
-# The tested variables include:
-#   - PYTHONUNBUFFERED: Should be set (typically "1").
-#   - PYTHONIOENCODING: Should be set (usually "utf-8").
-#   - PYTHONDONTWRITEBYTECODE: Should be set ("1" to disable writing .pyc files).
-#   - PYTHONPATH: Checks that the paths listed here appear in sys.path.
-#   - HISTFILE: Checks that it's set and writable.
-#
-# Note: PS1 isn't tested because its behavior is visible on container startup.
-#
 error=0
 
 # Function to check and optionally set environment variables.
@@ -69,7 +52,7 @@ function check_and_set_var() {
     local default_value="$2"
     if [[ -z "${!var_name}" ]]; then
         echo "WARN: $var_name is not set. Setting it to default value: '$default_value'."
-        export $var_name="$default_value"
+        echo "export PS1='\\u@devspace:\\w\\$ '" >> /etc/bash.bashrc
         echo "$var_name was overridden."
         overridden_vars+=("$var_name")
         ((overrides++))

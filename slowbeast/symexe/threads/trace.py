@@ -1,19 +1,21 @@
-from __future__ import annotations
-
+from typing import (
+    Self,
+    Set
+)
 from copy import deepcopy
-from pprint import pprint
 from slowbeast.ir.instruction import Instruction
 from slowbeast.ir.instruction import Store, Load, Call, Thread, ThreadJoin, Return
-from slowbeast.ir.types import PointerType
+# from slowbeast.ir.types import PointerType
 
 
 class Action:
     def __init__(self, tid: int | None, instr: Instruction | None):
         self.tid = tid
-        self.instr = instr
         self.occurrence: int | None = None
-        self.causes: set(Self) = set()
-        self.caused_by: set(Self) = set()
+        self.occurrence: int | None = None
+        self.causes: Set[Self] = set()
+        self.caused_by: Set[Self] = set()
+        self.instr = instr
 
 
 class Trace:
@@ -58,31 +60,37 @@ class Trace:
     def get_racist_set(self):
         return self._racist[-1]
 
-    def get_backtrack(self, action: Action | None = None) -> set(int):
+    def get_backtrack(self, action: Action | None = None) -> Set[int]:
         """Returns backtrack for the last action
         (= current trace) or backtrack of the PREFIX
         of the requested action"""
+        backtrack = self._backtrack[-1]
         if action is None:
-            return self._backtrack[-1]
-        return self._backtrack[self._sequence.index(action)]
+            backtrack = self._backtrack[-1]
+        else:
+            backtrack = self._backtrack[self._sequence.index(action)]
+        assert backtrack is not None, "Backtrack should not be None"
+        return backtrack
 
-    def set_occurrence(self, act: Action) -> None:  # ✅
+    def set_occurrence(self, act: Action) -> None:
         for e in reversed(self._sequence):
+            assert e.occurrence is not None, "Unknown behaviour"
             if e.tid == act.tid:
                 act.occurrence = e.occurrence + 1
                 break
         if act.occurrence is None:
             act.occurrence = 1
 
-    def add_to_prefix_backtrack(self, action: Action, thread: int) -> None:  # ✅
+    def add_to_prefix_backtrack(self, action: Action, thread: int) -> None:
+        # Remove try-except block. Likely just needs None handling.
         try:
-            self._backtrack[self._sequence.index(action)].add(thread)
+            self._backtrack[self._sequence.index(action)].add(thread) # type: ignore
         except ValueError:
-            self._backtrack[self.index(action)].add(thread)
+            self._backtrack[self.index(action)].add(thread) # type: ignore
 
-    def independent_suffix_set(self, action: Action) -> set(int):  # ✅
+    def independent_suffix_set(self, action: Action) -> Set[int]:  # ✅
         """The I_{E'.e}(notdep(e,E).p) for e."""
-        isfset = set()
+        isfset: Set[int] = set()
         initial_index = self._sequence.index(action) + 1
         initial_set = set(self._sequence[initial_index:])
         e_causes = self.get_causes(action)
@@ -92,12 +100,13 @@ class Trace:
         for e in suffix_set:
             if not e_caused_by.intersection(suffix_set):
                 # print(e)
+                assert e.tid is not None, "Unknown behaviour"
                 isfset.add(e.tid)
         return isfset
 
-    def get_causes(self, e: Action):
+    def get_causes(self, e: Action) -> Set[Action]:
         """Returns transivitively closed set of causal successors"""
-        successors = set()
+        successors : Set[Action] = set()
 
         stack = [e]
         while stack:
@@ -109,9 +118,9 @@ class Trace:
 
         return successors
 
-    def get_caused_by(self, e: Action):
+    def get_caused_by(self, e: Action) -> Set[Action]:
         """Returns transivitively closed set of causal predecessors"""
-        predecessors = set()
+        predecessors: Set[Action] = set()
 
         stack = [e]
         while stack:
@@ -128,7 +137,7 @@ class Trace:
         p = self._sequence[-1]
         for e in reversed(self._sequence[:-1]):
             if e.tid == p.tid:
-                if e.occurrence + 1 == p.occurrence:
+                if e.occurrence + 1 == p.occurrence:    # type: ignore
                     self.set_happens_before(e, p)
             elif self.in_data_race(e, p):
                 if self.update_race(e, p):
@@ -145,6 +154,7 @@ class Trace:
         """Returns True if race is updated"""
         e_causes = self.get_causes(e)
         if p not in e_causes:
+            assert self._racist[-1] is not None, "Racist set should not be None"
             self._racist[-1].add(e)
             return True
         else:
@@ -165,19 +175,20 @@ class Trace:
         Instructions ahead are paused untill lock is acquired, ergo they
         relate to the unlock event.
         CHECK LOCK SUCCESS."""
-
+        assert p.occurrence is not None, "Unknown behaviour"
         if (
             isinstance(e.instr, Call)
-            and e.instr.called_function().name() == "pthread_mutex_unlock"
+            and e.instr.called_function().name() == "pthread_mutex_unlock"  # type: ignore (legacy)
         ):
             for j in reversed(self._sequence):
+                assert j.occurrence is not None, "Unknown behaviour"
                 if (
                     j.tid == p.tid
                     and j.occurrence + 1 == p.occurrence
                     and isinstance(j.instr, Call)
-                    and j.instr.called_function().name() == "pthread_mutex_lock"
+                    and j.instr.called_function().name() == "pthread_mutex_lock" # type: ignore (legacy)
                     and j.instr.succ
-                    and e.instr.operand(0) == j.instr.operand(0)
+                    and e.instr.operand(0) == j.instr.operand(0) # type: ignore (legacy)
                 ):
                     return True
                 if j.tid == p.tid and j.occurrence < p.occurrence - 1:
@@ -186,21 +197,22 @@ class Trace:
 
     def fork_causality(self, e: Action, p: Action) -> bool:
         if isinstance(e.instr, Thread):
-            if e.instr._operand_tid == p.tid and p.occurrence == 1:
+            if e.instr.get_operand_tid() == p.tid and p.occurrence == 1:
                 return True
         return False
 
     def join_causality(self, e: Action, p: Action) -> bool:
+        assert p.occurrence is not None, "Unknown behaviour"
         if isinstance(e.instr, Return):
             for j in reversed(self._sequence):
+                assert j.occurrence is not None, "Unknown behaviour"
                 if (
                     j.tid == p.tid
                     and j.occurrence == p.occurrence - 1
                     and isinstance(j.instr, ThreadJoin)
-                    and j.instr._operand_tid == e.tid
+                    and j.instr.get_operand_tid() == e.tid
                 ):
                     return True
-                    break
         return False
 
     def in_data_race(self, e: Action, p: Action) -> bool:
@@ -211,43 +223,44 @@ class Trace:
                 (instr1, instr2) if isinstance(instr1, Store) else (instr2, instr1)
             )
             if isinstance(load_instr, Load) or isinstance(load_instr, Store):
-                return self.points_to_same_location(store_instr, load_instr)
+                return self.points_to_same_location(store_instr, load_instr) # type: ignore TODO
         return False
 
-    def points_to_same_location(self, store_instr, load_instr):
-        load_pointer_operand = load_instr.pointer_operand()
-        store_pointer_operand = store_instr.pointer_operand()
+    def points_to_same_location(self, store_instr: Store, load_instr: Load) -> bool:
+        """Checks if store and load point to the same location"""
+        load_pointer_operand = load_instr.pointer_operand() # type: ignore
+        store_pointer_operand = store_instr.pointer_operand() # type: ignore
 
-        load_location = self.resolve_multi_pointers(load_pointer_operand)
-        store_location = self.resolve_multi_pointers(store_pointer_operand)
+        load_location = self.resolve_multi_pointers(load_pointer_operand) # type: ignore
+        store_location = self.resolve_multi_pointers(store_pointer_operand) # type: ignore
 
-        load_metadata = load_instr._metadata
-        store_metadata = store_instr._metadata
-        lline = self.get_line_no_from_metadata(load_metadata)
-        sline = self.get_line_no_from_metadata(store_metadata)
-        return load_location == store_location
+        load_metadata = load_instr._metadata # type: ignore
+        store_metadata = store_instr._metadata # type: ignore
+        # lline = self.get_line_no_from_metadata(load_metadata) # type: ignore
+        # sline = self.get_line_no_from_metadata(store_metadata) # type: ignore
+        return load_location == store_location # type: ignore
 
-    def resolve_multi_pointers(self, pointer_op):
+    def resolve_multi_pointers(self, pointer_op): # type: ignore
         """Resolves double (or more) pointers"""
-        return_op = pointer_op
+        return_op = pointer_op # type: ignore
         while isinstance(return_op, Load):
-            return_op = return_op.pointer_operand()
-        return return_op
+            return_op = return_op.pointer_operand() # type: ignore
+        return return_op # type: ignore
 
-    def get_line_no_from_metadata(self, metadata: list):
-        try:
-            result = metadata[-1][-1][1]
-        except IndexError:
-            result = metadata
-        return result
+    # def get_line_no_from_metadata(self, metadata: list):
+    #     try:
+    #         result = metadata[-1][-1][1]
+    #     except IndexError:
+    #         result = metadata
+    #     return result
 
     def in_lock_race(self, e: Action, p: Action) -> bool:  # ✅
         return (
             isinstance(e.instr, Call)
             and isinstance(p.instr, Call)
-            and e.instr.called_function().name() == "pthread_mutex_lock"
-            and p.instr.called_function().name() == "pthread_mutex_lock"
-            and e.instr.operand(0) == p.instr.operand(0)
+            and e.instr.called_function().name() == "pthread_mutex_lock" # type: ignore (legacy)
+            and p.instr.called_function().name() == "pthread_mutex_lock" # type: ignore (legacy)
+            and e.instr.operand(0) == p.instr.operand(0) # type: ignore (legacy)
             and e.instr.succ  # LOCK ACQUIRED SUCCESSFULLY.
             and p.instr.succ  # LOCK ACQUIRED SUCCESSFULLY.
         )
@@ -258,6 +271,7 @@ class Trace:
         p.caused_by.add(e)
 
     def terminal_thread(self) -> int:
+        assert self._sequence[-1].tid is not None, "Unknown behaviour"
         return self._sequence[-1].tid
 
     def __len__(self):

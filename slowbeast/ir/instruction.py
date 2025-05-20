@@ -440,6 +440,10 @@ class Thread(Call):
         r += ", ".join(map(lambda x: x.as_value(), self.operands()))
         return r + f") -> {self._type}"
 
+    def get_operand_tid(self) -> int:
+        assert self._operand_tid is not None, "Thread operand tid not set"
+        return self._operand_tid
+    
 
 class ThreadJoin(ValueTypedInstruction):
     def __init__(self, ty, ops, optypes) -> None:
@@ -454,6 +458,9 @@ class ThreadJoin(ValueTypedInstruction):
         r += ", ".join(map(lambda x: x.as_value(), self.operands()))
         return r + ")"
 
+    def get_operand_tid(self) -> int:
+        assert self._operand_tid is not None, "ThreadJoin operand tid not set"
+        return self._operand_tid
 
 class Print(Instruction):
     def __init__(self, *operands) -> None:

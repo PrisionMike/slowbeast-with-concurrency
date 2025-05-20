@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 # from copy import deepcopy
 from sys import setrecursionlimit
 
@@ -9,6 +7,10 @@ from slowbeast.symexe.threads.state import TSEState
 from slowbeast.interpreter.interpreter import GlobalInit
 
 from slowbeast.core.errors import MemError
+
+from typing import (
+    Set,
+)
 
 # from slowbeast.ir.instruction import Branch
 
@@ -80,7 +82,7 @@ class SPORSymbolicInterpreter(SymbolicInterpreter):
             )
         # print(self.log_trace)
 
-    def explore(self, state: TSEState, sleep: set) -> None:
+    def explore(self, state: TSEState, sleep: Set[int]) -> None:
         """Source - DPOR"""
 
         if self.data_race:
