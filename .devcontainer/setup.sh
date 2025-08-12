@@ -6,18 +6,12 @@ mkdir -p sb-out
 # SHOULD BE DOCKERIZED
 
 apt update
-apt install -y \
-    --no-install-recommends \
-    llvm \
-    llvm-14 \
-    llvm-14-dev \
-    make \
-    build-essential \
-    clang-14 \
+apt install -y --no-install-recommends \
+  llvm llvm-14 llvm-14-dev make build-essential clang-14
 
 rm -rf /var/lib/apt/lists/*
 
-pip3 install --user -r requirements.txt
+python3 -m pip install --no-cache-dir -r requirements.txt
 
 # Post creation commands
 
@@ -33,13 +27,11 @@ echo "Attempting installation..."
 
 cd llvmlite
 python setup.py build
+# python3 -m pip install -e ./llvmlite
 cd ..
 
 echo "Testing llvm installation.."
 python ./tests/test-z3-installation.py
-
-echo "Adding python site packages to path..."
-export PATH=/root/.local/bin:$PATH
 
 echo "Running Unit tests..."
 pytest tests/unit-tests/
@@ -52,7 +44,6 @@ function check_and_set_var() {
     local default_value="$2"
     if [[ -z "${!var_name}" ]]; then
         echo "WARN: $var_name is not set. Setting it to default value: '$default_value'."
-        echo "export PS1='\\u@devspace:\\w\\$ '" >> /etc/bash.bashrc
         echo "$var_name was overridden."
         overridden_vars+=("$var_name")
         ((overrides++))
@@ -73,7 +64,6 @@ check_and_set_var PYTHONIOENCODING "utf-8"
 check_and_set_var PYTHONDONTWRITEBYTECODE "1"
 check_and_set_var PYTHONPATH "/usr/local/lib/python3.8/site-packages"
 check_and_set_var HISTFILE "/workspaces/slowbeast-no-data-race/.devcontainer/.command-history-docker"
-check_and_set_var PS1 "root@devspace# "
 
 # Test if HISTFILE is writable.
 if [[ -n "$HISTFILE" ]]; then
@@ -116,6 +106,27 @@ else
 fi
 
 # exit $error
+
+# Persist prompt + HOME for root
+if ! grep -q "DEVSPACE START" /root/.bashrc 2>/dev/null; then
+  cat >> /root/.bashrc <<'RC'
+# --- DEVSPACE START ---
+# Make workspace behave like ~ for root
+export HOME="/workspaces/slowbeast-no-data-race"
+cd "$HOME" 2>/dev/null || true
+
+# Prompt: root@devspace:/path$
+export PS1='\u@devspace:\w\$ '
+# Trim long paths in the prompt (optional)
+export PROMPT_DIRTRIM=3
+
+# Keep history inside the repo (optional; matches your script)
+export HISTFILE="$HOME/.devcontainer/.command-history-docker"
+mkdir -p "$(dirname "$HISTFILE")"; touch "$HISTFILE"
+# --- DEVSPACE END ---
+RC
+fi
+
 
 echo "Path variable"
 echo $PATH

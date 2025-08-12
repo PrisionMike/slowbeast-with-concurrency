@@ -98,7 +98,7 @@ def _bitwidth(ty: Sized) -> Optional[int]:
         return None
 
 
-def is_pointer_ty(ty: str) -> bool:
+def is_pointer_ty(ty: str) -> bool: # This might need fixing.
     if isinstance(ty, str):
         return ty[-1] == "*"
 

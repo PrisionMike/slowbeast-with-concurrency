@@ -234,8 +234,8 @@ class Trace:
         load_location = self.resolve_multi_pointers(load_pointer_operand) # type: ignore
         store_location = self.resolve_multi_pointers(store_pointer_operand) # type: ignore
 
-        load_metadata = load_instr._metadata # type: ignore
-        store_metadata = store_instr._metadata # type: ignore
+        # load_metadata = load_instr._metadata # type: ignore
+        # store_metadata = store_instr._metadata # type: ignore
         # lline = self.get_line_no_from_metadata(load_metadata) # type: ignore
         # sline = self.get_line_no_from_metadata(store_metadata) # type: ignore
         return load_location == store_location # type: ignore
@@ -243,8 +243,11 @@ class Trace:
     def resolve_multi_pointers(self, pointer_op): # type: ignore
         """Resolves double (or more) pointers"""
         return_op = pointer_op # type: ignore
-        while isinstance(return_op, Load):
-            return_op = return_op.pointer_operand() # type: ignore
+        while isinstance(return_op, Load) or isinstance(return_op, Store):
+            if isinstance(return_op, Load):
+                return_op = return_op.pointer_operand() # type: ignore
+            else:
+                pass
         return return_op # type: ignore
 
     # def get_line_no_from_metadata(self, metadata: list):

@@ -1,3 +1,4 @@
+# DEPRECATED. I think.
 # Saves the command history of the usage inside the container
 touch .command-history-docker
 
